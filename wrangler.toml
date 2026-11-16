@@ -1,0 +1,5 @@
+name = "dien-dan-10a4"
+compatibility_date = "2026-11-16"
+
+[site]
+bucket = "."
