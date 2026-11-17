@@ -3,270 +3,591 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diễn đàn Lớp 10A4 - THPT Hùng Vương</title>
-  <!-- Thư viện Supabase JS Client -->
+  <title>Diễn Đàn Học Tập Lớp 10A4 - THPT Hùng Vương</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
-    .container { max-width: 800px; margin: 0 auto; background: #1e293b; padding: 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-    h1 { text-align: center; color: #38bdf8; margin-bottom: 20px; font-size: 24px; }
-    
-    /* Khu vực đăng nhập / Đăng ký */
-    #auth-section, #forum-section { display: none; }
-    .active-section { display: block !important; }
-    
-    input, select, textarea, button { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 14px; }
-    button { background: #0ea5e9; color: white; border: none; font-weight: bold; cursor: pointer; transition: background 0.2s; }
-    button:hover { background: #0284c7; }
-    
-    /* Bài đăng & tìm kiếm */
-    .post-card { background: #334155; padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #38bdf8; }
-    .post-header { display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
-    .post-content { font-size: 15px; margin-bottom: 10px; line-height: 1.5; word-break: break-word; }
-    .attachment-preview { margin-top: 8px; }
-    .attachment-preview img { max-width: 100%; border-radius: 6px; max-height: 250px; }
-    .attachment-preview a { color: #38bdf8; text-decoration: none; font-size: 13px; display: inline-block; margin-top: 4px; }
-    
-    .user-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #334155; padding: 10px 16px; border-radius: 8px; }
-    .logout-btn { background: #ef4444; width: auto; padding: 6px 12px; margin: 0; }
-    .logout-btn:hover { background: #dc2626; }
+    :root {
+      --bg-main: #0b1120;
+      --bg-card: #1e293b;
+      --bg-input: #0f172a;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 50px; }
+
+    /* Header Navbar */
+    .navbar {
+      background: rgba(30, 41, 59, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--accent); }
+    .brand span { font-size: 12px; background: rgba(56, 189, 248, 0.15); padding: 3px 8px; border-radius: 99px; color: #7dd3fc; }
+
+    .container { max-width: 860px; margin: 24px auto; padding: 0 16px; }
+
+    /* Auth Box */
+    .auth-box {
+      max-width: 420px;
+      margin: 60px auto;
+      background: var(--bg-card);
+      padding: 32px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .auth-box h2 { text-align: center; margin-bottom: 8px; color: var(--accent); }
+    .auth-box p { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+
+    /* Inputs & Buttons */
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-main);
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+
+    button {
+      padding: 11px 18px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-primary { background: var(--accent); color: #0f172a; width: 100%; }
+    .btn-primary:hover { background: var(--accent-hover); color: white; }
+    .btn-success { background: var(--success); color: white; width: 100%; }
+    .btn-success:hover { opacity: 0.9; }
+    .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); padding: 6px 12px; font-size: 12px; }
+    .btn-danger:hover { background: var(--danger); color: white; }
+    .btn-ghost { background: transparent; color: var(--text-muted); padding: 6px 10px; border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text-main); border-color: var(--text-muted); }
+
+    /* Stats Bar */
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: var(--bg-card); padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .stat-card span { color: var(--text-muted); font-size: 13px; }
+    .stat-card strong { font-size: 20px; color: var(--accent); }
+
+    /* Create Post Card */
+    .create-card { background: var(--bg-card); padding: 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 24px; }
+    .create-header { font-weight: 600; margin-bottom: 14px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    .form-row { display: flex; gap: 12px; }
+    .file-upload-box {
+      border: 1px dashed var(--border);
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      background: rgba(15, 23, 42, 0.5);
+    }
+    .file-upload-box label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px; cursor: pointer; }
+    .file-upload-box input[type="file"] { margin-bottom: 0; padding: 6px; border: none; background: transparent; }
+
+    /* Filter Bar */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      background: var(--bg-card);
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .filter-bar input { flex: 2; min-width: 200px; margin-bottom: 0; }
+    .filter-bar select { flex: 1; min-width: 140px; margin-bottom: 0; }
+
+    /* Post Item */
+    .post-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: transform 0.15s;
+    }
+    .post-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .author-info { display: flex; align-items: center; gap: 10px; }
+    .avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      color: #0f172a; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 15px;
+    }
+    .author-name { font-weight: 600; font-size: 14px; display: block; }
+    .post-meta { font-size: 12px; color: var(--text-muted); }
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 11px; font-weight: 600;
+      background: rgba(56, 189, 248, 0.15); color: var(--accent); margin-left: 6px;
+    }
+
+    .post-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: #f1f5f9; }
+    .post-body { font-size: 14.5px; color: #cbd5e1; white-space: pre-wrap; word-break: break-word; margin-bottom: 14px; }
+
+    /* Attachment */
+    .attachment-box { margin-bottom: 14px; }
+    .attachment-box img { max-width: 100%; max-height: 360px; border-radius: 10px; border: 1px solid var(--border); display: block; }
+    .file-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--bg-input); border: 1px solid var(--border);
+      padding: 10px 14px; border-radius: 10px; color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 500;
+    }
+    .file-pill:hover { border-color: var(--accent); }
+
+    /* Actions (Like & Comment) */
+    .post-actions {
+      display: flex; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border);
+    }
+    .action-btn {
+      background: transparent; color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 13px;
+    }
+    .action-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+    .action-btn.liked { color: #f43f5e; background: rgba(244, 63, 94, 0.1); }
+
+    /* Comments Section */
+    .comments-area {
+      margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border);
+      background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 10px;
+    }
+    .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid rgba(51, 65, 85, 0.5); }
+    .comment-item:last-child { border-bottom: none; }
+    .comment-author { font-weight: 600; color: var(--accent); margin-right: 6px; }
+    .comment-form { display: flex; gap: 8px; margin-top: 10px; }
+    .comment-form input { margin-bottom: 0; padding: 8px 12px; font-size: 13px; }
+    .comment-form button { padding: 8px 14px; width: auto; }
+
+    .hidden { display: none !important; }
+    #loading-overlay { text-align: center; padding: 30px; color: var(--text-muted); }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h1>🎓 Diễn đàn Lớp 10A4 - THPT Hùng Vương</h1>
+  <!-- THANH ĐIỀU HƯỚNG -->
+  <nav class="navbar">
+    <div class="brand">
+      🎓 DIỄN ĐÀN 10A4 <span>THPT Hùng Vương</span>
+    </div>
+    <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 12px;">
+      <span id="display-username" style="font-size: 13px; color: #cbd5e1;"></span>
+      <button class="btn-danger" onclick="handleLogout()">Đăng xuất</button>
+    </div>
+  </nav>
 
-    <!-- PHẦN ĐĂNG NHẬP / ĐĂNG KÝ -->
-    <div id="auth-section" class="active-section">
-      <h3 style="margin-bottom: 12px; text-align: center; color: #cbd5e1;">Đăng nhập / Đăng ký tài khoản lớp</h3>
-      <input type="email" id="email" placeholder="Nhập Email học sinh (VD: thailocphuc@gmail.com)" />
-      <input type="password" id="password" placeholder="Mật khẩu" />
-      <div style="display: flex; gap: 10px;">
-        <button onclick="handleLogin()">Đăng nhập</button>
-        <button onclick="handleSignUp()" style="background: #10b981;">Đăng ký mới</button>
+  <!-- MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ -->
+  <div id="auth-view" class="container">
+    <div class="auth-box">
+      <h2>Chào mừng đến 10A4</h2>
+      <p>Đăng nhập để chia sẻ tài liệu & thảo luận bài tập cùng lớp</p>
+      <input type="email" id="auth-email" placeholder="Email của bạn (VD: tenban@gmail.com)" />
+      <input type="password" id="auth-password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" />
+      <div style="display: flex; gap: 10px; margin-top: 6px;">
+        <button class="btn-primary" onclick="handleLogin()">Đăng nhập</button>
+        <button class="btn-success" onclick="handleSignUp()">Đăng ký</button>
       </div>
-      <p id="auth-error" style="color: #ef4444; font-size: 13px; text-align: center; margin-top: 10px;"></p>
+      <p id="auth-msg" style="color: var(--danger); margin-top: 14px; margin-bottom: 0;"></p>
+    </div>
+  </div>
+
+  <!-- MÀN HÌNH DIỄN ĐÀN CHÍNH -->
+  <div id="forum-view" class="container hidden">
+    
+    <!-- Thống kê lớp -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span>📝 Tổng số bài thảo luận</span>
+        <strong id="stat-posts">0</strong>
+      </div>
+      <div class="stat-card">
+        <span>📁 Tài liệu & Hình ảnh chia sẻ</span>
+        <strong id="stat-files">0</strong>
+      </div>
     </div>
 
-    <!-- PHẦN CHÍNH CỦA DIỄN ĐÀN -->
-    <div id="forum-section">
-      <div class="user-bar">
-        <span id="user-welcome" style="font-size: 14px; color: #38bdf8;">Xin chào!</span>
-        <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
-      </div>
-
-      <!-- Ô TẠO BÀI ĐĂNG MỚI -->
-      <div style="background: #1e293b; border: 1px dashed #475569; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
-        <h3 style="margin-bottom: 10px; font-size: 15px; color: #38bdf8;">✍️ Đăng bài viết / Thảo luận mới</h3>
-        <select id="postCategory">
-          <option value="Thảo luận">Thảo luận chung</option>
-          <option value="Toán">Môn Toán</option>
-          <option value="Ngữ Văn">Môn Ngữ Văn</option>
-          <option value="Tiếng Anh">Môn Tiếng Anh</option>
-        </select>
-        <textarea id="postContent" rows="3" placeholder="Bạn muốn chia sẻ điều gì với lớp 10A4 hôm nay?..."></textarea>
-        
-        <!-- Nút đính kèm file/ảnh -->
-        <div style="margin-bottom: 10px;">
-          <label style="font-size: 13px; color: #94a3b8; display: block; margin-bottom: 4px;">📎 Đính kèm hình ảnh hoặc tài liệu:</label>
-          <input type="file" id="postAttachment" accept="image/*,.pdf,.doc,.docx,.pptx" style="padding: 6px;" />
-        </div>
-        
-        <button onclick="createPost()">Đăng bài lên lớp</button>
-      </div>
-
-      <!-- THANH TÌM KIẾM & BỘ LỌC BÀI ĐĂNG -->
-      <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
-        <input type="text" id="searchInput" onkeyup="filterPosts()" placeholder="🔍 Tìm kiếm nội dung bài đăng..." style="flex: 2; margin: 0;" />
-        <select id="categoryFilter" onchange="filterPosts()" style="flex: 1; margin: 0;">
-          <option value="all">Tất cả chủ đề</option>
-          <option value="Thảo luận">Thảo luận chung</option>
-          <option value="Toán">Môn Toán</option>
-          <option value="Ngữ Văn">Môn Ngữ Văn</option>
-          <option value="Tiếng Anh">Môn Tiếng Anh</option>
+    <!-- Khung tạo bài viết mới -->
+    <div class="create-card">
+      <div class="create-header">✍️ Tạo bài viết / Hỏi bài mới</div>
+      <div class="form-row">
+        <input type="text" id="post-title" placeholder="Tiêu đề bài viết (VD: Đề cương ôn tập Toán giữa kỳ...)" style="flex: 2;" />
+        <select id="post-category" style="flex: 1;">
+          <option value="Thảo luận">💬 Thảo luận chung</option>
+          <option value="Toán học">📐 Toán học</option>
+          <option value="Ngữ Văn">📖 Ngữ Văn</option>
+          <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
+          <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
+          <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+          <option value="Tin học">💻 Tin học</option>
         </select>
       </div>
-
-      <!-- DANH SÁCH BÀI ĐĂNG -->
-      <div id="posts-container">
-        <p style="text-align: center; color: #94a3b8;">Đang tải danh sách bài viết...</p>
+      <textarea id="post-content" rows="3" placeholder="Nhập nội dung chi tiết câu hỏi hoặc chia sẻ của bạn..."></textarea>
+      
+      <div class="file-upload-box">
+        <label for="post-file">📎 Đính kèm hình ảnh bài tập hoặc tài liệu (Ảnh, PDF, Word, PowerPoint, ZIP...):</label>
+        <input type="file" id="post-file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar" />
       </div>
+
+      <button id="btn-submit-post" class="btn-primary" onclick="createPost()">🚀 Đăng bài lên diễn đàn</button>
+    </div>
+
+    <!-- Thanh Tìm kiếm & Bộ lọc -->
+    <div class="filter-bar">
+      <input type="text" id="search-input" onkeyup="applyFilters()" placeholder="🔍 Tìm tiêu đề, nội dung hoặc tên người đăng..." />
+      <select id="filter-category" onchange="applyFilters()">
+        <option value="all">Tất cả môn học</option>
+        <option value="Thảo luận">💬 Thảo luận chung</option>
+        <option value="Toán học">📐 Toán học</option>
+        <option value="Ngữ Văn">📖 Ngữ Văn</option>
+        <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
+        <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
+        <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+        <option value="Tin học">💻 Tin học</option>
+      </select>
+      <select id="sort-order" onchange="applyFilters()">
+        <option value="newest">🕒 Mới nhất trước</option>
+        <option value="popular">❤️ Nhiều lượt thích nhất</option>
+      </select>
+    </div>
+
+    <!-- Danh sách bài đăng -->
+    <div id="posts-list">
+      <div id="loading-overlay">⏳ Đang tải dữ liệu diễn đàn lớp 10A4...</div>
     </div>
   </div>
 
   <script>
-    // Khởi tạo kết nối Supabase
+    // =========================================================================
+    // CẤU HÌNH SUPABASE (THAY ANON KEY CỦA BẠN VÀO DÒNG DƯỚI)
+    // =========================================================================
     const SUPABASE_URL = 'https://kafwlqcqqtvodzjgqdsw.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq'; 
-    // Lưu ý: Hãy thay chuỗi key an toàn của bạn vào biến SUPABASE_ANON_KEY nếu file cũ đang dùng key khác.
-    
-    // Khởi tạo client Supabase
-    const supabase = window.supabase.createClient(
-      'https://kafwlqcqqtvodzjgqdsw.supabase.co', 
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthZndsZWNxcXR2b2R6amdxZHN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwMDAwMDB9...' // Đảm bảo dùng đúng Anon Key chuẩn từ Project Settings > API của bạn
-    );
 
-    // Kiểm tra trạng thái đăng nhập khi vừa mở trang
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let allPosts = [];
+    let allComments = [];
+
+    // Khởi chạy kiểm tra phiên đăng nhập
+    window.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        showForum(session.user);
+        initApp(session.user);
       }
     });
 
+    // Đăng nhập
     async function handleLogin() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const msgEl = document.getElementById('auth-msg');
+      msgEl.innerText = "Đang kiểm tra...";
+
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      
       if (error) {
-        document.getElementById('auth-error').innerText = "Lỗi đăng nhập: " + error.message;
+        msgEl.innerText = "Lỗi: " + error.message;
         return;
       }
-      showForum(data.user);
+      initApp(data.user);
     }
 
+    // Đăng ký
     async function handleSignUp() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const msgEl = document.getElementById('auth-msg');
       
-      if (error) {
-        document.getElementById('auth-error').innerText = "Lỗi đăng ký: " + error.message;
+      if (!email || password.length < 6) {
+        msgEl.innerText = "Vui lòng nhập email hợp lệ và mật khẩu từ 6 ký tự trở lên.";
         return;
       }
-      alert("Đăng ký thành công! Bạn có thể đăng nhập ngay.");
+
+      msgEl.innerText = "Đang tạo tài khoản...";
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        msgEl.innerText = "Lỗi đăng ký: " + error.message;
+        return;
+      }
+      msgEl.style.color = "#10b981";
+      msgEl.innerText = "Đăng ký thành công! Đang tự động đăng nhập...";
+      if (data.user) initApp(data.user);
     }
 
+    // Đăng xuất
     async function handleLogout() {
       await supabase.auth.signOut();
-      document.getElementById('auth-section').classList.add('active-section');
-      document.getElementById('forum-section').classList.remove('active-section');
+      location.reload();
     }
 
-    function showForum(user) {
-      document.getElementById('auth-section').classList.remove('active-section');
-      document.getElementById('forum-section').classList.add('active-section');
-      document.getElementById('user-welcome').innerText = `👤 Tài khoản: ${user.email}`;
-      loadPosts();
-    }
-
-    // Tải tệp lên Supabase Storage
-    async function uploadFile(file) {
-      if (!file) return null;
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36.substring(2))}.${fileExt}`;
-      const filePath = `uploads/${fileName}`;
-
-      const { error } = await supabase.storage.from('forum-files').upload(filePath, file);
-      if (error) {
-        alert("Lỗi tải file: " + error.message);
-        return null;
-      }
-
-      const { data } = supabase.storage.from('forum-files').getPublicUrl(filePath);
-      return { url: data.publicUrl, name: file.name, type: file.type };
-    }
-
-    // Tạo bài đăng mới (Lưu ý: Bạn cần có sẵn bảng 'posts' gồm các cột: id, content, category, user_email, file_url, file_name, created_at)
-    async function createPost() {
-      const content = document.getElementById('postContent').value;
-      const category = document.getElementById('postCategory').value;
-      const fileInput = document.getElementById('postAttachment');
+    // Khởi tạo giao diện chính sau khi đăng nhập
+    function initApp(user) {
+      currentUser = user;
+      document.getElementById('auth-view').classList.add('hidden');
+      document.getElementById('forum-view').classList.remove('hidden');
+      document.getElementById('nav-user-info').classList.remove('hidden');
       
-      if (!content.trim() && fileInput.files.length === 0) {
-        alert("Vui lòng nhập nội dung hoặc đính kèm tệp!");
-        return;
-      }
+      const shortName = user.email.split('@')[0];
+      document.getElementById('display-username').innerText = `👋 ${shortName}`;
+      
+      fetchData();
+    }
 
-      let fileData = null;
-      if (fileInput.files.length > 0) {
-        fileData = await uploadFile(fileInput.files[0]);
-      }
-
-      const { data: { user } } = await supabase.auth.getUser();
-
-      const { error } = await supabase.from('posts').insert([
-        {
-          content: content,
-          category: category,
-          user_email: user.email,
-          file_url: fileData ? fileData.url : null,
-          file_name: fileData ? fileData.name : null
-        }
+    // Lấy dữ liệu bài viết và bình luận từ Supabase
+    async function fetchData() {
+      const [postsRes, commentsRes] = await Promise.all([
+        supabase.from('posts').select('*').order('created_at', { ascending: false }),
+        supabase.from('comments').select('*').order('created_at', { ascending: true })
       ]);
 
-      if (error) {
-        alert("Lỗi đăng bài: " + error.message);
+      if (postsRes.error) {
+        document.getElementById('posts-list').innerHTML = `<p style="color:#ef4444; text-align:center;">Lỗi tải dữ liệu: ${postsRes.error.message}</p>`;
         return;
       }
 
-      document.getElementById('postContent').value = '';
-      fileInput.value = '';
-      loadPosts();
+      allPosts = postsRes.data || [];
+      allComments = commentsRes.data || [];
+
+      // Cập nhật thống kê
+      document.getElementById('stat-posts').innerText = allPosts.length;
+      document.getElementById('stat-files').innerText = allPosts.filter(p => p.file_url).length;
+
+      applyFilters();
     }
 
-    // Tải danh sách bài đăng từ Database
-    async function loadPosts() {
-      const { data: posts, error } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+    // Tải tệp đính kèm lên Storage 'forum-files'
+    async function uploadAttachment(file) {
+      const ext = file.name.split('.').pop();
+      const safeName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
+      const filePath = `uploads/${safeName}`;
 
-      const container = document.getElementById('posts-container');
+      const { error } = await supabase.storage.from('forum-files').upload(filePath, file);
+      if (error) throw error;
+
+      const { data } = supabase.storage.from('forum-files').getPublicUrl(filePath);
+      return { url: data.publicUrl, name: file.name };
+    }
+
+    // Tạo bài đăng mới
+    async function createPost() {
+      const title = document.getElementById('post-title').value.trim();
+      const category = document.getElementById('post-category').value;
+      const content = document.getElementById('post-content').value.trim();
+      const fileInput = document.getElementById('post-file');
+      const btn = document.getElementById('btn-submit-post');
+
+      if (!content && fileInput.files.length === 0) {
+        alert("Bạn cần nhập nội dung hoặc chọn ít nhất 1 tệp đính kèm!");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "⏳ Đang tải lên & đăng bài...";
+
+      try {
+        let fileData = null;
+        if (fileInput.files.length > 0) {
+          fileData = await uploadAttachment(fileInput.files[0]);
+        }
+
+        const { error } = await supabase.from('posts').insert([{
+          title: title || 'Thảo luận không tiêu đề',
+          category: category,
+          content: content,
+          user_email: currentUser.email,
+          file_url: fileData ? fileData.url : null,
+          file_name: fileData ? fileData.name : null,
+          likes: []
+        }]);
+
+        if (error) throw error;
+
+        // Reset form
+        document.getElementById('post-title').value = '';
+        document.getElementById('post-content').value = '';
+        fileInput.value = '';
+        await fetchData();
+      } catch (err) {
+        alert("Có lỗi xảy ra: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "🚀 Đăng bài lên diễn đàn";
+      }
+    }
+
+    // Xóa bài viết (chỉ chính chủ)
+    async function deletePost(postId) {
+      if (!confirm("Bạn có chắc muốn xóa bài viết này không?")) return;
+      const { error } = await supabase.from('posts').delete().eq('id', postId);
+      if (error) alert("Lỗi xóa bài: " + error.message);
+      else fetchData();
+    }
+
+    // Thả tim / Bỏ tim bài viết
+    async function toggleLike(postId) {
+      const post = allPosts.find(p => p.id === postId);
+      if (!post) return;
+
+      let likes = Array.isArray(post.likes) ? [...post.likes] : [];
+      const userEmail = currentUser.email;
+
+      if (likes.includes(userEmail)) {
+        likes = likes.filter(e => e !== userEmail);
+      } else {
+        likes.push(userEmail);
+      }
+
+      const { error } = await supabase.from('posts').update({ likes }).eq('id', postId);
+      if (!error) fetchData();
+    }
+
+    // Thêm bình luận
+    async function addComment(postId) {
+      const inputEl = document.getElementById(`comment-input-${postId}`);
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      const { error } = await supabase.from('comments').insert([{
+        post_id: postId,
+        user_email: currentUser.email,
+        content: text
+      }]);
+
       if (error) {
-        container.innerHTML = `<p style="color: #ef4444;">Lỗi tải bài viết: ${error.message}</p>`;
+        alert("Lỗi gửi bình luận: " + error.message);
         return;
       }
+      inputEl.value = '';
+      fetchData();
+    }
 
+    // Lọc và sắp xếp danh sách bài viết
+    function applyFilters() {
+      const keyword = document.getElementById('search-input').value.toLowerCase().trim();
+      const catFilter = document.getElementById('filter-category').value;
+      const sortOrder = document.getElementById('sort-order').value;
+
+      let filtered = allPosts.filter(post => {
+        const matchCat = (catFilter === 'all') || (post.category === catFilter);
+        const matchKey = !keyword || 
+          (post.title && post.title.toLowerCase().includes(keyword)) ||
+          (post.content && post.content.toLowerCase().includes(keyword)) ||
+          (post.user_email && post.user_email.toLowerCase().includes(keyword));
+        return matchCat && matchKey;
+      });
+
+      if (sortOrder === 'popular') {
+        filtered.sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
+      } else {
+        filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
+
+      renderPosts(filtered);
+    }
+
+    // Hiển thị danh sách bài viết ra màn hình
+    function renderPosts(posts) {
+      const listEl = document.getElementById('posts-list');
       if (posts.length === 0) {
-        container.innerHTML = `<p style="text-align: center; color: #94a3b8;">Chưa có bài đăng nào.</p>`;
+        listEl.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-muted); background: var(--bg-card); border-radius: 12px;">Không tìm thấy bài viết nào phù hợp!</div>`;
         return;
       }
 
-      container.innerHTML = posts.map(post => {
-        let attachmentHtml = '';
+      listEl.innerHTML = posts.map(post => {
+        const authorShort = post.user_email.split('@')[0];
+        const avatarChar = authorShort.charAt(0).toUpperCase();
+        const timeStr = new Date(post.created_at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
+        
+        const likesList = Array.isArray(post.likes) ? post.likes : [];
+        const isLiked = likesList.includes(currentUser.email);
+        const isOwner = post.user_email === currentUser.email;
+
+        // Xử lý hiển thị tệp đính kèm
+        let attachmentHTML = '';
         if (post.file_url) {
-          if (post.file_url.match(/\.(jpeg|jpg|gif|png)$/i)) {
-            attachmentHtml = `<div class="attachment-preview"><img src="${post.file_url}" alt="Đính kèm" /></div>`;
+          const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(post.file_url);
+          if (isImg) {
+            attachmentHTML = `<div class="attachment-box"><a href="${post.file_url}" target="_blank"><img src="${post.file_url}" alt="Ảnh đính kèm" loading="lazy" /></a></div>`;
           } else {
-            attachmentHtml = `<div class="attachment-preview"><a href="${post.file_url}" target="_blank">📥 Tải xuống tệp: ${post.file_name || 'Tài liệu đính kèm'}</a></div>`;
+            attachmentHTML = `<div class="attachment-box"><a class="file-pill" href="${post.file_url}" target="_blank">📄 Tải tài liệu: ${post.file_name || 'Tệp đính kèm'}</a></div>`;
           }
         }
 
+        // Lọc bình luận của bài này
+        const postComments = allComments.filter(c => c.post_id === post.id);
+        const commentsHTML = postComments.map(c => `
+          <div class="comment-item">
+            <span class="comment-author">${c.user_email.split('@')[0]}:</span>
+            <span>${escapeHTML(c.content)}</span>
+          </div>
+        `).join('');
+
         return `
-          <div class="post-card" data-category="${post.category}">
-            <div class="post-header">
-              <span><b>${post.user_email}</b> • <span style="color: #38bdf8;">[${post.category}]</span></span>
-              <span>${new Date(post.created_at).toLocaleString('vi-VN')}</span>
+          <div class="post-card">
+            <div class="post-top">
+              <div class="author-info">
+                <div class="avatar">${avatarChar}</div>
+                <div>
+                  <span class="author-name">${authorShort} <span class="badge">${post.category}</span></span>
+                  <span class="post-meta">${timeStr}</span>
+                </div>
+              </div>
+              ${isOwner ? `<button class="btn-danger" onclick="deletePost(${post.id})">🗑️ Xóa</button>` : ''}
             </div>
-            <div class="post-content">${post.content}</div>
-            ${attachmentHtml}
+
+            ${post.title ? `<div class="post-title">${escapeHTML(post.title)}</div>` : ''}
+            <div class="post-body">${escapeHTML(post.content)}</div>
+            ${attachmentHTML}
+
+            <div class="post-actions">
+              <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                ${isLiked ? '❤️' : '🤍'} Thích (${likesList.length})
+              </button>
+              <button class="action-btn" onclick="document.getElementById('comment-input-${post.id}').focus()">
+                💬 Bình luận (${postComments.length})
+              </button>
+            </div>
+
+            <div class="comments-area">
+              ${commentsHTML || '<div style="font-size: 12px; color: var(--text-muted);">Chưa có bình luận nào. Hãy là người đầu tiên thảo luận!</div>'}
+              <div class="comment-form">
+                <input type="text" id="comment-input-${post.id}" placeholder="Viết bình luận giải đáp..." onkeypress="if(event.key==='Enter') addComment(${post.id})" />
+                <button class="btn-ghost" onclick="addComment(${post.id})">Gửi</button>
+              </div>
+            </div>
           </div>
         `;
       }).join('');
     }
 
-    // Bộ lọc và tìm kiếm bài viết theo thời gian thực
-    function filterPosts() {
-      const keyword = document.getElementById('searchInput').value.toLowerCase();
-      const selectedCategory = document.getElementById('categoryFilter').value;
-      const postCards = document.querySelectorAll('.post-card');
-
-      postCards.forEach(card => {
-        const textContent = card.innerText.toLowerCase();
-        const category = card.getAttribute('data-category');
-
-        const matchesKeyword = textContent.includes(keyword);
-        const matchesCategory = (selectedCategory === 'all') || (category === selectedCategory);
-
-        if (matchesKeyword && matchesCategory) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+    // Chống lỗi XSS khi người dùng nhập ký tự đặc biệt
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag]));
     }
   </script>
 </body>
