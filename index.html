@@ -498,7 +498,6 @@
       }
     }
 
-    // TÍNH NĂNG SỬA BÀI VIẾT
     async function editPost(postId, oldTitle, oldContent) {
       const newTitle = prompt("Sửa tiêu đề bài viết:", oldTitle);
       if (newTitle === null) return;
@@ -566,7 +565,6 @@
       inputEl.focus();
     }
 
-    // TÍNH NĂNG SỬA BÌNH LUẬN
     async function editComment(commentId, oldContent) {
       const newContent = prompt("Sửa nội dung bình luận:", oldContent);
       if (newContent === null || !newContent.trim()) return;
@@ -576,7 +574,6 @@
       else fetchData();
     }
 
-    // TÍNH NĂNG XÓA BÌNH LUẬN
     async function deleteComment(commentId) {
       if (!confirm("Bạn có chắc muốn xóa bình luận này?")) return;
       const { error } = await sb.from('comments').delete().eq('id', commentId);
@@ -637,6 +634,7 @@
         const postComments = allComments.filter(c => c.post_id === post.id);
         const commentsHTML = postComments.map(c => {
           const cAuthor = getAuthorInfo(c.user_email);
+          // Sửa điều kiện kiểm tra sở hữu linh hoạt hơn bằng email đăng nhập
           const isCommentOwner = c.user_email === currentUser.email;
           return `
             <div class="comment-item">
