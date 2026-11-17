@@ -132,7 +132,8 @@
     .author-info { display: flex; align-items: center; gap: 10px; }
     .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--bg-input); color: var(--accent); font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 15px; }
     .author-name { font-weight: 600; font-size: 14px; display: block; }
-    .post-meta { font-size: 12px; color: var(--text-muted); }
+    .post-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .edited-tag { font-size: 11px; color: var(--text-muted); font-style: italic; }
     .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; background: var(--notice-bg); color: var(--accent); margin-left: 6px; }
 
     .post-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
@@ -483,7 +484,8 @@
           user_email: currentUser.email,
           file_url: fileData ? fileData.url : null,
           file_name: fileData ? fileData.name : null,
-          likes: []
+          likes: [],
+          is_edited: false // Đánh dấu chưa chỉnh sửa
         }]);
 
         document.getElementById('post-title').value = '';
@@ -498,6 +500,7 @@
       }
     }
 
+    // Sửa bài viết và bật cờ is_edited = true
     async function editPost(postId, oldTitle, oldContent) {
       const newTitle = prompt("Sửa tiêu đề bài viết:", oldTitle);
       if (newTitle === null) return;
@@ -506,7 +509,8 @@
 
       const { error } = await sb.from('posts').update({ 
         title: newTitle.trim() || 'Thảo luận chung', 
-        content: newContent.trim() 
+        content: newContent.trim(),
+        is_edited: true // Đánh dấu đã chỉnh sửa
       }).eq('id', postId);
 
       if (error) alert("Lỗi sửa bài viết: " + error.message);
@@ -545,7 +549,8 @@
       const { error } = await sb.from('comments').insert([{ 
         post_id: postId, 
         user_email: currentUser.email, 
-        content: text 
+        content: text,
+        is_edited: false // Đánh dấu chưa chỉnh sửa
       }]);
 
       if (error) {
@@ -565,17 +570,22 @@
       inputEl.focus();
     }
 
+    // Sửa bình luận và bật cờ is_edited = true
     async function editComment(commentId, oldContent) {
       const newContent = prompt("Sửa nội dung bình luận:", oldContent);
       if (newContent === null || !newContent.trim()) return;
 
-      const { error } = await sb.from('comments').update({ content: newContent.trim() }).eq('id', commentId);
+      const { error } = await sb.from('comments').update({ 
+        content: newContent.trim(),
+        is_edited: true // Đánh dấu đã chỉnh sửa
+      }).eq('id', commentId);
+
       if (error) alert("Lỗi sửa bình luận: " + error.message);
       else fetchData();
     }
 
     async function deleteComment(commentId) {
-      if (!confirm("Bạn có chắc muốn xóa bình luận này?")) return;
+      if (!confirm("You sure want to delete this comment?")) return;
       const { error } = await sb.from('comments').delete().eq('id', commentId);
       if (error) alert("Lỗi xóa bình luận: " + error.message);
       else fetchData();
@@ -616,6 +626,8 @@
       listEl.innerHTML = posts.map(post => {
         const author = getAuthorInfo(post.user_email);
         const timeStr = new Date(post.created_at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
+        // Hiển thị nhãn "(đã chỉnh sửa)" cho bài viết nếu được đánh dấu
+        const editedPostHTML = post.is_edited ? `<span class="edited-tag">(đã chỉnh sửa)</span>` : '';
         
         const likesList = Array.isArray(post.likes) ? post.likes : [];
         const isLiked = likesList.includes(currentUser.email);
@@ -634,13 +646,16 @@
         const postComments = allComments.filter(c => c.post_id === post.id);
         const commentsHTML = postComments.map(c => {
           const cAuthor = getAuthorInfo(c.user_email);
-          // Sửa điều kiện kiểm tra sở hữu linh hoạt hơn bằng email đăng nhập
           const isCommentOwner = c.user_email === currentUser.email;
+          // Hiển thị nhãn "(đã chỉnh sửa)" cho bình luận nếu được đánh dấu
+          const editedCommentHTML = c.is_edited ? `<span class="edited-tag" style="font-size: 10px; margin-left: 4px;">(đã chỉnh sửa)</span>` : '';
+
           return `
             <div class="comment-item">
               <div>
                 <span class="comment-author">${cAuthor.name}:</span>
                 <span>${escapeHTML(c.content)}</span>
+                ${editedCommentHTML}
               </div>
               <div class="comment-actions">
                 <button class="comment-btn" onclick="setReplyTo(${post.id}, '${cAuthor.name}')">💬 Trả lời</button>
@@ -660,7 +675,10 @@
                 <img src="${author.avatar}" alt="Avatar" class="avatar" />
                 <div>
                   <span class="author-name">${author.name} <span class="badge">${post.category}</span></span>
-                  <span class="post-meta">${timeStr}</span>
+                  <div class="post-meta">
+                    <span>${timeStr}</span>
+                    ${editedPostHTML}
+                  </div>
                 </div>
               </div>
               <div style="display: flex; gap: 6px;">
