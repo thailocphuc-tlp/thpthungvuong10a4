@@ -1,423 +1,273 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full bg-slate-950">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diễn đàn Lớp 10A4 - THPT Hùng Vương</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #334155; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diễn đàn Lớp 10A4 - THPT Hùng Vương</title>
+  <!-- Thư viện Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; background: #1e293b; padding: 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    h1 { text-align: center; color: #38bdf8; margin-bottom: 20px; font-size: 24px; }
+    
+    /* Khu vực đăng nhập / Đăng ký */
+    #auth-section, #forum-section { display: none; }
+    .active-section { display: block !important; }
+    
+    input, select, textarea, button { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; font-size: 14px; }
+    button { background: #0ea5e9; color: white; border: none; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    button:hover { background: #0284c7; }
+    
+    /* Bài đăng & tìm kiếm */
+    .post-card { background: #334155; padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #38bdf8; }
+    .post-header { display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
+    .post-content { font-size: 15px; margin-bottom: 10px; line-height: 1.5; word-break: break-word; }
+    .attachment-preview { margin-top: 8px; }
+    .attachment-preview img { max-width: 100%; border-radius: 6px; max-height: 250px; }
+    .attachment-preview a { color: #38bdf8; text-decoration: none; font-size: 13px; display: inline-block; margin-top: 4px; }
+    
+    .user-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #334155; padding: 10px 16px; border-radius: 8px; }
+    .logout-btn { background: #ef4444; width: auto; padding: 6px 12px; margin: 0; }
+    .logout-btn:hover { background: #dc2626; }
+  </style>
 </head>
-<body class="h-full flex flex-col min-h-screen selection:bg-cyan-500 selection:text-slate-950">
-    <!-- Header -->
-    <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800/80 sticky top-0 z-40 px-4 py-3 flex justify-between items-center shadow-lg">
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-slate-950 font-extrabold text-lg shadow-lg shadow-cyan-500/20">10</div>
-            <div>
-                <h1 class="font-bold text-base text-slate-100 leading-tight">Diễn đàn Lớp 10A4</h1>
-                <p class="text-xs text-slate-400">THPT Hùng Vương - Quận 5</p>
-            </div>
-        </div>
-        <div class="flex items-center space-x-3">
-            <div id="userProfile" class="hidden items-center space-x-2 bg-slate-800/80 border border-slate-700/60 px-3 py-1.5 rounded-xl">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span id="userNameDisplay" class="text-xs font-semibold text-slate-200"></span>
-                <button onclick="handleLogout()" class="text-xs text-rose-400 hover:text-rose-300 ml-2 font-medium">Đăng xuất</button>
-            </div>
-            <div id="authButtons" class="flex items-center space-x-2">
-                <button onclick="openAuthModal('login')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl transition-all border border-slate-700">
-                    Đăng nhập
-                </button>
-                <button onclick="openAuthModal('signup')" class="px-3.5 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md shadow-cyan-500/20">
-                    Đăng ký
-                </button>
-            </div>
-        </div>
-    </header>
+<body>
 
-    <!-- Main Content -->
-    <main class="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 flex flex-col gap-6">
-        <!-- Welcome Banner -->
-        <div class="bg-gradient-to-r from-cyan-950/50 via-slate-900 to-slate-900 border border-cyan-500/20 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-            <div class="absolute right-0 top-0 translate-x-6 -translate-y-6 w-36 h-36 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <h2 class="text-lg sm:text-xl font-bold text-cyan-400 mb-2">Chào mừng đến với không gian học tập 10A4! ✨</h2>
-            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Nơi trao đổi bài tập, chia sẻ tài liệu, giải đáp thắc mắc và kết nối tình cảm của tập thể lớp chúng mình.</p>
-        </div>
+  <div class="container">
+    <h1>🎓 Diễn đàn Lớp 10A4 - THPT Hùng Vương</h1>
 
-        <!-- Post Trigger -->
-        <div class="flex flex-col sm:flex-row gap-3 items-center justify-between">
-            <div class="w-full sm:w-auto flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-3 flex items-center justify-between shadow-lg cursor-pointer hover:border-slate-700 transition-all" onclick="openPostModal()">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-sm font-bold">✍️</div>
-                    <span class="text-slate-400 text-xs sm:text-sm font-medium">Hôm nay bạn muốn thảo luận gì cùng lớp?</span>
-                </div>
-                <button class="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition-all">
-                    Đăng bài
-                </button>
-            </div>
-        </div>
-
-        <!-- Filter tabs by Subject -->
-        <div class="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
-            <button onclick="filterPosts('Tất cả')" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 transition-all shrink-0" data-subject="Tất cả">Tất cả</button>
-            <button onclick="filterPosts('Toán học')" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all shrink-0" data-subject="Toán học">Toán học</button>
-            <button onclick="filterPosts('Ngữ văn')" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all shrink-0" data-subject="Ngữ văn">Ngữ văn</button>
-            <button onclick="filterPosts('Tiếng Anh')" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all shrink-0" data-subject="Tiếng Anh">Tiếng Anh</button>
-            <button onclick="filterPosts('Hóa học')" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all shrink-0" data-subject="Hóa học">Hóa học</button>
-            <button onclick="filterPosts('Vật lý')" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all shrink-0" data-subject="Vật lý">Vật lý</button>
-            <button onclick="filterPosts('Khác')" class="filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all shrink-0" data-subject="Khác">Khác</button>
-        </div>
-
-        <!-- Posts Feed -->
-        <div class="flex flex-col gap-4">
-            <div id="postsContainer" class="flex flex-col gap-4">
-                <div class="text-center py-12 text-slate-500 text-sm">Đang tải bài viết từ hệ thống...</div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Auth Modal (Login / Signup) -->
-    <div id="authModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
-            <h3 class="text-base font-bold text-slate-100 mb-4" id="authTitle">Đăng nhập tài khoản</h3>
-            <form onsubmit="handleAuth(event)" class="flex flex-col gap-3">
-                <input type="hidden" id="authMode" value="login">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Email học sinh</label>
-                    <input type="email" id="authEmail" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-cyan-500" placeholder="vd: 10a4@hungvuong.edu.vn">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Mật khẩu</label>
-                    <input type="password" id="authPassword" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-cyan-500" placeholder="••••••••">
-                </div>
-                <div class="flex justify-end space-x-2 mt-3">
-                    <button type="button" onclick="closeAuthModal()" class="px-3.5 py-2 text-slate-400 hover:text-slate-200 text-xs font-medium">Hủy</button>
-                    <button type="submit" id="authSubmitBtn" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition-all">Đăng nhập</button>
-                </div>
-            </form>
-        </div>
+    <!-- PHẦN ĐĂNG NHẬP / ĐĂNG KÝ -->
+    <div id="auth-section" class="active-section">
+      <h3 style="margin-bottom: 12px; text-align: center; color: #cbd5e1;">Đăng nhập / Đăng ký tài khoản lớp</h3>
+      <input type="email" id="email" placeholder="Nhập Email học sinh (VD: thailocphuc@gmail.com)" />
+      <input type="password" id="password" placeholder="Mật khẩu" />
+      <div style="display: flex; gap: 10px;">
+        <button onclick="handleLogin()">Đăng nhập</button>
+        <button onclick="handleSignUp()" style="background: #10b981;">Đăng ký mới</button>
+      </div>
+      <p id="auth-error" style="color: #ef4444; font-size: 13px; text-align: center; margin-top: 10px;"></p>
     </div>
 
-    <!-- Post Modal -->
-    <div id="postModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
-            <h3 class="text-base font-bold text-slate-100 mb-4">Tạo bài viết / Thảo luận mới</h3>
-            <form onsubmit="handleCreatePost(event)" class="flex flex-col gap-3.5">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Tiêu đề bài viết</label>
-                    <input type="text" id="postTitle" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-cyan-500" placeholder="Ví dụ: Giải bài tập Toán hình...">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Môn học</label>
-                    <select id="postSubject" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-cyan-500">
-                        <option value="Toán học">Toán học</option>
-                        <option value="Ngữ văn">Ngữ văn</option>
-                        <option value="Tiếng Anh">Tiếng Anh</option>
-                        <option value="Hóa học">Hóa học</option>
-                        <option value="Vật lý">Vật lý</option>
-                        <option value="Khác">Khác</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nội dung chi tiết</label>
-                    <textarea id="postContent" rows="4" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-cyan-500 resize-none" placeholder="Nhập nội dung câu hỏi hoặc chia sẻ tài liệu..."></textarea>
-                </div>
-                <div class="flex justify-end space-x-2 mt-2">
-                    <button type="button" onclick="closePostModal()" class="px-3.5 py-2 text-slate-400 hover:text-slate-200 text-xs font-medium">Hủy</button>
-                    <button type="submit" class="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-xl transition-all">Đăng bài ngay</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <!-- PHẦN CHÍNH CỦA DIỄN ĐÀN -->
+    <div id="forum-section">
+      <div class="user-bar">
+        <span id="user-welcome" style="font-size: 14px; color: #38bdf8;">Xin chào!</span>
+        <button class="logout-btn" onclick="handleLogout()">Đăng xuất</button>
+      </div>
 
-    <!-- Script kết nối Supabase -->
-    <script>
-        const SUPABASE_URL = 'https://kafwlqcqqtvodzjgqdsw.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let currentUser = null;
-        let allPosts = [];
-        let currentFilter = 'Tất cả';
-
-        async function checkUser() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                updateAuthUI();
-            }
-        }
-
-        function updateAuthUI() {
-            const profile = document.getElementById('userProfile');
-            const authBtns = document.getElementById('authButtons');
-            if (currentUser) {
-                authBtns.classList.add('hidden');
-                profile.classList.remove('hidden');
-                profile.classList.add('flex');
-                document.getElementById('userNameDisplay').innerText = currentUser.email.split('@')[0];
-            } else {
-                authBtns.classList.remove('hidden');
-                profile.classList.add('hidden');
-                profile.classList.remove('flex');
-            }
-        }
-
-        function openAuthModal(mode) {
-            const modal = document.getElementById('authModal');
-            const title = document.getElementById('authTitle');
-            const btn = document.getElementById('authSubmitBtn');
-            document.getElementById('authMode').value = mode;
-
-            if (mode === 'signup') {
-                title.innerText = 'Đăng ký tài khoản mới';
-                btn.innerText = 'Đăng ký';
-            } else {
-                title.innerText = 'Đăng nhập tài khoản';
-                btn.innerText = 'Đăng nhập';
-            }
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.remove('flex');
-            document.getElementById('authModal').classList.add('hidden');
-        }
+      <!-- Ô TẠO BÀI ĐĂNG MỚI -->
+      <div style="background: #1e293b; border: 1px dashed #475569; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+        <h3 style="margin-bottom: 10px; font-size: 15px; color: #38bdf8;">✍️ Đăng bài viết / Thảo luận mới</h3>
+        <select id="postCategory">
+          <option value="Thảo luận">Thảo luận chung</option>
+          <option value="Toán">Môn Toán</option>
+          <option value="Ngữ Văn">Môn Ngữ Văn</option>
+          <option value="Tiếng Anh">Môn Tiếng Anh</option>
+        </select>
+        <textarea id="postContent" rows="3" placeholder="Bạn muốn chia sẻ điều gì với lớp 10A4 hôm nay?..."></textarea>
         
-        function openPostModal() {
-            if (!currentUser) {
-                alert('Vui lòng đăng nhập để đăng bài viết!');
-                openAuthModal('login');
-                return;
-            }
-            document.getElementById('postModal').classList.remove('hidden'); 
-            document.getElementById('postModal').classList.add('flex');
+        <!-- Nút đính kèm file/ảnh -->
+        <div style="margin-bottom: 10px;">
+          <label style="font-size: 13px; color: #94a3b8; display: block; margin-bottom: 4px;">📎 Đính kèm hình ảnh hoặc tài liệu:</label>
+          <input type="file" id="postAttachment" accept="image/*,.pdf,.doc,.docx,.pptx" style="padding: 6px;" />
+        </div>
+        
+        <button onclick="createPost()">Đăng bài lên lớp</button>
+      </div>
+
+      <!-- THANH TÌM KIẾM & BỘ LỌC BÀI ĐĂNG -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
+        <input type="text" id="searchInput" onkeyup="filterPosts()" placeholder="🔍 Tìm kiếm nội dung bài đăng..." style="flex: 2; margin: 0;" />
+        <select id="categoryFilter" onchange="filterPosts()" style="flex: 1; margin: 0;">
+          <option value="all">Tất cả chủ đề</option>
+          <option value="Thảo luận">Thảo luận chung</option>
+          <option value="Toán">Môn Toán</option>
+          <option value="Ngữ Văn">Môn Ngữ Văn</option>
+          <option value="Tiếng Anh">Môn Tiếng Anh</option>
+        </select>
+      </div>
+
+      <!-- DANH SÁCH BÀI ĐĂNG -->
+      <div id="posts-container">
+        <p style="text-align: center; color: #94a3b8;">Đang tải danh sách bài viết...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Khởi tạo kết nối Supabase
+    const SUPABASE_URL = 'https://kafwlqcqqtvodzjgqdsw.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq'; 
+    // Lưu ý: Hãy thay chuỗi key an toàn của bạn vào biến SUPABASE_ANON_KEY nếu file cũ đang dùng key khác.
+    
+    // Khởi tạo client Supabase
+    const supabase = window.supabase.createClient(
+      'https://kafwlqcqqtvodzjgqdsw.supabase.co', 
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImthZndsZWNxcXR2b2R6amdxZHN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAwMDAwMDB9...' // Đảm bảo dùng đúng Anon Key chuẩn từ Project Settings > API của bạn
+    );
+
+    // Kiểm tra trạng thái đăng nhập khi vừa mở trang
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        showForum(session.user);
+      }
+    });
+
+    async function handleLogin() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      
+      if (error) {
+        document.getElementById('auth-error').innerText = "Lỗi đăng nhập: " + error.message;
+        return;
+      }
+      showForum(data.user);
+    }
+
+    async function handleSignUp() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      
+      if (error) {
+        document.getElementById('auth-error').innerText = "Lỗi đăng ký: " + error.message;
+        return;
+      }
+      alert("Đăng ký thành công! Bạn có thể đăng nhập ngay.");
+    }
+
+    async function handleLogout() {
+      await supabase.auth.signOut();
+      document.getElementById('auth-section').classList.add('active-section');
+      document.getElementById('forum-section').classList.remove('active-section');
+    }
+
+    function showForum(user) {
+      document.getElementById('auth-section').classList.remove('active-section');
+      document.getElementById('forum-section').classList.add('active-section');
+      document.getElementById('user-welcome').innerText = `👤 Tài khoản: ${user.email}`;
+      loadPosts();
+    }
+
+    // Tải tệp lên Supabase Storage
+    async function uploadFile(file) {
+      if (!file) return null;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36.substring(2))}.${fileExt}`;
+      const filePath = `uploads/${fileName}`;
+
+      const { error } = await supabase.storage.from('forum-files').upload(filePath, file);
+      if (error) {
+        alert("Lỗi tải file: " + error.message);
+        return null;
+      }
+
+      const { data } = supabase.storage.from('forum-files').getPublicUrl(filePath);
+      return { url: data.publicUrl, name: file.name, type: file.type };
+    }
+
+    // Tạo bài đăng mới (Lưu ý: Bạn cần có sẵn bảng 'posts' gồm các cột: id, content, category, user_email, file_url, file_name, created_at)
+    async function createPost() {
+      const content = document.getElementById('postContent').value;
+      const category = document.getElementById('postCategory').value;
+      const fileInput = document.getElementById('postAttachment');
+      
+      if (!content.trim() && fileInput.files.length === 0) {
+        alert("Vui lòng nhập nội dung hoặc đính kèm tệp!");
+        return;
+      }
+
+      let fileData = null;
+      if (fileInput.files.length > 0) {
+        fileData = await uploadFile(fileInput.files[0]);
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { error } = await supabase.from('posts').insert([
+        {
+          content: content,
+          category: category,
+          user_email: user.email,
+          file_url: fileData ? fileData.url : null,
+          file_name: fileData ? fileData.name : null
         }
-        function closePostModal() { document.getElementById('postModal').classList.remove('flex'); document.getElementById('postModal').classList.add('hidden'); }
+      ]);
 
-        async function handleAuth(e) {
-            e.preventDefault();
-            const email = document.getElementById('authEmail').value;
-            const password = document.getElementById('authPassword').value;
-            const mode = document.getElementById('authMode').value;
+      if (error) {
+        alert("Lỗi đăng bài: " + error.message);
+        return;
+      }
 
-            try {
-                if (mode === 'signup') {
-                    const { data, error } = await supabaseClient.auth.signUp({ email, password });
-                    if (error) throw error;
-                    currentUser = data.user;
-                    alert('Đăng ký thành công!');
-                } else {
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                    if (error) throw error;
-                    currentUser = data.user;
-                    alert('Đăng nhập thành công!');
-                }
-                closeAuthModal();
-                updateAuthUI();
-                fetchPosts();
-            } catch (err) {
-                alert('Lỗi xác thực: ' + err.message);
-            }
-        }
+      document.getElementById('postContent').value = '';
+      fileInput.value = '';
+      loadPosts();
+    }
 
-        async function handleLogout() {
-            await supabaseClient.auth.signOut();
-            currentUser = null;
-            updateAuthUI();
-            alert('Đã đăng xuất!');
-            fetchPosts();
-        }
+    // Tải danh sách bài đăng từ Database
+    async function loadPosts() {
+      const { data: posts, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-        async function handleCreatePost(e) {
-            e.preventDefault();
-            const title = document.getElementById('postTitle').value;
-            const subject = document.getElementById('postSubject').value;
-            const content = document.getElementById('postContent').value;
-            const author = currentUser ? currentUser.email.split('@')[0] : 'Học sinh 10A4';
+      const container = document.getElementById('posts-container');
+      if (error) {
+        container.innerHTML = `<p style="color: #ef4444;">Lỗi tải bài viết: ${error.message}</p>`;
+        return;
+      }
 
-            const { error } = await supabaseClient.from('posts').insert([{
-                title,
-                category: subject,
-                subject,
-                content,
-                author,
-                role: 'Học sinh 10A4',
-                likes: 0
-            }]);
+      if (posts.length === 0) {
+        container.innerHTML = `<p style="text-align: center; color: #94a3b8;">Chưa có bài đăng nào.</p>`;
+        return;
+      }
 
-            if (error) {
-                alert('Lỗi đăng bài: ' + error.message);
-            } else {
-                alert('Đăng bài thành công!');
-                closePostModal();
-                document.getElementById('postTitle').value = '';
-                document.getElementById('postContent').value = '';
-                fetchPosts();
-            }
-        }
-
-        async function deletePost(postId) {
-            if (!confirm('Bạn có chắc chắn muốn xóa bài viết này không?')) return;
-            const { error } = await supabaseClient.from('posts').delete().eq('id', postId);
-            if (error) {
-                alert('Lỗi khi xóa bài viết: ' + error.message);
-            } else {
-                alert('Đã xóa bài viết thành công!');
-                fetchPosts();
-            }
-        }
-
-        async function deleteComment(commentId) {
-            if (!confirm('Bạn có muốn xóa bình luận này?')) return;
-            const { error } = await supabaseClient.from('comments').delete().eq('id', commentId);
-            if (error) {
-                alert('Lỗi khi xóa bình luận: ' + error.message);
-            } else {
-                fetchPosts();
-            }
-        }
-
-        async function likePost(postId, currentLikes) {
-            const newLikes = (currentLikes || 0) + 1;
-            const { error } = await supabaseClient.from('posts').update({ likes: newLikes }).eq('id', postId);
-            if (!error) fetchPosts();
-        }
-
-        async function addComment(e, postId) {
-            e.preventDefault();
-            if (!currentUser) {
-                alert('Vui lòng đăng nhập để bình luận!');
-                openAuthModal('login');
-                return;
-            }
-            const inputField = document.getElementById(`commentInput-${postId}`);
-            const content = inputField.value;
-            const author = currentUser.email.split('@')[0];
-
-            const { error } = await supabaseClient.from('comments').insert([{
-                post_id: postId,
-                author,
-                role: 'Học sinh 10A4',
-                content
-            }]);
-
-            if (error) {
-                alert('Lỗi bình luận: ' + error.message);
-            } else {
-                inputField.value = '';
-                fetchPosts();
-            }
-        }
-
-        function filterPosts(subject) {
-            currentFilter = subject;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                if (btn.getAttribute('data-subject') === subject) {
-                    btn.classList.remove('bg-slate-900', 'border', 'border-slate-800', 'text-slate-400');
-                    btn.classList.add('bg-cyan-500', 'text-slate-950');
-                } else {
-                    btn.classList.add('bg-slate-900', 'border', 'border-slate-800', 'text-slate-400');
-                    btn.classList.remove('bg-cyan-500', 'text-slate-950');
-                }
-            });
-            renderPosts();
-        }
-
-        async function fetchPosts() {
-            const container = document.getElementById('postsContainer');
-            const [postsRes, commentsRes] = await Promise.all([
-                supabaseClient.from('posts').select('*').order('created_at', { ascending: false }),
-                supabaseClient.from('comments').select('*').order('created_at', { ascending: true })
-            ]);
-            
-            if (postsRes.error) {
-                container.innerHTML = `<div class="text-center py-12 text-rose-400 text-xs">Lỗi tải dữ liệu: ${postsRes.error.message}</div>`;
-                return;
-            }
-
-            allPosts = postsRes.data || [];
-            window.allComments = commentsRes.data || [];
-            renderPosts();
-        }
-
-        function renderPosts() {
-            const container = document.getElementById('postsContainer');
-            const filtered = currentFilter === 'Tất cả' ? allPosts : allPosts.filter(p => p.subject === currentFilter);
-            const currentUserName = currentUser ? currentUser.email.split('@')[0] : null;
-
-            if (!filtered || filtered.length === 0) {
-                container.innerHTML = `<div class="text-center py-12 text-slate-500 text-xs bg-slate-900/50 border border-slate-800/80 rounded-2xl">Chưa có bài viết nào trong chủ đề này. Hãy là người đầu tiên đăng bài nhé!</div>`;
-                return;
-            }
-
-            container.innerHTML = filtered.map(post => {
-                const postComments = (window.allComments || []).filter(c => c.post_id === post.id);
-                const isMyPost = currentUserName && post.author === currentUserName;
-
-                return `
-                    <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 shadow-xl flex flex-col gap-3.5 transition-all hover:border-slate-700">
-                        <div class="flex justify-between items-center">
-                            <span class="px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold rounded-lg">${post.subject || 'Chung'}</span>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-[11px] text-slate-500">${new Date(post.created_at).toLocaleDateString('vi-VN')}</span>
-                                ${isMyPost ? `<button onclick="deletePost(${post.id})" class="text-xs text-rose-400 hover:text-rose-300 font-semibold px-2 py-0.5 bg-rose-500/10 rounded-lg border border-rose-500/20">Xóa</button>` : ''}
-                            </div>
-                        </div>
-                        <h4 class="font-bold text-slate-100 text-sm sm:text-base">${post.title}</h4>
-                        <p class="text-slate-300 text-xs sm:text-sm leading-relaxed whitespace-pre-line">${post.content}</p>
-                        
-                        <!-- Author & Interaction bar -->
-                        <div class="flex justify-between items-center pt-3 border-t border-slate-800/60 text-xs text-slate-400">
-                            <span>Đăng bởi: <strong class="text-slate-200">${post.author}</strong></span>
-                            <button onclick="likePost(${post.id}, ${post.likes || 0})" class="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700/80 border border-slate-700/60 rounded-xl text-slate-200 transition-all">
-                                <span>❤️</span>
-                                <span class="font-bold text-xs">${post.likes || 0}</span>
-                            </button>
-                        </div>
-
-                        <!-- Comments Section -->
-                        <div class="mt-2 pt-3 border-t border-slate-800/40 flex flex-col gap-2.5">
-                            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Bình luận (${postComments.length})</span>
-                            <div class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
-                                ${postComments.length === 0 ? '<p class="text-[11px] text-slate-500 italic">Chưa có bình luận nào.</p>' : 
-                                    postComments.map(c => {
-                                        const isMyComment = currentUserName && c.author === currentUserName;
-                                        return `
-                                            <div class="bg-slate-950/60 border border-slate-800/60 rounded-xl p-2.5 text-xs flex flex-col gap-1">
-                                                <div class="flex justify-between items-center">
-                                                    <span class="font-bold text-cyan-400">${c.author}</span>
-                                                    <div class="flex items-center space-x-2">
-                                                        <span class="text-[10px] text-slate-500">${new Date(c.created_at).toLocaleDateString('vi-VN')}</span>
-                                                        ${isMyComment ? `<button onclick="deleteComment(${c.id})" class="text-[10px] text-rose-400 hover:text-rose-300">Xóa</button>` : ''}
-                                                    </div>
-                                                </div>
-                                                <p class="text-slate-300 text-xs">${c.content}</p>
-                                            </div>
-                                        `;
-                                    }).join('')}
-                            </div>
-                            <!-- Add Comment Form -->
-                            <form onsubmit="addComment(event, ${post.id})" class="flex gap-2 mt-1">
-                                <input type="text" id="commentInput-${post.id}" required placeholder="Viết bình luận..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-cyan-500">
-                                <button type="submit" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-400 font-bold text-xs rounded-xl transition-all">Gửi</button>
-                            </form>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+      container.innerHTML = posts.map(post => {
+        let attachmentHtml = '';
+        if (post.file_url) {
+          if (post.file_url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+            attachmentHtml = `<div class="attachment-preview"><img src="${post.file_url}" alt="Đính kèm" /></div>`;
+          } else {
+            attachmentHtml = `<div class="attachment-preview"><a href="${post.file_url}" target="_blank">📥 Tải xuống tệp: ${post.file_name || 'Tài liệu đính kèm'}</a></div>`;
+          }
         }
 
-        checkUser();
-        fetchPosts();
-    </script>
+        return `
+          <div class="post-card" data-category="${post.category}">
+            <div class="post-header">
+              <span><b>${post.user_email}</b> • <span style="color: #38bdf8;">[${post.category}]</span></span>
+              <span>${new Date(post.created_at).toLocaleString('vi-VN')}</span>
+            </div>
+            <div class="post-content">${post.content}</div>
+            ${attachmentHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Bộ lọc và tìm kiếm bài viết theo thời gian thực
+    function filterPosts() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const selectedCategory = document.getElementById('categoryFilter').value;
+      const postCards = document.querySelectorAll('.post-card');
+
+      postCards.forEach(card => {
+        const textContent = card.innerText.toLowerCase();
+        const category = card.getAttribute('data-category');
+
+        const matchesKeyword = textContent.includes(keyword);
+        const matchesCategory = (selectedCategory === 'all') || (category === selectedCategory);
+
+        if (matchesKeyword && matchesCategory) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
 </html>
