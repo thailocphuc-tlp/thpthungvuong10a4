@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diễn Đàn Học Tập Lớp 10A4 - THPT Hùng Vương</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root {
+    /* Định nghĩa 2 giao diện Sáng / Tối */
+    :root[data-theme="dark"] {
       --bg-main: #0b1120;
       --bg-card: #1e293b;
       --bg-input: #0f172a;
@@ -17,14 +18,31 @@
       --border: #334155;
       --danger: #ef4444;
       --success: #10b981;
+      --notice-bg: rgba(56, 189, 248, 0.1);
+      --notice-border: rgba(56, 189, 248, 0.3);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    :root[data-theme="light"] {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-input: #f8fafc;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #cbd5e1;
+      --danger: #dc2626;
+      --success: #059669;
+      --notice-bg: rgba(2, 132, 199, 0.08);
+      --notice-border: rgba(2, 132, 199, 0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s; }
     body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 50px; }
 
     /* Header Navbar */
     .navbar {
-      background: rgba(30, 41, 59, 0.9);
+      background: var(--bg-card);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
       padding: 12px 20px;
@@ -37,7 +55,9 @@
     }
     .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 18px; color: var(--accent); }
     .brand img { width: 40px; height: 40px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; }
-    .brand span { font-size: 12px; background: rgba(56, 189, 248, 0.15); padding: 3px 8px; border-radius: 99px; color: #7dd3fc; }
+    .brand span { font-size: 12px; background: var(--notice-bg); padding: 3px 8px; border-radius: 99px; color: var(--accent); }
+
+    .nav-right { display: flex; align-items: center; gap: 10px; }
 
     .container { max-width: 860px; margin: 24px auto; padding: 0 16px; }
 
@@ -49,26 +69,37 @@
       overflow: hidden;
       margin-bottom: 24px;
       border: 1px solid var(--border);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
       position: relative;
     }
     .school-banner img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: brightness(0.9);
+      filter: brightness(0.95);
       transition: transform 0.5s ease;
     }
     .school-banner:hover img { transform: scale(1.03); }
     .banner-overlay {
       position: absolute;
       bottom: 0; left: 0; right: 0;
-      background: linear-gradient(to top, rgba(11, 17, 32, 0.9), transparent);
+      background: linear-gradient(to top, var(--bg-main), transparent);
       padding: 20px;
-      color: #fff;
+      color: var(--text-main);
     }
     .banner-overlay h3 { font-size: 20px; color: var(--accent); margin-bottom: 4px; }
     .banner-overlay p { font-size: 13px; color: var(--text-muted); }
+
+    /* Bảng Thông Báo Lớp Học */
+    .notice-board {
+      background: var(--notice-bg);
+      border: 1px solid var(--notice-border);
+      padding: 16px 20px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+    }
+    .notice-title { font-weight: 700; font-size: 15px; color: var(--accent); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .notice-content { font-size: 13.5px; color: var(--text-main); }
 
     /* Auth Box */
     .auth-box {
@@ -78,7 +109,7 @@
       padding: 32px;
       border-radius: 16px;
       border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
     .auth-box h2 { text-align: center; margin-bottom: 8px; color: var(--accent); }
     .auth-box p { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
@@ -93,25 +124,23 @@
       background: var(--bg-input);
       color: var(--text-main);
       font-size: 14px;
-      transition: border-color 0.2s;
     }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
 
     button {
-      padding: 11px 18px;
+      padding: 10px 16px;
       border-radius: 10px;
       border: none;
       font-weight: 600;
       font-size: 14px;
       cursor: pointer;
-      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
     }
-    .btn-primary { background: var(--accent); color: #0f172a; width: 100%; }
-    .btn-primary:hover { background: var(--accent-hover); color: white; }
+    .btn-primary { background: var(--accent); color: var(--bg-main); width: 100%; }
+    .btn-primary:hover { opacity: 0.9; }
     .btn-success { background: var(--success); color: white; width: 100%; }
     .btn-success:hover { opacity: 0.9; }
     .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); padding: 6px 12px; font-size: 12px; }
@@ -134,7 +163,7 @@
       padding: 12px;
       border-radius: 10px;
       margin-bottom: 14px;
-      background: rgba(15, 23, 42, 0.5);
+      background: var(--bg-input);
     }
     .file-upload-box label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px; cursor: pointer; }
     .file-upload-box input[type="file"] { margin-bottom: 0; padding: 6px; border: none; background: transparent; }
@@ -150,8 +179,8 @@
       border-radius: 12px;
       border: 1px solid var(--border);
     }
-    .filter-bar input { flex: 2; min-width: 200px; margin-bottom: 0; }
-    .filter-bar select { flex: 1; min-width: 140px; margin-bottom: 0; }
+    .filter-bar input { flex: 2; min-width: 180px; margin-bottom: 0; }
+    .filter-bar select { flex: 1; min-width: 130px; margin-bottom: 0; }
 
     /* Post Item */
     .post-card {
@@ -160,7 +189,6 @@
       border-radius: 14px;
       padding: 20px;
       margin-bottom: 16px;
-      transition: transform 0.15s;
     }
     .post-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
     .author-info { display: flex; align-items: center; gap: 10px; }
@@ -173,11 +201,11 @@
     .post-meta { font-size: 12px; color: var(--text-muted); }
     .badge {
       display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 11px; font-weight: 600;
-      background: rgba(56, 189, 248, 0.15); color: var(--accent); margin-left: 6px;
+      background: var(--notice-bg); color: var(--accent); margin-left: 6px;
     }
 
-    .post-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: #f1f5f9; }
-    .post-body { font-size: 14.5px; color: #cbd5e1; white-space: pre-wrap; word-break: break-word; margin-bottom: 14px; }
+    .post-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .post-body { font-size: 14.5px; color: var(--text-main); white-space: pre-wrap; word-break: break-word; margin-bottom: 14px; }
 
     /* Attachment */
     .attachment-box { margin-bottom: 14px; }
@@ -189,22 +217,18 @@
     }
     .file-pill:hover { border-color: var(--accent); }
 
-    /* Actions (Like & Comment) */
-    .post-actions {
-      display: flex; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border);
-    }
-    .action-btn {
-      background: transparent; color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 13px;
-    }
-    .action-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+    /* Actions */
+    .post-actions { display: flex; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .action-btn { background: transparent; color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 13px; }
+    .action-btn:hover { background: var(--notice-bg); color: var(--text-main); }
     .action-btn.liked { color: #f43f5e; background: rgba(244, 63, 94, 0.1); }
 
-    /* Comments Section */
+    /* Comments */
     .comments-area {
-      margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border);
-      background: rgba(15, 23, 42, 0.4); padding: 12px; border-radius: 10px;
+      margin-top: 14px; padding: 12px; border-top: 1px dashed var(--border);
+      background: var(--bg-input); border-radius: 10px;
     }
-    .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid rgba(51, 65, 85, 0.5); }
+    .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); }
     .comment-item:last-child { border-bottom: none; }
     .comment-author { font-weight: 600; color: var(--accent); margin-right: 6px; }
     .comment-form { display: flex; gap: 8px; margin-top: 10px; }
@@ -217,19 +241,22 @@
 </head>
 <body>
 
-  <!-- THANH ĐIỀU HƯỚNG CÓ LOGO TRƯỜNG -->
+  <!-- THANH ĐIỀU HƯỚNG -->
   <nav class="navbar">
     <div class="brand">
-      <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/logo.png" alt="Logo THPT Hùng Vương" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'48\' fill=\'%230b1120\' stroke=\'%2338bdf8\' stroke-width=\'4\'/><text x=\'50\' y=\'58\' font-size=\'36\' font-weight=\'bold\' fill=\'%2338bdf8\' text-anchor=\'middle\'>HV</text></svg>'" />
+      <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/logo.png" alt="Logo" />
       DIỄN ĐÀN 10A4 <span>THPT Hùng Vương</span>
     </div>
-    <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 12px;">
-      <span id="display-username" style="font-size: 13px; color: #cbd5e1;"></span>
-      <button class="btn-danger" onclick="handleLogout()">Đăng xuất</button>
+    <div class="nav-right">
+      <button class="btn-ghost" onclick="toggleTheme()" id="theme-btn">☀️ Sáng/Tối</button>
+      <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 10px;">
+        <span id="display-username" style="font-size: 13px; color: var(--text-muted);"></span>
+        <button class="btn-danger" onclick="handleLogout()">Đăng xuất</button>
+      </div>
     </div>
   </nav>
 
-  <!-- MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ -->
+  <!-- MÀN HÌNH ĐĂNG NHẬP -->
   <div id="auth-view" class="container">
     <div class="auth-box">
       <h2>Chào mừng đến 10A4</h2>
@@ -244,10 +271,10 @@
     </div>
   </div>
 
-  <!-- MÀN HÌNH DIỄN ĐÀN CHÍNH -->
+  <!-- MÀN HÌNH CHÍNH -->
   <div id="forum-view" class="container hidden">
     
-  <!-- BANNER KHUÔN VIÊN TRƯỜNG -->
+    <!-- BANNER KHUÔN VIÊN TRƯỜNG -->
     <div class="school-banner">
       <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/banner.jpg" alt="Khuôn viên THPT Hùng Vương" />
       <div class="banner-overlay">
@@ -255,7 +282,13 @@
         <p>Nơi kết nối tri thức, lưu giữ thanh xuân và sẻ chia tài liệu học tập mỗi ngày.</p>
       </div>
     </div>
-    
+
+    <!-- BẢNG THÔNG BÁO LỚP HỌC -->
+    <div class="notice-board">
+      <div class="notice-title">📌 Thông báo quan trọng từ lớp</div>
+      <div class="notice-content">Chào mừng các thành viên 10A4! Nhớ nộp bài tập đầy đủ và cập nhật lịch kiểm tra thường xuyên tại đây nhé. Chúc cả lớp tuần mới học tập thật tốt! 🚀</div>
+    </div>
+
     <!-- Thống kê lớp -->
     <div class="stats-grid">
       <div class="stat-card">
@@ -268,11 +301,11 @@
       </div>
     </div>
 
-    <!-- Khung tạo bài viết mới -->
+    <!-- Khung tạo bài viết -->
     <div class="create-card">
       <div class="create-header">✍️ Tạo bài viết / Hỏi bài mới</div>
       <div class="form-row">
-        <input type="text" id="post-title" placeholder="Tiêu đề bài viết (VD: Đề cương ôn tập Toán giữa kỳ...)" style="flex: 2;" />
+        <input type="text" id="post-title" placeholder="Tiêu đề bài viết (VD: Đề cương Toán giữa kỳ...)" style="flex: 2;" />
         <select id="post-category" style="flex: 1;">
           <option value="Thảo luận">💬 Thảo luận chung</option>
           <option value="Toán học">📐 Toán học</option>
@@ -286,16 +319,16 @@
       <textarea id="post-content" rows="3" placeholder="Nhập nội dung chi tiết câu hỏi hoặc chia sẻ của bạn..."></textarea>
       
       <div class="file-upload-box">
-        <label for="post-file">📎 Đính kèm hình ảnh bài tập hoặc tài liệu (Ảnh, PDF, Word, PowerPoint, ZIP...):</label>
+        <label for="post-file">📎 Đính kèm tệp tài liệu hoặc hình ảnh (Ảnh, PDF, Word, PPT, ZIP...):</label>
         <input type="file" id="post-file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar" />
       </div>
 
       <button id="btn-submit-post" class="btn-primary" onclick="createPost()">🚀 Đăng bài lên diễn đàn</button>
     </div>
 
-    <!-- Thanh Tìm kiếm & Bộ lọc -->
+    <!-- Thanh Tìm kiếm & Bộ lọc mở rộng -->
     <div class="filter-bar">
-      <input type="text" id="search-input" onkeyup="applyFilters()" placeholder="🔍 Tìm tiêu đề, nội dung hoặc tên người đăng..." />
+      <input type="text" id="search-input" onkeyup="applyFilters()" placeholder="🔍 Tìm kiếm bài viết..." />
       <select id="filter-category" onchange="applyFilters()">
         <option value="all">Tất cả môn học</option>
         <option value="Thảo luận">💬 Thảo luận chung</option>
@@ -306,123 +339,106 @@
         <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
         <option value="Tin học">💻 Tin học</option>
       </select>
+      <select id="filter-type" onchange="applyFilters()">
+        <option value="all">Tất cả bài viết</option>
+        <option value="has-file">📁 Chỉ bài có đính kèm file</option>
+      </select>
       <select id="sort-order" onchange="applyFilters()">
-        <option value="newest">🕒 Mới nhất trước</option>
-        <option value="popular">❤️ Nhiều lượt thích nhất</option>
+        <option value="newest">🕒 Mới nhất</option>
+        <option value="popular">❤️ Nhiều tim nhất</option>
       </select>
     </div>
 
     <!-- Danh sách bài đăng -->
     <div id="posts-list">
-      <div id="loading-overlay">⏳ Đang tải dữ liệu diễn đàn lớp 10A4...</div>
+      <div id="loading-overlay">⏳ Đang tải dữ liệu diễn đàn...</div>
     </div>
   </div>
 
   <script>
-    // =========================================================================
-    // CẤU HÌNH SUPABASE
-    // =========================================================================
     const SUPABASE_URL = 'https://kafwlqcqqtvodzjgqdsw.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq'; 
-
+    const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
     let allPosts = [];
     let allComments = [];
 
-    // Khởi chạy kiểm tra phiên đăng nhập
+    // Chuyển đổi giao diện Sáng / Tối
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+
+    // Khôi phục giao diện đã lưu
     window.addEventListener('DOMContentLoaded', async () => {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+
       const { data: { session } } = await sb.auth.getSession();
-      if (session) {
-        initApp(session.user);
-      }
+      if (session) initApp(session.user);
     });
 
-    // Đăng nhập
     async function handleLogin() {
       const email = document.getElementById('auth-email').value.trim();
       const password = document.getElementById('auth-password').value;
       const msgEl = document.getElementById('auth-msg');
-      msgEl.style.color = "#38bdf8";
       msgEl.innerText = "Đang kiểm tra...";
 
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) {
-        msgEl.style.color = "#ef4444";
-        msgEl.innerText = "Lỗi: " + error.message;
-        return;
-      }
+      if (error) { msgEl.innerText = "Lỗi: " + error.message; return; }
       initApp(data.user);
     }
 
-    // Đăng ký
     async function handleSignUp() {
       const email = document.getElementById('auth-email').value.trim();
       const password = document.getElementById('auth-password').value;
       const msgEl = document.getElementById('auth-msg');
       
       if (!email || password.length < 6) {
-        msgEl.style.color = "#ef4444";
         msgEl.innerText = "Vui lòng nhập email hợp lệ và mật khẩu từ 6 ký tự trở lên.";
         return;
       }
 
-      msgEl.style.color = "#38bdf8";
       msgEl.innerText = "Đang tạo tài khoản...";
       const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) {
-        msgEl.style.color = "#ef4444";
-        msgEl.innerText = "Lỗi đăng ký: " + error.message;
-        return;
-      }
-      msgEl.style.color = "#10b981";
-      msgEl.innerText = "Đăng ký thành công! Đang tự động đăng nhập...";
+      if (error) { msgEl.innerText = "Lỗi đăng ký: " + error.message; return; }
+      msgEl.innerText = "Đăng ký thành công! Đang đăng nhập...";
       if (data.user) initApp(data.user);
     }
 
-    // Đăng xuất
     async function handleLogout() {
       await sb.auth.signOut();
       location.reload();
     }
 
-    // Khởi tạo giao diện chính sau khi đăng nhập
     function initApp(user) {
       currentUser = user;
       document.getElementById('auth-view').classList.add('hidden');
       document.getElementById('forum-view').classList.remove('hidden');
       document.getElementById('nav-user-info').classList.remove('hidden');
-      
-      const shortName = user.email.split('@')[0];
-      document.getElementById('display-username').innerText = `👋 ${shortName}`;
-      
+      document.getElementById('display-username').innerText = `👋 ${user.email.split('@')[0]}`;
       fetchData();
     }
 
-    // Lấy dữ liệu bài viết và bình luận từ Supabase
     async function fetchData() {
       const [postsRes, commentsRes] = await Promise.all([
         sb.from('posts').select('*').order('created_at', { ascending: false }),
         sb.from('comments').select('*').order('created_at', { ascending: true })
       ]);
 
-      if (postsRes.error) {
-        document.getElementById('posts-list').innerHTML = `<p style="color:#ef4444; text-align:center;">Lỗi tải dữ liệu: ${postsRes.error.message}</p>`;
-        return;
-      }
-
+      if (postsRes.error) return;
       allPosts = postsRes.data || [];
       allComments = commentsRes.data || [];
 
-      // Cập nhật thống kê
       document.getElementById('stat-posts').innerText = allPosts.length;
       document.getElementById('stat-files').innerText = allPosts.filter(p => p.file_url).length;
-
       applyFilters();
     }
 
-    // Tải tệp đính kèm lên Storage 'forum-files'
     async function uploadAttachment(file) {
       const ext = file.name.split('.').pop();
       const safeName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
@@ -435,7 +451,6 @@
       return { url: data.publicUrl, name: file.name };
     }
 
-    // Tạo bài đăng mới
     async function createPost() {
       const title = document.getElementById('post-title').value.trim();
       const category = document.getElementById('post-category').value;
@@ -444,12 +459,12 @@
       const btn = document.getElementById('btn-submit-post');
 
       if (!content && fileInput.files.length === 0) {
-        alert("Bạn cần nhập nội dung hoặc chọn ít nhất 1 tệp đính kèm!");
+        alert("Bạn cần nhập nội dung hoặc đính kèm file!");
         return;
       }
 
       btn.disabled = true;
-      btn.innerText = "⏳ Đang tải lên & đăng bài...";
+      btn.innerText = "⏳ Đang đăng...";
 
       try {
         let fileData = null;
@@ -457,8 +472,8 @@
           fileData = await uploadAttachment(fileInput.files[0]);
         }
 
-        const { error } = await sb.from('posts').insert([{
-          title: title || 'Thảo luận không tiêu đề',
+        await sb.from('posts').insert([{
+          title: title || 'Thảo luận chung',
           category: category,
           content: content,
           user_email: currentUser.email,
@@ -467,80 +482,61 @@
           likes: []
         }]);
 
-        if (error) throw error;
-
-        // Reset form
         document.getElementById('post-title').value = '';
         document.getElementById('post-content').value = '';
         fileInput.value = '';
         await fetchData();
       } catch (err) {
-        alert("Có lỗi xảy ra: " + err.message);
+        alert("Lỗi: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerText = "🚀 Đăng bài lên diễn đàn";
       }
     }
 
-    // Xóa bài viết (chỉ chính chủ)
     async function deletePost(postId) {
-      if (!confirm("Bạn có chắc muốn xóa bài viết này không?")) return;
-      const { error } = await sb.from('posts').delete().eq('id', postId);
-      if (error) alert("Lỗi xóa bài: " + error.message);
-      else fetchData();
+      if (!confirm("Bạn có chắc muốn xóa bài viết này?")) return;
+      await sb.from('posts').delete().eq('id', postId);
+      fetchData();
     }
 
-    // Thả tim / Bỏ tim bài viết
     async function toggleLike(postId) {
       const post = allPosts.find(p => p.id === postId);
       if (!post) return;
-
       let likes = Array.isArray(post.likes) ? [...post.likes] : [];
       const userEmail = currentUser.email;
 
-      if (likes.includes(userEmail)) {
-        likes = likes.filter(e => e !== userEmail);
-      } else {
-        likes.push(userEmail);
-      }
+      if (likes.includes(userEmail)) likes = likes.filter(e => e !== userEmail);
+      else likes.push(userEmail);
 
-      const { error } = await sb.from('posts').update({ likes }).eq('id', postId);
-      if (!error) fetchData();
+      await sb.from('posts').update({ likes }).eq('id', postId);
+      fetchData();
     }
 
-    // Thêm bình luận
     async function addComment(postId) {
       const inputEl = document.getElementById(`comment-input-${postId}`);
       const text = inputEl.value.trim();
       if (!text) return;
 
-      const { error } = await sb.from('comments').insert([{
-        post_id: postId,
-        user_email: currentUser.email,
-        content: text
-      }]);
-
-      if (error) {
-        alert("Lỗi gửi bình luận: " + error.message);
-        return;
-      }
+      await sb.from('comments').insert([{ post_id: postId, user_email: currentUser.email, content: text }]);
       inputEl.value = '';
       fetchData();
     }
 
-    // Lọc và sắp xếp danh sách bài viết
     function applyFilters() {
       const keyword = document.getElementById('search-input').value.toLowerCase().trim();
       const catFilter = document.getElementById('filter-category').value;
+      const typeFilter = document.getElementById('filter-type').value;
       const sortOrder = document.getElementById('sort-order').value;
 
       let filtered = allPosts.filter(post => {
         const matchCat = (catFilter === 'all') || (post.category === catFilter);
+        const matchType = (typeFilter === 'all') || (typeFilter === 'has-file' && post.file_url);
         const matchKey = !keyword || 
           (post.title && post.title.toLowerCase().includes(keyword)) ||
           (post.content && post.content.toLowerCase().includes(keyword)) ||
           (post.user_email && post.user_email.toLowerCase().includes(keyword));
-        return matchCat && matchKey;
+        return matchCat && matchType && matchKey;
       });
 
       if (sortOrder === 'popular') {
@@ -552,11 +548,10 @@
       renderPosts(filtered);
     }
 
-    // Hiển thị danh sách bài viết ra màn hình
     function renderPosts(posts) {
       const listEl = document.getElementById('posts-list');
       if (posts.length === 0) {
-        listEl.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-muted); background: var(--bg-card); border-radius: 12px;">Không tìm thấy bài viết nào phù hợp!</div>`;
+        listEl.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-muted); background: var(--bg-card); border-radius: 12px;">Không tìm thấy bài viết nào!</div>`;
         return;
       }
 
@@ -569,7 +564,6 @@
         const isLiked = likesList.includes(currentUser.email);
         const isOwner = post.user_email === currentUser.email;
 
-        // Xử lý hiển thị tệp đính kèm
         let attachmentHTML = '';
         if (post.file_url) {
           const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(post.file_url);
@@ -580,7 +574,6 @@
           }
         }
 
-        // Lọc bình luận của bài này
         const postComments = allComments.filter(c => c.post_id === post.id);
         const commentsHTML = postComments.map(c => `
           <div class="comment-item">
@@ -602,7 +595,7 @@
               ${isOwner ? `<button class="btn-danger" onclick="deletePost(${post.id})">🗑️ Xóa</button>` : ''}
             </div>
 
-            ${post.title ? `<div class="post-title">${escapeHTML(post.title)}</div>` : ''}
+            <div class="post-title">${escapeHTML(post.title)}</div>
             <div class="post-body">${escapeHTML(post.content)}</div>
             ${attachmentHTML}
 
@@ -616,9 +609,9 @@
             </div>
 
             <div class="comments-area">
-              ${commentsHTML || '<div style="font-size: 12px; color: var(--text-muted);">Chưa có bình luận nào. Hãy là người đầu tiên thảo luận!</div>'}
+              ${commentsHTML || '<div style="font-size: 12px; color: var(--text-muted);">Chưa có bình luận nào.</div>'}
               <div class="comment-form">
-                <input type="text" id="comment-input-${post.id}" placeholder="Viết bình luận giải đáp..." onkeypress="if(event.key==='Enter') addComment(${post.id})" />
+                <input type="text" id="comment-input-${post.id}" placeholder="Viết bình luận..." onkeypress="if(event.key==='Enter') addComment(${post.id})" />
                 <button class="btn-ghost" onclick="addComment(${post.id})">Gửi</button>
               </div>
             </div>
@@ -627,7 +620,6 @@
       }).join('');
     }
 
-    // Chống lỗi XSS khi người dùng nhập ký tự đặc biệt
     function escapeHTML(str) {
       if (!str) return '';
       return str.replace(/[&<>'"]/g, tag => ({
