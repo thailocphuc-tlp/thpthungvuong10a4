@@ -280,12 +280,12 @@
 
   <script>
     // =========================================================================
-    // CẤU HÌNH SUPABASE (THAY ANON KEY CỦA BẠN VÀO DÒNG DƯỚI)
+    // CẤU HÌNH SUPABASE (ĐÃ SỬA TÊN BIẾN TRÁNH XUNG ĐỘT)
     // =========================================================================
     const SUPABASE_URL = 'https://kafwlqcqqtvodzjgqdsw.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq'; 
+    const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvG0LldYLgYEGcw_LWHEyOvq'; 
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
     let allPosts = [];
@@ -293,7 +293,7 @@
 
     // Khởi chạy kiểm tra phiên đăng nhập
     window.addEventListener('DOMContentLoaded', async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await sb.auth.getSession();
       if (session) {
         initApp(session.user);
       }
@@ -304,10 +304,12 @@
       const email = document.getElementById('auth-email').value.trim();
       const password = document.getElementById('auth-password').value;
       const msgEl = document.getElementById('auth-msg');
+      msgEl.style.color = "#38bdf8";
       msgEl.innerText = "Đang kiểm tra...";
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
       if (error) {
+        msgEl.style.color = "#ef4444";
         msgEl.innerText = "Lỗi: " + error.message;
         return;
       }
@@ -321,13 +323,16 @@
       const msgEl = document.getElementById('auth-msg');
       
       if (!email || password.length < 6) {
+        msgEl.style.color = "#ef4444";
         msgEl.innerText = "Vui lòng nhập email hợp lệ và mật khẩu từ 6 ký tự trở lên.";
         return;
       }
 
+      msgEl.style.color = "#38bdf8";
       msgEl.innerText = "Đang tạo tài khoản...";
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await sb.auth.signUp({ email, password });
       if (error) {
+        msgEl.style.color = "#ef4444";
         msgEl.innerText = "Lỗi đăng ký: " + error.message;
         return;
       }
@@ -338,7 +343,7 @@
 
     // Đăng xuất
     async function handleLogout() {
-      await supabase.auth.signOut();
+      await sb.auth.signOut();
       location.reload();
     }
 
@@ -358,8 +363,8 @@
     // Lấy dữ liệu bài viết và bình luận từ Supabase
     async function fetchData() {
       const [postsRes, commentsRes] = await Promise.all([
-        supabase.from('posts').select('*').order('created_at', { ascending: false }),
-        supabase.from('comments').select('*').order('created_at', { ascending: true })
+        sb.from('posts').select('*').order('created_at', { ascending: false }),
+        sb.from('comments').select('*').order('created_at', { ascending: true })
       ]);
 
       if (postsRes.error) {
@@ -383,10 +388,10 @@
       const safeName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`;
       const filePath = `uploads/${safeName}`;
 
-      const { error } = await supabase.storage.from('forum-files').upload(filePath, file);
+      const { error } = await sb.storage.from('forum-files').upload(filePath, file);
       if (error) throw error;
 
-      const { data } = supabase.storage.from('forum-files').getPublicUrl(filePath);
+      const { data } = sb.storage.from('forum-files').getPublicUrl(filePath);
       return { url: data.publicUrl, name: file.name };
     }
 
@@ -412,7 +417,7 @@
           fileData = await uploadAttachment(fileInput.files[0]);
         }
 
-        const { error } = await supabase.from('posts').insert([{
+        const { error } = await sb.from('posts').insert([{
           title: title || 'Thảo luận không tiêu đề',
           category: category,
           content: content,
@@ -440,7 +445,7 @@
     // Xóa bài viết (chỉ chính chủ)
     async function deletePost(postId) {
       if (!confirm("Bạn có chắc muốn xóa bài viết này không?")) return;
-      const { error } = await supabase.from('posts').delete().eq('id', postId);
+      const { error } = await sb.from('posts').delete().eq('id', postId);
       if (error) alert("Lỗi xóa bài: " + error.message);
       else fetchData();
     }
@@ -459,7 +464,7 @@
         likes.push(userEmail);
       }
 
-      const { error } = await supabase.from('posts').update({ likes }).eq('id', postId);
+      const { error } = await sb.from('posts').update({ likes }).eq('id', postId);
       if (!error) fetchData();
     }
 
@@ -469,7 +474,7 @@
       const text = inputEl.value.trim();
       if (!text) return;
 
-      const { error } = await supabase.from('comments').insert([{
+      const { error } = await sb.from('comments').insert([{
         post_id: postId,
         user_email: currentUser.email,
         content: text
