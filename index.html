@@ -6,7 +6,6 @@
   <title>Diễn Đàn Học Tập Lớp 10A4 - THPT Hùng Vương</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    /* Định nghĩa 2 giao diện Sáng / Tối */
     :root[data-theme="dark"] {
       --bg-main: #0b1120;
       --bg-card: #1e293b;
@@ -40,197 +39,118 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; transition: background-color 0.3s, color 0.3s; }
     body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 50px; }
 
-    /* Header Navbar */
     .navbar {
       background: var(--bg-card);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
       padding: 12px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      position: sticky; top: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
     }
     .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 18px; color: var(--accent); }
     .brand img { width: 40px; height: 40px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; }
     .brand span { font-size: 12px; background: var(--notice-bg); padding: 3px 8px; border-radius: 99px; color: var(--accent); }
 
     .nav-right { display: flex; align-items: center; gap: 10px; }
-
     .container { max-width: 860px; margin: 24px auto; padding: 0 16px; }
 
-    /* Banner Khuôn Viên Trường */
     .school-banner {
-      width: 100%;
-      height: 240px;
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-      position: relative;
+      width: 100%; height: 240px; border-radius: 14px; overflow: hidden; margin-bottom: 24px;
+      border: 1px solid var(--border); box-shadow: 0 8px 25px rgba(0,0,0,0.2); position: relative;
     }
-    .school-banner img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.95);
-      transition: transform 0.5s ease;
-    }
+    .school-banner img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.95); transition: transform 0.5s ease; }
     .school-banner:hover img { transform: scale(1.03); }
     .banner-overlay {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
+      position: absolute; bottom: 0; left: 0; right: 0;
       background: linear-gradient(to top, var(--bg-main), transparent);
-      padding: 20px;
-      color: var(--text-main);
+      padding: 20px; color: var(--text-main);
     }
     .banner-overlay h3 { font-size: 20px; color: var(--accent); margin-bottom: 4px; }
     .banner-overlay p { font-size: 13px; color: var(--text-muted); }
 
-    /* Bảng Thông Báo Lớp Học */
     .notice-board {
-      background: var(--notice-bg);
-      border: 1px solid var(--notice-border);
-      padding: 16px 20px;
-      border-radius: 14px;
-      margin-bottom: 24px;
+      background: var(--notice-bg); border: 1px solid var(--notice-border);
+      padding: 16px 20px; border-radius: 14px; margin-bottom: 24px;
     }
     .notice-title { font-weight: 700; font-size: 15px; color: var(--accent); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
     .notice-content { font-size: 13.5px; color: var(--text-main); }
 
-    /* Auth Box */
     .auth-box {
-      max-width: 420px;
-      margin: 60px auto;
-      background: var(--bg-card);
-      padding: 32px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      max-width: 420px; margin: 60px auto; background: var(--bg-card);
+      padding: 32px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
     .auth-box h2 { text-align: center; margin-bottom: 8px; color: var(--accent); }
     .auth-box p { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
 
-    /* Inputs & Buttons */
     input, select, textarea {
-      width: 100%;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--bg-input);
-      color: var(--text-main);
-      font-size: 14px;
+      width: 100%; padding: 12px 14px; margin-bottom: 14px;
+      border-radius: 10px; border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main); font-size: 14px;
     }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
 
     button {
-      padding: 10px 16px;
-      border-radius: 10px;
-      border: none;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      padding: 10px 16px; border-radius: 10px; border: none;
+      font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
     .btn-primary { background: var(--accent); color: var(--bg-main); width: 100%; }
     .btn-primary:hover { opacity: 0.9; }
     .btn-success { background: var(--success); color: white; width: 100%; }
-    .btn-success:hover { opacity: 0.9; }
     .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); padding: 6px 12px; font-size: 12px; }
     .btn-danger:hover { background: var(--danger); color: white; }
     .btn-ghost { background: transparent; color: var(--text-muted); padding: 6px 10px; border: 1px solid var(--border); }
     .btn-ghost:hover { color: var(--text-main); border-color: var(--text-muted); }
 
-    /* Stats Bar */
     .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
     .stat-card { background: var(--bg-card); padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .stat-card span { color: var(--text-muted); font-size: 13px; }
     .stat-card strong { font-size: 20px; color: var(--accent); }
 
-    /* Create Post Card */
+    /* Cài đặt tài khoản modal/khung */
+    .profile-card { background: var(--bg-card); padding: 16px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .profile-info { display: flex; align-items: center; gap: 12px; }
+    .user-avatar-lg { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: #fff; }
+
     .create-card { background: var(--bg-card); padding: 20px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 24px; }
     .create-header { font-weight: 600; margin-bottom: 14px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
     .form-row { display: flex; gap: 12px; }
-    .file-upload-box {
-      border: 1px dashed var(--border);
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 14px;
-      background: var(--bg-input);
-    }
+    .file-upload-box { border: 1px dashed var(--border); padding: 12px; border-radius: 10px; margin-bottom: 14px; background: var(--bg-input); }
     .file-upload-box label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px; cursor: pointer; }
     .file-upload-box input[type="file"] { margin-bottom: 0; padding: 6px; border: none; background: transparent; }
 
-    /* Filter Bar */
     .filter-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      background: var(--bg-card);
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+      background: var(--bg-card); padding: 12px; border-radius: 12px; border: 1px solid var(--border);
     }
     .filter-bar input { flex: 2; min-width: 180px; margin-bottom: 0; }
     .filter-bar select { flex: 1; min-width: 130px; margin-bottom: 0; }
 
-    /* Post Item */
-    .post-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
+    .post-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
     .post-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
     .author-info { display: flex; align-items: center; gap: 10px; }
-    .avatar {
-      width: 38px; height: 38px; border-radius: 50%;
-      background: linear-gradient(135deg, #38bdf8, #818cf8);
-      color: #0f172a; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 15px;
-    }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--bg-input); color: var(--accent); font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 15px; }
     .author-name { font-weight: 600; font-size: 14px; display: block; }
     .post-meta { font-size: 12px; color: var(--text-muted); }
-    .badge {
-      display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 11px; font-weight: 600;
-      background: var(--notice-bg); color: var(--accent); margin-left: 6px;
-    }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; background: var(--notice-bg); color: var(--accent); margin-left: 6px; }
 
     .post-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
     .post-body { font-size: 14.5px; color: var(--text-main); white-space: pre-wrap; word-break: break-word; margin-bottom: 14px; }
 
-    /* Attachment */
     .attachment-box { margin-bottom: 14px; }
     .attachment-box img { max-width: 100%; max-height: 360px; border-radius: 10px; border: 1px solid var(--border); display: block; }
-    .file-pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--bg-input); border: 1px solid var(--border);
-      padding: 10px 14px; border-radius: 10px; color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 500;
-    }
-    .file-pill:hover { border-color: var(--accent); }
+    .file-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--bg-input); border: 1px solid var(--border); padding: 10px 14px; border-radius: 10px; color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 500; }
 
-    /* Actions */
     .post-actions { display: flex; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
     .action-btn { background: transparent; color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 13px; }
     .action-btn:hover { background: var(--notice-bg); color: var(--text-main); }
     .action-btn.liked { color: #f43f5e; background: rgba(244, 63, 94, 0.1); }
 
-    /* Comments */
-    .comments-area {
-      margin-top: 14px; padding: 12px; border-top: 1px dashed var(--border);
-      background: var(--bg-input); border-radius: 10px;
-    }
-    .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+    .comments-area { margin-top: 14px; padding: 12px; border-top: 1px dashed var(--border); background: var(--bg-input); border-radius: 10px; }
+    .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
     .comment-item:last-child { border-bottom: none; }
-    .comment-author { font-weight: 600; color: var(--accent); margin-right: 6px; }
+    .comment-author { font-weight: 600; color: var(--accent); }
+    .comment-reply-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; padding: 2px 6px; }
+    .comment-reply-btn:hover { color: var(--accent); }
+
     .comment-form { display: flex; gap: 8px; margin-top: 10px; }
     .comment-form input { margin-bottom: 0; padding: 8px 12px; font-size: 13px; }
     .comment-form button { padding: 8px 14px; width: auto; }
@@ -283,6 +203,22 @@
       </div>
     </div>
 
+    <!-- KHUNG CÀI ĐẶT TÀI KHOẢN (ĐỔI TÊN & ẢNH ĐẠI DIỆN) -->
+    <div class="profile-card">
+      <div class="profile-info">
+        <img id="profile-avatar-preview" src="" alt="Avatar" class="user-avatar-lg" />
+        <div>
+          <strong id="profile-display-name" style="font-size: 15px; display: block;">Hồ sơ cá nhân</strong>
+          <span style="font-size: 12px; color: var(--text-muted);" id="profile-email-txt"></span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <input type="text" id="input-new-name" placeholder="Tên hiển thị mới..." style="width: 160px; margin-bottom: 0; padding: 8px;" />
+        <input type="text" id="input-new-avatar" placeholder="Link ảnh đại diện (URL)..." style="width: 200px; margin-bottom: 0; padding: 8px;" />
+        <button class="btn-success" onclick="saveProfile()" style="padding: 8px 14px; width: auto;">💾 Lưu cài đặt</button>
+      </div>
+    </div>
+
     <!-- BẢNG THÔNG BÁO LỚP HỌC -->
     <div class="notice-board">
       <div class="notice-title">📌 Thông báo quan trọng từ lớp</div>
@@ -326,7 +262,7 @@
       <button id="btn-submit-post" class="btn-primary" onclick="createPost()">🚀 Đăng bài lên diễn đàn</button>
     </div>
 
-    <!-- Thanh Tìm kiếm & Bộ lọc mở rộng -->
+    <!-- Thanh Tìm kiếm & Bộ lọc -->
     <div class="filter-bar">
       <input type="text" id="search-input" onkeyup="applyFilters()" placeholder="🔍 Tìm kiếm bài viết..." />
       <select id="filter-category" onchange="applyFilters()">
@@ -361,10 +297,10 @@
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
-    let allPosts = [];
+    let allposts = [];
     let allComments = [];
+    let userProfiles = {}; // Lưu thông tin tên và avatar tùy chỉnh theo email
 
-    // Chuyển đổi giao diện Sáng / Tối
     function toggleTheme() {
       const html = document.documentElement;
       const currentTheme = html.getAttribute('data-theme');
@@ -373,10 +309,13 @@
       localStorage.setItem('theme', newTheme);
     }
 
-    // Khôi phục giao diện đã lưu
     window.addEventListener('DOMContentLoaded', async () => {
       const savedTheme = localStorage.getItem('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
+
+      // Tải profile đã lưu trên localStorage
+      const savedProfiles = localStorage.getItem('class_user_profiles');
+      if (savedProfiles) userProfiles = JSON.parse(savedProfiles);
 
       const { data: { session } } = await sb.auth.getSession();
       if (session) initApp(session.user);
@@ -420,8 +359,59 @@
       document.getElementById('auth-view').classList.add('hidden');
       document.getElementById('forum-view').classList.remove('hidden');
       document.getElementById('nav-user-info').classList.remove('hidden');
-      document.getElementById('display-username').innerText = `👋 ${user.email.split('@')[0]}`;
+      
+      const emailKey = user.email;
+      if (!userProfiles[emailKey]) {
+        const defaultName = emailKey.split('@')[0];
+        userProfiles[emailKey] = {
+          name: defaultName,
+          avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${defaultName}`
+        };
+      }
+
+      updateProfileUI();
       fetchData();
+    }
+
+    function updateProfileUI() {
+      const profile = userProfiles[currentUser.email];
+      document.getElementById('display-username').innerText = `👋 ${profile.name}`;
+      document.getElementById('profile-display-name').innerText = profile.name;
+      document.getElementById('profile-email-txt').innerText = currentUser.email;
+      document.getElementById('profile-avatar-preview').src = profile.avatar;
+      document.getElementById('input-new-name').value = profile.name;
+      document.getElementById('input-new-avatar').value = profile.avatar;
+    }
+
+    function saveProfile() {
+      const newName = document.getElementById('input-new-name').value.trim();
+      const newAvatar = document.getElementById('input-new-avatar').value.trim();
+
+      if (!newName) {
+        alert("Tên hiển thị không được để trống!");
+        return;
+      }
+
+      userProfiles[currentUser.email] = {
+        name: newName,
+        avatar: newAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${newName}`
+      };
+
+      localStorage.setItem('class_user_profiles', JSON.stringify(userProfiles));
+      updateProfileUI();
+      renderPosts(allPosts);
+      alert("Đã lưu cài đặt hồ sơ thành công!");
+    }
+
+    function getAuthorInfo(email) {
+      if (userProfiles[email]) {
+        return userProfiles[email];
+      }
+      const short = email.split('@')[0];
+      return {
+        name: short,
+        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${short}`
+      };
     }
 
     async function fetchData() {
@@ -513,14 +503,25 @@
       fetchData();
     }
 
-    async function addComment(postId) {
+    async function addComment(postId, replyToAuthor = null) {
       const inputEl = document.getElementById(`comment-input-${postId}`);
-      const text = inputEl.value.trim();
+      let text = inputEl.value.trim();
       if (!text) return;
+
+      if (replyToAuthor) {
+        text = `@${replyToAuthor} ${text}`;
+      }
 
       await sb.from('comments').insert([{ post_id: postId, user_email: currentUser.email, content: text }]);
       inputEl.value = '';
+      inputEl.placeholder = "Viết bình luận...";
       fetchData();
+    }
+
+    function setReplyTo(postId, authorName) {
+      const inputEl = document.getElementById(`comment-input-${postId}`);
+      inputEl.placeholder = `Trả lời ${authorName}...`;
+      inputEl.focus();
     }
 
     function applyFilters() {
@@ -556,8 +557,7 @@
       }
 
       listEl.innerHTML = posts.map(post => {
-        const authorShort = post.user_email.split('@')[0];
-        const avatarChar = authorShort.charAt(0).toUpperCase();
+        const author = getAuthorInfo(post.user_email);
         const timeStr = new Date(post.created_at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
         
         const likesList = Array.isArray(post.likes) ? post.likes : [];
@@ -575,20 +575,26 @@
         }
 
         const postComments = allComments.filter(c => c.post_id === post.id);
-        const commentsHTML = postComments.map(c => `
-          <div class="comment-item">
-            <span class="comment-author">${c.user_email.split('@')[0]}:</span>
-            <span>${escapeHTML(c.content)}</span>
-          </div>
-        `).join('');
+        const commentsHTML = postComments.map(c => {
+          const cAuthor = getAuthorInfo(c.user_email);
+          return `
+            <div class="comment-item">
+              <div>
+                <span class="comment-author">${cAuthor.name}:</span>
+                <span>${escapeHTML(c.content)}</span>
+              </div>
+              <button class="comment-reply-btn" onclick="setReplyTo(${post.id}, '${cAuthor.name}')">💬 Trả lời</button>
+            </div>
+          `;
+        }).join('');
 
         return `
           <div class="post-card">
             <div class="post-top">
               <div class="author-info">
-                <div class="avatar">${avatarChar}</div>
+                <img src="${author.avatar}" alt="Avatar" class="avatar" />
                 <div>
-                  <span class="author-name">${authorShort} <span class="badge">${post.category}</span></span>
+                  <span class="author-name">${author.name} <span class="badge">${post.category}</span></span>
                   <span class="post-meta">${timeStr}</span>
                 </div>
               </div>
