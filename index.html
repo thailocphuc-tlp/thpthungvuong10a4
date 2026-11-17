@@ -105,7 +105,6 @@
     .stat-card span { color: var(--text-muted); font-size: 13px; }
     .stat-card strong { font-size: 20px; color: var(--accent); }
 
-    /* Cài đặt tài khoản modal/khung */
     .profile-card { background: var(--bg-card); padding: 16px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
     .profile-info { display: flex; align-items: center; gap: 12px; }
     .user-avatar-lg { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: #fff; }
@@ -203,7 +202,7 @@
       </div>
     </div>
 
-    <!-- KHUNG CÀI ĐẶT TÀI KHOẢN (ĐỔI TÊN & ẢNH ĐẠI DIỆN) -->
+    <!-- KHUNG CÀI ĐẶT TÀI KHOẢN (ĐỔI TÊN & TẢI ẢNH ĐẠI DIỆN TỪ MÁY) -->
     <div class="profile-card">
       <div class="profile-info">
         <img id="profile-avatar-preview" src="" alt="Avatar" class="user-avatar-lg" />
@@ -212,10 +211,12 @@
           <span style="font-size: 12px; color: var(--text-muted);" id="profile-email-txt"></span>
         </div>
       </div>
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <input type="text" id="input-new-name" placeholder="Tên hiển thị mới..." style="width: 160px; margin-bottom: 0; padding: 8px;" />
-        <input type="text" id="input-new-avatar" placeholder="Link ảnh đại diện (URL)..." style="width: 200px; margin-bottom: 0; padding: 8px;" />
-        <button class="btn-success" onclick="saveProfile()" style="padding: 8px 14px; width: auto;">💾 Lưu cài đặt</button>
+      <div style="display: flex; gap: 8px; flex-wrap: column; align-items: flex-end;">
+        <input type="text" id="input-new-name" placeholder="Tên hiển thị mới..." style="width: 220px; margin-bottom: 6px; padding: 8px;" />
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <input type="file" id="input-avatar-file" accept="image/*" style="width: 210px; margin-bottom: 0; padding: 4px; font-size: 12px; background: var(--bg-input);" />
+          <button class="btn-success" onclick="saveProfile()" style="padding: 8px 14px; width: auto;">💾 Lưu cài đặt</button>
+        </div>
       </div>
     </div>
 
@@ -297,9 +298,9 @@
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentUser = null;
-    let allposts = [];
+    let allPosts = [];
     let allComments = [];
-    let userProfiles = {}; // Lưu thông tin tên và avatar tùy chỉnh theo email
+    let userProfiles = {};
 
     function toggleTheme() {
       const html = document.documentElement;
@@ -313,7 +314,6 @@
       const savedTheme = localStorage.getItem('theme') || 'dark';
       document.documentElement.setAttribute('data-theme', savedTheme);
 
-      // Tải profile đã lưu trên localStorage
       const savedProfiles = localStorage.getItem('class_user_profiles');
       if (savedProfiles) userProfiles = JSON.parse(savedProfiles);
 
@@ -380,27 +380,46 @@
       document.getElementById('profile-email-txt').innerText = currentUser.email;
       document.getElementById('profile-avatar-preview').src = profile.avatar;
       document.getElementById('input-new-name').value = profile.name;
-      document.getElementById('input-new-avatar').value = profile.avatar;
     }
 
-    function saveProfile() {
+    // Tải ảnh đại diện trực tiếp từ máy lên Supabase Storage
+    async function saveProfile() {
       const newName = document.getElementById('input-new-name').value.trim();
-      const newAvatar = document.getElementById('input-new-avatar').value.trim();
+      const avatarFileInput = document.getElementById('input-avatar-file');
 
       if (!newName) {
         alert("Tên hiển thị không được để trống!");
         return;
       }
 
-      userProfiles[currentUser.email] = {
-        name: newName,
-        avatar: newAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${newName}`
-      };
+      let avatarUrl = userProfiles[currentUser.email].avatar;
 
-      localStorage.setItem('class_user_profiles', JSON.stringify(userProfiles));
-      updateProfileUI();
-      renderPosts(allPosts);
-      alert("Đã lưu cài đặt hồ sơ thành công!");
+      try {
+        if (avatarFileInput.files.length > 0) {
+          const file = avatarFileInput.files[0];
+          const ext = file.name.split('.').pop();
+          const safeName = `avatar_${Date.now()}_${Math.random().toString(36).substring(2, 6)}.${ext}`;
+          const filePath = `uploads/${safeName}`;
+
+          const { error: uploadErr } = await sb.storage.from('forum-files').upload(filePath, file);
+          if (uploadErr) throw uploadErr;
+
+          const { data: pubData } = sb.storage.from('forum-files').getPublicUrl(filePath);
+          avatarUrl = pubData.publicUrl;
+        }
+
+        userProfiles[currentUser.email] = {
+          name: newName,
+          avatar: avatarUrl
+        };
+
+        localStorage.setItem('class_user_profiles', JSON.stringify(userProfiles));
+        updateProfileUI();
+        renderPosts(allPosts);
+        alert("Đã cập nhật hồ sơ thành công!");
+      } catch (err) {
+        alert("Lỗi tải ảnh đại diện: " + err.message);
+      }
     }
 
     function getAuthorInfo(email) {
@@ -503,16 +522,27 @@
       fetchData();
     }
 
-    async function addComment(postId, replyToAuthor = null) {
+    async function addComment(postId) {
       const inputEl = document.getElementById(`comment-input-${postId}`);
       let text = inputEl.value.trim();
       if (!text) return;
 
-      if (replyToAuthor) {
-        text = `@${replyToAuthor} ${text}`;
+      if (inputEl.dataset.replyTo) {
+        text = `@${inputEl.dataset.replyTo} ${text}`;
+        delete inputEl.dataset.replyTo;
       }
 
-      await sb.from('comments').insert([{ post_id: postId, user_email: currentUser.email, content: text }]);
+      const { error } = await sb.from('comments').insert([{ 
+        post_id: postId, 
+        user_email: currentUser.email, 
+        content: text 
+      }]);
+
+      if (error) {
+        alert("Lỗi gửi bình luận: " + error.message);
+        return;
+      }
+
       inputEl.value = '';
       inputEl.placeholder = "Viết bình luận...";
       fetchData();
@@ -520,7 +550,8 @@
 
     function setReplyTo(postId, authorName) {
       const inputEl = document.getElementById(`comment-input-${postId}`);
-      inputEl.placeholder = `Trả lời ${authorName}...`;
+      inputEl.dataset.replyTo = authorName;
+      inputEl.placeholder = `Đang trả lời ${authorName}...`;
       inputEl.focus();
     }
 
