@@ -17,6 +17,7 @@
       --border: #334155;
       --danger: #ef4444;
       --success: #10b981;
+      --warning: #f59e0b;
       --notice-bg: rgba(56, 189, 248, 0.1);
       --notice-border: rgba(56, 189, 248, 0.3);
     }
@@ -32,6 +33,7 @@
       --border: #cbd5e1;
       --danger: #dc2626;
       --success: #059669;
+      --warning: #d97706;
       --notice-bg: rgba(2, 132, 199, 0.08);
       --notice-border: rgba(2, 132, 199, 0.2);
     }
@@ -95,6 +97,8 @@
     .btn-primary { background: var(--accent); color: var(--bg-main); width: 100%; }
     .btn-primary:hover { opacity: 0.9; }
     .btn-success { background: var(--success); color: white; width: 100%; }
+    .btn-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 6px 12px; font-size: 12px; }
+    .btn-warning:hover { background: var(--warning); color: white; }
     .btn-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); padding: 6px 12px; font-size: 12px; }
     .btn-danger:hover { background: var(--danger); color: white; }
     .btn-ghost { background: transparent; color: var(--text-muted); padding: 6px 10px; border: 1px solid var(--border); }
@@ -138,17 +142,18 @@
     .attachment-box img { max-width: 100%; max-height: 360px; border-radius: 10px; border: 1px solid var(--border); display: block; }
     .file-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--bg-input); border: 1px solid var(--border); padding: 10px 14px; border-radius: 10px; color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 500; }
 
-    .post-actions { display: flex; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .post-actions { display: flex; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border); align-items: center; }
     .action-btn { background: transparent; color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 13px; }
     .action-btn:hover { background: var(--notice-bg); color: var(--text-main); }
     .action-btn.liked { color: #f43f5e; background: rgba(244, 63, 94, 0.1); }
 
     .comments-area { margin-top: 14px; padding: 12px; border-top: 1px dashed var(--border); background: var(--bg-input); border-radius: 10px; }
-    .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
+    .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .comment-item:last-child { border-bottom: none; }
     .comment-author { font-weight: 600; color: var(--accent); }
-    .comment-reply-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; padding: 2px 6px; }
-    .comment-reply-btn:hover { color: var(--accent); }
+    .comment-actions { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+    .comment-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; padding: 2px 6px; }
+    .comment-btn:hover { color: var(--accent); }
 
     .comment-form { display: flex; gap: 8px; margin-top: 10px; }
     .comment-form input { margin-bottom: 0; padding: 8px 12px; font-size: 13px; }
@@ -202,7 +207,7 @@
       </div>
     </div>
 
-    <!-- KHUNG CÀI ĐẶT TÀI KHOẢN (ĐỔI TÊN & TẢI ẢNH ĐẠI DIỆN TỪ MÁY) -->
+    <!-- KHUNG CÀI ĐẶT TÀI KHOẢN -->
     <div class="profile-card">
       <div class="profile-info">
         <img id="profile-avatar-preview" src="" alt="Avatar" class="user-avatar-lg" />
@@ -211,7 +216,7 @@
           <span style="font-size: 12px; color: var(--text-muted);" id="profile-email-txt"></span>
         </div>
       </div>
-      <div style="display: flex; gap: 8px; flex-wrap: column; align-items: flex-end;">
+      <div style="display: flex; gap: 8px; flex-direction: column; align-items: flex-end;">
         <input type="text" id="input-new-name" placeholder="Tên hiển thị mới..." style="width: 220px; margin-bottom: 6px; padding: 8px;" />
         <div style="display: flex; gap: 8px; align-items: center;">
           <input type="file" id="input-avatar-file" accept="image/*" style="width: 210px; margin-bottom: 0; padding: 4px; font-size: 12px; background: var(--bg-input);" />
@@ -382,7 +387,6 @@
       document.getElementById('input-new-name').value = profile.name;
     }
 
-    // Tải ảnh đại diện trực tiếp từ máy lên Supabase Storage
     async function saveProfile() {
       const newName = document.getElementById('input-new-name').value.trim();
       const avatarFileInput = document.getElementById('input-avatar-file');
@@ -408,11 +412,7 @@
           avatarUrl = pubData.publicUrl;
         }
 
-        userProfiles[currentUser.email] = {
-          name: newName,
-          avatar: avatarUrl
-        };
-
+        userProfiles[currentUser.email] = { name: newName, avatar: avatarUrl };
         localStorage.setItem('class_user_profiles', JSON.stringify(userProfiles));
         updateProfileUI();
         renderPosts(allPosts);
@@ -423,14 +423,9 @@
     }
 
     function getAuthorInfo(email) {
-      if (userProfiles[email]) {
-        return userProfiles[email];
-      }
+      if (userProfiles[email]) return userProfiles[email];
       const short = email.split('@')[0];
-      return {
-        name: short,
-        avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${short}`
-      };
+      return { name: short, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${short}` };
     }
 
     async function fetchData() {
@@ -503,6 +498,22 @@
       }
     }
 
+    // TÍNH NĂNG SỬA BÀI VIẾT
+    async function editPost(postId, oldTitle, oldContent) {
+      const newTitle = prompt("Sửa tiêu đề bài viết:", oldTitle);
+      if (newTitle === null) return;
+      const newContent = prompt("Sửa nội dung bài viết:", oldContent);
+      if (newContent === null) return;
+
+      const { error } = await sb.from('posts').update({ 
+        title: newTitle.trim() || 'Thảo luận chung', 
+        content: newContent.trim() 
+      }).eq('id', postId);
+
+      if (error) alert("Lỗi sửa bài viết: " + error.message);
+      else fetchData();
+    }
+
     async function deletePost(postId) {
       if (!confirm("Bạn có chắc muốn xóa bài viết này?")) return;
       await sb.from('posts').delete().eq('id', postId);
@@ -553,6 +564,24 @@
       inputEl.dataset.replyTo = authorName;
       inputEl.placeholder = `Đang trả lời ${authorName}...`;
       inputEl.focus();
+    }
+
+    // TÍNH NĂNG SỬA BÌNH LUẬN
+    async function editComment(commentId, oldContent) {
+      const newContent = prompt("Sửa nội dung bình luận:", oldContent);
+      if (newContent === null || !newContent.trim()) return;
+
+      const { error } = await sb.from('comments').update({ content: newContent.trim() }).eq('id', commentId);
+      if (error) alert("Lỗi sửa bình luận: " + error.message);
+      else fetchData();
+    }
+
+    // TÍNH NĂNG XÓA BÌNH LUẬN
+    async function deleteComment(commentId) {
+      if (!confirm("Bạn có chắc muốn xóa bình luận này?")) return;
+      const { error } = await sb.from('comments').delete().eq('id', commentId);
+      if (error) alert("Lỗi xóa bình luận: " + error.message);
+      else fetchData();
     }
 
     function applyFilters() {
@@ -608,13 +637,20 @@
         const postComments = allComments.filter(c => c.post_id === post.id);
         const commentsHTML = postComments.map(c => {
           const cAuthor = getAuthorInfo(c.user_email);
+          const isCommentOwner = c.user_email === currentUser.email;
           return `
             <div class="comment-item">
               <div>
                 <span class="comment-author">${cAuthor.name}:</span>
                 <span>${escapeHTML(c.content)}</span>
               </div>
-              <button class="comment-reply-btn" onclick="setReplyTo(${post.id}, '${cAuthor.name}')">💬 Trả lời</button>
+              <div class="comment-actions">
+                <button class="comment-btn" onclick="setReplyTo(${post.id}, '${cAuthor.name}')">💬 Trả lời</button>
+                ${isCommentOwner ? `
+                  <button class="comment-btn" onclick="editComment(${c.id}, '${escapeHTML(c.content).replace(/'/g, "\\'")}')">✏️ Sửa</button>
+                  <button class="comment-btn" style="color: var(--danger);" onclick="deleteComment(${c.id})">🗑️ Xóa</button>
+                ` : ''}
+              </div>
             </div>
           `;
         }).join('');
@@ -629,7 +665,12 @@
                   <span class="post-meta">${timeStr}</span>
                 </div>
               </div>
-              ${isOwner ? `<button class="btn-danger" onclick="deletePost(${post.id})">🗑️ Xóa</button>` : ''}
+              <div style="display: flex; gap: 6px;">
+                ${isOwner ? `
+                  <button class="btn-warning" onclick="editPost(${post.id}, '${escapeHTML(post.title).replace(/'/g, "\\'")}', '${escapeHTML(post.content).replace(/'/g, "\\'")}')">✏️ Sửa</button>
+                  <button class="btn-danger" onclick="deletePost(${post.id})">🗑️ Xóa</button>
+                ` : ''}
+              </div>
             </div>
 
             <div class="post-title">${escapeHTML(post.title)}</div>
