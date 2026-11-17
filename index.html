@@ -7,128 +7,100 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root[data-theme="dark"] {
-      --bg-main: #050b14;
-      --bg-card: rgba(19, 28, 49, 0.65);
-      --bg-input: rgba(9, 14, 26, 0.7);
+      --bg-main: #040812;
+      --bg-card: rgba(15, 23, 42, 0.7);
+      --bg-input: rgba(7, 11, 20, 0.8);
       --accent: #38bdf8;
-      --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --border: rgba(255, 255, 255, 0.08);
-      --border-glow: rgba(56, 189, 248, 0.3);
+      --border-glow: rgba(56, 189, 248, 0.35);
       --danger: #ef4444;
       --success: #10b981;
       --warning: #f59e0b;
-      --notice-bg: rgba(56, 189, 248, 0.06);
-      --notice-border: rgba(56, 189, 248, 0.2);
-      --shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-      --glass-blur: blur(20px);
+      --notice-bg: rgba(56, 189, 248, 0.08);
+      --notice-border: rgba(56, 189, 248, 0.25);
+      --shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      --glass-blur: blur(24px);
     }
 
     :root[data-theme="light"] {
-      --bg-main: #f0f4f8;
-      --bg-card: rgba(255, 255, 255, 0.75);
-      --bg-input: rgba(241, 245, 249, 0.8);
+      --bg-main: #f1f5f9;
+      --bg-card: rgba(255, 255, 255, 0.8);
+      --bg-input: rgba(248, 250, 252, 0.9);
       --accent: #0284c7;
       --accent-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
       --text-main: #0f172a;
       --text-muted: #64748b;
       --border: rgba(0, 0, 0, 0.06);
-      --border-glow: rgba(2, 132, 199, 0.2);
+      --border-glow: rgba(2, 132, 199, 0.25);
       --danger: #dc2626;
       --success: #059669;
       --warning: #d97706;
-      --notice-bg: rgba(2, 132, 199, 0.04);
+      --notice-bg: rgba(2, 132, 199, 0.05);
       --notice-border: rgba(2, 132, 199, 0.15);
-      --shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-      --glass-blur: blur(20px);
+      --shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+      --glass-blur: blur(24px);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
-    body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 60px; position: relative; overflow-x: hidden; }
+    body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 70px; position: relative; overflow-x: hidden; }
 
     /* HIỆU ỨNG LIQUID GLOWING BACKGROUND ORBS */
-    .liquid-bg {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: -1;
-      overflow: hidden;
-    }
-    .liquid-blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.45;
-      animation: floatBlob 12s infinite alternate ease-in-out;
-    }
-    .blob-1 { width: 450px; height: 450px; background: #38bdf8; top: -100px; left: -100px; animation-delay: 0s; }
-    .blob-2 { width: 400px; height: 400px; background: #818cf8; bottom: -100px; right: -100px; animation-delay: -4s; }
-    .blob-3 { width: 350px; height: 350px; background: #c084fc; top: 40%; left: 30%; animation-delay: -8s; opacity: 0.25; }
+    .liquid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: hidden; }
+    .liquid-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.4; animation: floatBlob 14s infinite alternate ease-in-out; }
+    .blob-1 { width: 500px; height: 500px; background: #38bdf8; top: -120px; left: -100px; animation-delay: 0s; }
+    .blob-2 { width: 450px; height: 450px; background: #6366f1; bottom: -100px; right: -100px; animation-delay: -5s; }
+    .blob-3 { width: 400px; height: 400px; background: #c084fc; top: 35%; left: 35%; animation-delay: -9s; opacity: 0.2; }
 
     @keyframes floatBlob {
       0% { transform: translate(0px, 0px) scale(1); }
-      100% { transform: translate(50px, 60px) scale(1.15); }
+      100% { transform: translate(60px, 70px) scale(1.18); }
     }
 
     /* Navbar Liquid Glass */
     .navbar {
-      background: var(--bg-card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border-bottom: 1px solid var(--border);
-      padding: 14px 28px;
-      position: sticky; top: 0; z-index: 100;
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: var(--shadow);
+      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--border); padding: 14px 28px; position: sticky; top: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);
     }
-    .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 19px; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 20px; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; border: 2px solid var(--accent); }
     .brand span { font-size: 11px; background: var(--notice-bg); padding: 4px 10px; border-radius: 99px; color: var(--accent); border: 1px solid var(--notice-border); font-weight: 600; -webkit-text-fill-color: initial; }
 
     .nav-right { display: flex; align-items: center; gap: 12px; }
-    .container { max-width: 900px; margin: 28px auto; padding: 0 16px; position: relative; z-index: 1; }
+    .container { max-width: 920px; margin: 28px auto; padding: 0 16px; position: relative; z-index: 1; }
 
     /* Banner Khuôn Viên Trường */
     .school-banner {
-      width: 100%; height: 260px; border-radius: 22px; overflow: hidden; margin-bottom: 24px;
+      width: 100%; height: 270px; border-radius: 24px; overflow: hidden; margin-bottom: 24px;
       border: 1px solid var(--border); box-shadow: var(--shadow); position: relative;
     }
-    .school-banner img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-    .school-banner:hover img { transform: scale(1.04); }
+    .school-banner img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.92); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    .school-banner:hover img { transform: scale(1.03); }
     .banner-overlay {
       position: absolute; bottom: 0; left: 0; right: 0;
       background: linear-gradient(to top, var(--bg-main) 10%, transparent 90%);
-      padding: 24px; color: var(--text-main);
+      padding: 26px; color: var(--text-main);
     }
-    .banner-overlay h3 { font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+    .banner-overlay h3 { font-size: 23px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
     .banner-overlay p { font-size: 13.5px; color: var(--text-muted); }
 
-    /* Layout Lưới: Thông báo & Thông tin liên hệ */
-    .grid-top-section {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
+    /* Layout Lưới Top */
+    .grid-top-section { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
     @media(max-width: 768px) { .grid-top-section { grid-template-columns: 1fr; } }
 
     .notice-board {
-      background: var(--bg-card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--notice-border);
-      padding: 20px; border-radius: 20px; box-shadow: var(--shadow);
+      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--notice-border); padding: 22px; border-radius: 22px; box-shadow: var(--shadow);
     }
     .notice-title { font-weight: 700; font-size: 15px; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     .notice-content { font-size: 13.5px; color: var(--text-main); line-height: 1.5; }
 
     .author-contact-card {
-      background: var(--bg-card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--border);
-      padding: 20px; border-radius: 20px; box-shadow: var(--shadow);
+      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border); padding: 22px; border-radius: 22px; box-shadow: var(--shadow);
       display: flex; flex-direction: column; justify-content: space-between;
     }
     .author-contact-title { font-weight: 700; font-size: 14px; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
@@ -140,27 +112,23 @@
     }
     .social-pill:hover { border-color: var(--accent); color: var(--accent); background: var(--notice-bg); }
 
-    /* Auth Box Liquid Glass */
+    /* Auth Box */
     .auth-box {
-      max-width: 440px; margin: 80px auto;
-      background: var(--bg-card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      padding: 36px; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow);
+      max-width: 440px; margin: 80px auto; background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      padding: 36px; border-radius: 26px; border: 1px solid var(--border); box-shadow: var(--shadow);
     }
     .auth-box h2 { text-align: center; margin-bottom: 8px; font-weight: 800; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .auth-box p { text-align: center; color: var(--text-muted); font-size: 13.5px; margin-bottom: 24px; }
 
     input, select, textarea {
-      width: 100%; padding: 13px 16px; margin-bottom: 14px;
-      border-radius: 14px; border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main); font-size: 14px;
-      backdrop-filter: blur(10px);
+      width: 100%; padding: 13px 16px; margin-bottom: 14px; border-radius: 14px;
+      border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main); font-size: 14px; backdrop-filter: blur(10px);
     }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--border-glow); }
 
     button {
-      padding: 11px 18px; border-radius: 14px; border: none;
-      font-weight: 600; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 11px 18px; border-radius: 14px; border: none; font-weight: 600; font-size: 14px;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn-primary { background: var(--accent-gradient); color: #fff; width: 100%; box-shadow: 0 4px 20px rgba(56, 189, 248, 0.35); }
     .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
@@ -174,32 +142,23 @@
 
     .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
     .stat-card {
-      background: var(--bg-card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      padding: 18px 22px; border-radius: 20px; border: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);
+      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      padding: 18px 22px; border-radius: 20px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);
     }
     .stat-card span { color: var(--text-muted); font-size: 13px; font-weight: 500; }
     .stat-card strong { font-size: 22px; font-weight: 800; color: var(--accent); }
 
-    /* Khung Hồ sơ cá nhân */
     .profile-card {
-      background: var(--bg-card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      padding: 20px; border-radius: 20px; border: 1px solid var(--border); margin-bottom: 24px;
+      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      padding: 22px; border-radius: 22px; border: 1px solid var(--border); margin-bottom: 24px;
       display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: var(--shadow);
     }
     .profile-info { display: flex; align-items: center; gap: 14px; }
-    .user-avatar-lg { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: #fff; box-shadow: 0 0 15px var(--border-glow); }
+    .user-avatar-lg { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: #fff; box-shadow: 0 0 15px var(--border-glow); }
 
-    /* Khung tạo bài viết */
     .create-card {
-      background: var(--bg-card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      padding: 24px; border-radius: 22px; border: 1px solid var(--border); margin-bottom: 24px; box-shadow: var(--shadow);
+      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      padding: 26px; border-radius: 24px; border: 1px solid var(--border); margin-bottom: 24px; box-shadow: var(--shadow);
     }
     .create-header { font-weight: 700; font-size: 16px; margin-bottom: 16px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
     .form-row { display: flex; gap: 12px; }
@@ -208,37 +167,35 @@
     .file-upload-box input[type="file"] { display: none; }
     .custom-file-upload { display: inline-block; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--accent); font-weight: 600; cursor: pointer; margin-top: 6px; }
 
-    /* Thanh lọc */
     .filter-bar {
       display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
-      background: var(--bg-card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      padding: 14px; border-radius: 18px; border: 1px solid var(--border); box-shadow: var(--shadow);
+      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      padding: 16px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow);
     }
     .filter-bar input { flex: 2; min-width: 180px; margin-bottom: 0; }
     .filter-bar select { flex: 1; min-width: 140px; margin-bottom: 0; }
 
-    /* Bài đăng */
+    /* Post Card */
     .post-card {
-      background: var(--bg-card);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--border); border-radius: 22px; padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow);
+      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border); border-radius: 24px; padding: 26px; margin-bottom: 22px; box-shadow: var(--shadow);
+      transition: border-color 0.3s, transform 0.2s;
     }
+    .post-card:hover { border-color: var(--border-glow); }
     .post-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
     .author-info { display: flex; align-items: center; gap: 12px; }
-    .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--bg-input); color: var(--accent); font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 15px; }
-    .author-name { font-weight: 700; font-size: 14.5px; display: block; }
+    .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--bg-input); color: var(--accent); font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .author-name { font-weight: 700; font-size: 15px; display: block; display: flex; align-items: center; gap: 6px; }
     .post-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
     .edited-tag { font-size: 11px; color: var(--text-muted); font-style: italic; }
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; background: var(--notice-bg); color: var(--accent); margin-left: 6px; border: 1px solid var(--notice-border); }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; background: var(--notice-bg); color: var(--accent); border: 1px solid var(--notice-border); }
+    .admin-badge { font-size: 10px; background: rgba(16, 185, 129, 0.15); color: var(--success); padding: 2px 6px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3); }
 
-    .post-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; color: var(--text-main); }
-    .post-body { font-size: 14.5px; color: var(--text-main); white-space: pre-wrap; word-break: break-word; margin-bottom: 16px; }
+    .post-title { font-size: 18.5px; font-weight: 800; margin-bottom: 10px; color: var(--text-main); }
+    .post-body { font-size: 15px; color: var(--text-main); white-space: pre-wrap; word-break: break-word; margin-bottom: 16px; }
 
     .attachment-box { margin-bottom: 16px; }
-    .attachment-box img { max-width: 100%; max-height: 400px; border-radius: 14px; border: 1px solid var(--border); display: block; }
+    .attachment-box img { max-width: 100%; max-height: 420px; border-radius: 16px; border: 1px solid var(--border); display: block; }
     .file-pill { display: inline-flex; align-items: center; gap: 10px; background: var(--bg-input); border: 1px solid var(--border); padding: 12px 16px; border-radius: 14px; color: var(--accent); text-decoration: none; font-size: 13.5px; font-weight: 600; }
     .file-pill:hover { border-color: var(--accent); }
 
@@ -247,17 +204,23 @@
     .action-btn:hover { background: var(--notice-bg); color: var(--text-main); }
     .action-btn.liked { color: #f43f5e; background: rgba(244, 63, 94, 0.12); }
 
-    .comments-area { margin-top: 16px; padding: 14px; border-top: 1px dashed var(--border); background: var(--bg-input); border-radius: 16px; }
-    .comment-item { font-size: 13px; padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    /* Comments Area */
+    .comments-area { margin-top: 16px; padding: 16px; border-top: 1px dashed var(--border); background: var(--bg-input); border-radius: 18px; }
+    .comment-item { font-size: 13.5px; padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
     .comment-item:last-child { border-bottom: none; }
-    .comment-author { font-weight: 700; color: var(--accent); }
+    .comment-author { font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 6px; }
+    .comment-img { max-width: 160px; max-height: 160px; border-radius: 10px; margin-top: 6px; display: block; border: 1px solid var(--border); }
     .comment-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
     .comment-btn { background: none; border: none; color: var(--text-muted); font-size: 11.5px; cursor: pointer; padding: 3px 8px; border-radius: 8px; font-weight: 600; }
     .comment-btn:hover { color: var(--accent); background: var(--bg-card); }
 
-    .comment-form { display: flex; gap: 8px; margin-top: 12px; }
-    .comment-form input { margin-bottom: 0; padding: 10px 14px; font-size: 13px; }
+    .comment-form-wrapper { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .comment-form { display: flex; gap: 8px; align-items: center; }
+    .comment-form input { margin-bottom: 0; padding: 10px 14px; font-size: 13px; flex: 1; }
     .comment-form button { padding: 10px 16px; width: auto; border-radius: 12px; }
+    
+    .comment-file-label { font-size: 12px; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+    .comment-file-label:hover { color: var(--accent); }
 
     .hidden { display: none !important; }
     #loading-overlay { text-align: center; padding: 40px; color: var(--text-muted); }
@@ -665,28 +628,40 @@
 
     async function addComment(postId) {
       const inputEl = document.getElementById(`comment-input-${postId}`);
+      const fileInputEl = document.getElementById(`comment-file-${postId}`);
       let text = inputEl.value.trim();
-      if (!text) return;
+      
+      if (!text && fileInputEl.files.length === 0) return;
 
       if (inputEl.dataset.replyTo) {
         text = `@${inputEl.dataset.replyTo} ${text}`;
         delete inputEl.dataset.replyTo;
       }
 
-      const { error } = await sb.from('comments').insert([{ 
-        post_id: postId, 
-        user_email: currentUser.email, 
-        content: text 
-      }]);
+      try {
+        let fileUrl = null;
+        if (fileInputEl.files.length > 0) {
+          const uploaded = await uploadAttachment(fileInputEl.files[0]);
+          fileUrl = uploaded.url;
+        }
 
-      if (error) {
-        alert("Lỗi gửi bình luận: " + error.message);
-        return;
+        const { error } = await sb.from('comments').insert([{ 
+          post_id: postId, 
+          user_email: currentUser.email, 
+          content: text,
+          file_url: fileUrl 
+        }]);
+
+        if (error) throw error;
+
+        inputEl.value = '';
+        fileInputEl.value = '';
+        document.getElementById(`comment-file-name-${postId}`).innerText = '';
+        inputEl.placeholder = "Viết bình luận...";
+        fetchData();
+      } catch (err) {
+        alert("Lỗi gửi bình luận: " + err.message);
       }
-
-      inputEl.value = '';
-      inputEl.placeholder = "Viết bình luận...";
-      fetchData();
     }
 
     function setReplyTo(postId, authorName) {
@@ -762,6 +737,7 @@
         const likesList = Array.isArray(post.likes) ? post.likes : [];
         const isLiked = likesList.includes(currentUser.email);
         const isOwner = post.user_email === currentUser.email;
+        const isAdmin = post.user_email.includes('thailocphuc');
 
         let attachmentHTML = '';
         if (post.file_url) {
@@ -780,12 +756,18 @@
           const isCommentEdited = editedItems[`comment_${c.id}`];
           const editedCommentHTML = isCommentEdited ? `<span class="edited-tag" style="font-size: 10px; margin-left: 4px;">(đã chỉnh sửa)</span>` : '';
 
+          let commentFileHTML = '';
+          if (c.file_url) {
+            commentFileHTML = `<br><a href="${c.file_url}" target="_blank"><img src="${c.file_url}" class="comment-img" /></a>`;
+          }
+
           return `
             <div class="comment-item">
               <div>
-                <span class="comment-author">${cAuthor.name}:</span>
+                <span class="comment-author">${cAuthor.name}</span>
                 <span>${escapeHTML(c.content)}</span>
                 ${editedCommentHTML}
+                ${commentFileHTML}
               </div>
               <div class="comment-actions">
                 <button class="comment-btn" onclick="setReplyTo(${post.id}, '${cAuthor.name}')">💬 Trả lời</button>
@@ -804,7 +786,11 @@
               <div class="author-info">
                 <img src="${author.avatar}" alt="Avatar" class="avatar" />
                 <div>
-                  <span class="author-name">${author.name} <span class="badge">${post.category}</span></span>
+                  <span class="author-name">
+                    ${author.name} 
+                    ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
+                    <span class="badge">${post.category}</span>
+                  </span>
                   <div class="post-meta">
                     <span>${timeStr}</span>
                     ${editedPostHTML}
@@ -834,9 +820,13 @@
 
             <div class="comments-area">
               ${commentsHTML || '<div style="font-size: 12px; color: var(--text-muted);">Chưa có bình luận nào.</div>'}
-              <div class="comment-form">
-                <input type="text" id="comment-input-${post.id}" placeholder="Viết bình luận..." onkeypress="if(event.key==='Enter') addComment(${post.id})" />
-                <button class="btn-ghost" onclick="addComment(${post.id})">Gửi</button>
+              <div class="comment-form-wrapper">
+                <div class="comment-form">
+                  <input type="text" id="comment-input-${post.id}" placeholder="Viết bình luận..." onkeypress="if(event.key==='Enter') addComment(${post.id})" />
+                  <label for="comment-file-${post.id}" class="comment-file-label" title="Đính kèm ảnh bình luận">📷 <span id="comment-file-name-${post.id}"></span></label>
+                  <input type="file" id="comment-file-${post.id}" accept="image/*" style="display:none;" onchange="document.getElementById('comment-file-name-${post.id}').innerText = this.files[0] ? 'Đã chọn ảnh' : ''" />
+                  <button class="btn-ghost" onclick="addComment(${post.id})">Gửi</button>
+                </div>
               </div>
             </div>
           </div>
@@ -845,7 +835,7 @@
     }
 
     function escapeHTML(str) {
-      if (!str) return {};
+      if (!str) return '';
       return String(str).replace(/[&<>'"]/g, tag => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
       }[tag]));
