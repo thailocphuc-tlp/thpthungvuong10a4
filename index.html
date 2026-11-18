@@ -91,7 +91,7 @@
     .banner-overlay h3 { font-size: 23px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
     .banner-overlay p { font-size: 13.5px; color: var(--text-muted); }
 
-    /* Layout Lưới Top & Tiện ích 2.0 */
+    /* Layout Lưới Top & Tiện ích 2.1 */
     .grid-top-section { display: grid; grid-template-columns: 1fr 1.35fr; gap: 16px; margin-bottom: 20px; }
     .grid-widgets-section { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
     @media(max-width: 768px) { 
@@ -122,16 +122,17 @@
     .leader-stats { font-size: 11px; color: var(--text-muted); }
     .leader-score { font-size: 12px; font-weight: 800; color: var(--warning); background: rgba(245, 158, 11, 0.12); padding: 4px 10px; border-radius: 99px; border: 1px solid rgba(245, 158, 11, 0.25); }
 
-    /* Danh Sách Nhắc Việc & Hạn Nộp Bài Tập (Homework Tracker) */
+    /* Danh Sách Nhắc Việc & Hạn Nộp Bài Tập (Cloud Synced) */
     .deadline-list { display: flex; flex-direction: column; gap: 8px; max-height: 185px; overflow-y: auto; padding-right: 4px; }
-    .deadline-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 9px 12px; border-radius: 12px; border: 1px solid var(--border); font-size: 12.5px; }
+    .deadline-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 9px 12px; border-radius: 12px; border: 1px solid var(--border); font-size: 12.5px; gap: 8px; }
     .deadline-item.done { opacity: 0.55; text-decoration: line-through; }
-    .deadline-tag { font-size: 10.5px; padding: 2px 8px; border-radius: 6px; font-weight: 700; margin-right: 6px; }
+    .deadline-tag { font-size: 10.5px; padding: 2px 8px; border-radius: 6px; font-weight: 700; margin-right: 6px; white-space: nowrap; }
     .tag-urgent { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
     .tag-normal { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
     .deadline-add-row { display: flex; gap: 6px; margin-top: 10px; }
     .deadline-add-row input { margin-bottom: 0; padding: 8px 12px; font-size: 12px; }
     .deadline-add-row button { padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0; }
+    .sync-badge { font-size: 10px; background: rgba(16, 185, 129, 0.15); color: var(--success); padding: 2px 8px; border-radius: 99px; border: 1px solid rgba(16, 185, 129, 0.3); }
 
     /* Auth Box */
     .auth-box {
@@ -352,7 +353,7 @@
       </div>
     </div>
 
-    <!-- HÀNG 2 (ULTIMATE 2.0): BẢNG XẾP HẠNG TÍCH CỰC & NHẮC VIỆC / HẠN NỘP BÀI TẬP -->
+    <!-- HÀNG 2 (ULTIMATE 2.1 - CLOUD SYNC): BẢNG XẾP HẠNG TÍCH CỰC & NHẮC VIỆC ĐỒNG BỘ -->
     <div class="grid-widgets-section">
       <!-- Bảng xếp hạng thành viên tích cực -->
       <div class="glass-box">
@@ -365,20 +366,22 @@
         </div>
       </div>
 
-      <!-- Danh sách nhắc việc & hạn nộp bài tập -->
+      <!-- Danh sách nhắc việc & hạn nộp bài tập đồng bộ Supabase -->
       <div class="glass-box">
         <div class="box-title">
           <span>⏰ Nhắc Việc & Hạn Nộp Bài Tập</span>
-          <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Bấm vào để đánh dấu xong</span>
+          <span class="sync-badge">☁️ Đồng bộ cả lớp</span>
         </div>
-        <div id="deadline-list" class="deadline-list"></div>
+        <div id="deadline-list" class="deadline-list">
+          <div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px;">⏳ Đang tải danh sách nhắc việc...</div>
+        </div>
         <div class="deadline-add-row">
           <input type="text" id="new-deadline-text" placeholder="VD: Thứ 6 nộp bài tập Toán..." onkeypress="if(event.key==='Enter') addDeadline()" />
           <select id="new-deadline-type" style="width: 105px; margin-bottom: 0; padding: 8px; font-size: 12px;">
             <option value="urgent">🔥 Gấp</option>
             <option value="normal">📘 Thường</option>
           </select>
-          <button class="btn-primary" onclick="addDeadline()">+ Thêm</button>
+          <button id="btn-add-deadline" class="btn-primary" onclick="addDeadline()">+ Thêm</button>
         </div>
       </div>
     </div>
@@ -428,7 +431,6 @@
           <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
           <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
           <option value="Tin học">💻 Tin học</option>
-          <option value="GDĐP"> GD-ĐP</option>
         </select>
       </div>
 
@@ -464,7 +466,6 @@
         <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
         <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
         <option value="Tin học">💻 Tin học</option>
-        <option value="GDĐP"> GD-ĐP</option>
       </select>
       <select id="filter-type" onchange="applyFilters()">
         <option value="all">Tất cả bài viết</option>
@@ -490,14 +491,10 @@
     let currentUser = null;
     let allPosts = [];
     let allComments = [];
+    let allDeadlines = [];
     let userProfiles = {};
     let editedItems = JSON.parse(localStorage.getItem('class_edited_items') || '{}');
-    let pinnedPosts = JSON.parse(localStorage.getItem('class_pinned_posts') || '[]');
-    let deadlines = JSON.parse(localStorage.getItem('class_deadlines_10a4') || JSON.stringify([
-      { id: 1, text: 'Hoàn thành bài tập Ngữ văn tiết S3', type: 'urgent', done: false },
-      { id: 2, text: 'Ôn tập kiểm tra Tin học & Tiếng Anh', type: 'normal', done: false },
-      { id: 3, text: 'Chuẩn bị nội dung HĐTN-LMS thứ 7', type: 'normal', done: false }
-    ]));
+    let localPinnedPosts = JSON.parse(localStorage.getItem('class_pinned_posts') || '[]');
 
     function toggleTheme() {
       const html = document.documentElement;
@@ -520,23 +517,35 @@
       const savedProfiles = localStorage.getItem('class_user_profiles');
       if (savedProfiles) userProfiles = JSON.parse(savedProfiles);
 
-      renderDeadlines();
-
       const { data: { session } } = await sb.auth.getSession();
       if (session) initApp(session.user);
     });
 
-    /* QUẢN LÝ NHẮC VIỆC & HẠN NỘP BÀI TẬP */
+    /* QUẢN LÝ NHẮC VIỆC & HẠN NỘP BÀI TẬP (ĐỒNG BỘ SUPABASE) */
+    async function fetchDeadlines() {
+      const { data, error } = await sb.from('deadlines').select('*').order('created_at', { ascending: false });
+      if (error) {
+        console.warn("Chưa tạo bảng deadlines trên Supabase:", error.message);
+        document.getElementById('deadline-list').innerHTML = `
+          <div style="font-size: 11.5px; color: var(--warning); text-align: center; padding: 10px;">
+            ⚠️ Bạn hãy chạy lệnh SQL tạo bảng <b>deadlines</b> trên Supabase để bật đồng bộ nhắc việc giữa điện thoại và máy tính nhé!
+          </div>`;
+        return;
+      }
+      allDeadlines = data || [];
+      renderDeadlines();
+    }
+
     function renderDeadlines() {
       const listEl = document.getElementById('deadline-list');
       if (!listEl) return;
-      if (deadlines.length === 0) {
+      if (allDeadlines.length === 0) {
         listEl.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px;">Chưa có nhắc việc nào. Cả lớp thảnh thơi! 🎉</div>`;
         return;
       }
-      listEl.innerHTML = deadlines.map(item => `
-        <div class="deadline-item ${item.done ? 'done' : ''}" onclick="toggleDeadline(${item.id})" style="cursor: pointer;">
-          <div>
+      listEl.innerHTML = allDeadlines.map(item => `
+        <div class="deadline-item ${item.done ? 'done' : ''}" onclick="toggleDeadline(${item.id}, ${item.done})" style="cursor: pointer;">
+          <div style="flex: 1;">
             <span class="deadline-tag ${item.type === 'urgent' ? 'tag-urgent' : 'tag-normal'}">${item.type === 'urgent' ? '🔥 Gấp' : '📘 Nhắc'}</span>
             <span>${escapeHTML(item.text)}</span>
           </div>
@@ -545,28 +554,43 @@
       `).join('');
     }
 
-    function addDeadline() {
+    async function addDeadline() {
       const textInput = document.getElementById('new-deadline-text');
       const typeSelect = document.getElementById('new-deadline-type');
+      const btn = document.getElementById('btn-add-deadline');
       const text = textInput.value.trim();
       if (!text) return;
 
-      deadlines.unshift({ id: Date.now(), text, type: typeSelect.value, done: false });
-      localStorage.setItem('class_deadlines_10a4', JSON.stringify(deadlines));
+      btn.disabled = true;
+      btn.innerText = "⏳";
+
+      const { error } = await sb.from('deadlines').insert([{
+        text: text,
+        type: typeSelect.value,
+        done: false,
+        user_email: currentUser.email
+      }]);
+
+      btn.disabled = false;
+      btn.innerText = "+ Thêm";
+
+      if (error) {
+        alert("Lỗi lưu nhắc việc lên Supabase: " + error.message);
+        return;
+      }
+
       textInput.value = '';
-      renderDeadlines();
+      await fetchDeadlines();
     }
 
-    function toggleDeadline(id) {
-      deadlines = deadlines.map(d => d.id === id ? { ...d, done: !d.done } : d);
-      localStorage.setItem('class_deadlines_10a4', JSON.stringify(deadlines));
-      renderDeadlines();
+    async function toggleDeadline(id, currentDone) {
+      const { error } = await sb.from('deadlines').update({ done: !currentDone }).eq('id', id);
+      if (!error) await fetchDeadlines();
     }
 
-    function deleteDeadline(id) {
-      deadlines = deadlines.filter(d => d.id !== id);
-      localStorage.setItem('class_deadlines_10a4', JSON.stringify(deadlines));
-      renderDeadlines();
+    async function deleteDeadline(id) {
+      const { error } = await sb.from('deadlines').delete().eq('id', id);
+      if (!error) await fetchDeadlines();
     }
 
     /* BẢNG XẾP HẠNG THÀNH VIÊN TÍCH CỰC */
@@ -617,15 +641,28 @@
       }).join('');
     }
 
-    /* GHIM BÀI VIẾT QUAN TRỌNG */
-    function togglePinPost(postId) {
-      if (pinnedPosts.includes(postId)) {
-        pinnedPosts = pinnedPosts.filter(id => id !== postId);
+    /* GHIM BÀI VIẾT QUAN TRỌNG (Hỗ trợ đồng bộ cột is_pinned trên Supabase) */
+    function isPostPinned(post) {
+      if (typeof post.is_pinned === 'boolean') return post.is_pinned;
+      return localPinnedPosts.includes(post.id);
+    }
+
+    async function togglePinPost(postId, currentPinState) {
+      const newPinState = !currentPinState;
+      const { error } = await sb.from('posts').update({ is_pinned: newPinState }).eq('id', postId);
+      
+      if (error) {
+        // Fallback nếu cột is_pinned chưa tạo trên Supabase
+        if (localPinnedPosts.includes(postId)) {
+          localPinnedPosts = localPinnedPosts.filter(id => id !== postId);
+        } else {
+          localPinnedPosts.push(postId);
+        }
+        localStorage.setItem('class_pinned_posts', JSON.stringify(localPinnedPosts));
+        applyFilters();
       } else {
-        pinnedPosts.push(postId);
+        await fetchData();
       }
-      localStorage.setItem('class_pinned_posts', JSON.stringify(pinnedPosts));
-      applyFilters();
     }
 
     async function handleLogin() {
@@ -678,6 +715,7 @@
 
       updateProfileUI();
       fetchData();
+      fetchDeadlines();
     }
 
     function updateProfileUI() {
@@ -929,8 +967,8 @@
 
       // Sắp xếp ưu tiên bài viết được ghim lên đầu tiên
       filtered.sort((a, b) => {
-        const aPinned = pinnedPosts.includes(a.id) ? 1 : 0;
-        const bPinned = pinnedPosts.includes(b.id) ? 1 : 0;
+        const aPinned = isPostPinned(a) ? 1 : 0;
+        const bPinned = isPostPinned(b) ? 1 : 0;
         if (aPinned !== bPinned) return bPinned - aPinned;
 
         if (sortOrder === 'popular') {
@@ -962,7 +1000,7 @@
         const isLiked = likesList.includes(currentUser.email);
         const isOwner = post.user_email === currentUser.email;
         const isAdmin = post.user_email.includes('thailocphuc');
-        const isPinned = pinnedPosts.includes(post.id);
+        const pinned = isPostPinned(post);
 
         let attachmentHTML = '';
         if (post.file_url) {
@@ -1006,8 +1044,8 @@
         }).join('');
 
         return `
-          <div class="post-card ${isPinned ? 'pinned-post' : ''}">
-            ${isPinned ? `<div class="pin-banner">📌 Bài viết quan trọng được ghim bởi Admin</div>` : ''}
+          <div class="post-card ${pinned ? 'pinned-post' : ''}">
+            ${pinned ? `<div class="pin-banner">📌 Bài viết quan trọng được ghim bởi Admin</div>` : ''}
             <div class="post-top">
               <div class="author-info">
                 <img src="${author.avatar}" alt="Avatar" class="avatar" />
@@ -1025,7 +1063,7 @@
               </div>
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 ${(isCurrentUserAdmin || isOwner) ? `
-                  <button class="btn-pin ${isPinned ? 'active' : ''}" onclick="togglePinPost(${post.id})">📌 ${isPinned ? 'Bỏ ghim' : 'Ghim'}</button>
+                  <button class="btn-pin ${pinned ? 'active' : ''}" onclick="togglePinPost(${post.id}, ${pinned})">📌 ${pinned ? 'Bỏ ghim' : 'Ghim'}</button>
                 ` : ''}
                 ${isOwner ? `
                   <button class="btn-warning" onclick="editPost(${post.id}, '${escapeHTML(post.title).replace(/'/g, "\\'")}', '${escapeHTML(post.content).replace(/'/g, "\\'")}')">✏️ Sửa</button>
