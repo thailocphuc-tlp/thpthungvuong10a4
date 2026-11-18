@@ -343,7 +343,7 @@
               <tr><td class="session-col">S2</td><td>SHL</td><td>Tin học</td><td>Anh NN</td><td>Ngữ văn</td><td>Mỹ thuật</td><td>-</td></tr>
               <tr><td class="session-col">S3</td><td>Ngữ văn</td><td>Ngữ văn</td><td>GDKT-PL</td><td>Toán</td><td>Tin học</td><td>-</td></tr>
               <tr><td class="session-col">S4</td><td>Tiếng Anh</td><td>Toán</td><td>GDKT-PL</td><td>Địa lý</td><td>-</td><td>-</td></tr>
-              <tr><td class="session-col">C1</td><td>-</td><td>ND GDĐP</td><td>Toán</td><td>Lịch sử</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">C1</td><td>-</td><td>GDĐP</td><td>Toán</td><td>Lịch sử</td><td>-</td><td>-</td></tr>
               <tr><td class="session-col">C2</td><td>-</td><td>GDKT-PL</td><td>Toán</td><td>GD QP-AN</td><td>-</td><td>-</td></tr>
               <tr><td class="session-col">C3</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
               <tr><td class="session-col">C4</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
@@ -353,9 +353,8 @@
       </div>
     </div>
 
-    <!-- HÀNG 2 (ULTIMATE 2.1 - CLOUD SYNC): BẢNG XẾP HẠNG TÍCH CỰC & NHẮC VIỆC ĐỒNG BỘ -->
+    <!-- HÀNG 2: BẢNG XẾP HẠNG & NHẮC VIỆC ĐỒNG BỘ -->
     <div class="grid-widgets-section">
-      <!-- Bảng xếp hạng thành viên tích cực -->
       <div class="glass-box">
         <div class="box-title">
           <span>🏆 Top 3 Thành Viên Tích Cực</span>
@@ -366,7 +365,6 @@
         </div>
       </div>
 
-      <!-- Danh sách nhắc việc & hạn nộp bài tập đồng bộ Supabase -->
       <div class="glass-box">
         <div class="box-title">
           <span>⏰ Nhắc Việc & Hạn Nộp Bài Tập</span>
@@ -643,7 +641,7 @@
       }).join('');
     }
 
-    /* GHIM BÀI VIẾT QUAN TRỌNG (Hỗ trợ đồng bộ cột is_pinned trên Supabase) */
+    /* GHIM BÀI VIẾT QUAN TRỌNG */
     function isPostPinned(post) {
       if (typeof post.is_pinned === 'boolean') return post.is_pinned;
       return localPinnedPosts.includes(post.id);
@@ -654,7 +652,6 @@
       const { error } = await sb.from('posts').update({ is_pinned: newPinState }).eq('id', postId);
       
       if (error) {
-        // Fallback nếu cột is_pinned chưa tạo trên Supabase
         if (localPinnedPosts.includes(postId)) {
           localPinnedPosts = localPinnedPosts.filter(id => id !== postId);
         } else {
@@ -882,12 +879,16 @@
       fetchData();
     }
 
+    /* ĐÃ SỬA VÀ TỐI ƯU HÀM BÌNH LUẬN */
     async function addComment(postId) {
       const inputEl = document.getElementById(`comment-input-${postId}`);
       const fileInputEl = document.getElementById(`comment-file-${postId}`);
       let text = inputEl.value.trim();
       
-      if (!text && fileInputEl.files.length === 0) return;
+      if (!text && (!fileInputEl || fileInputEl.files.length === 0)) {
+        alert("Vui lòng nhập nội dung bình luận hoặc chọn ảnh!");
+        return;
+      }
 
       if (inputEl.dataset.replyTo) {
         text = `@${inputEl.dataset.replyTo} ${text}`;
@@ -896,7 +897,7 @@
 
       try {
         let fileUrl = null;
-        if (fileInputEl.files.length > 0) {
+        if (fileInputEl && fileInputEl.files.length > 0) {
           const uploaded = await uploadAttachment(fileInputEl.files[0]);
           fileUrl = uploaded.url;
         }
@@ -911,10 +912,11 @@
         if (error) throw error;
 
         inputEl.value = '';
-        fileInputEl.value = '';
-        document.getElementById(`comment-file-name-${postId}`).innerText = '';
+        if (fileInputEl) fileInputEl.value = '';
+        const fileNameEl = document.getElementById(`comment-file-name-${postId}`);
+        if (fileNameEl) fileNameEl.innerText = '';
         inputEl.placeholder = "Viết bình luận...";
-        fetchData();
+        await fetchData();
       } catch (err) {
         alert("Lỗi gửi bình luận: " + err.message);
       }
@@ -967,7 +969,6 @@
         return matchCat && matchType && matchKey;
       });
 
-      // Sắp xếp ưu tiên bài viết được ghim lên đầu tiên
       filtered.sort((a, b) => {
         const aPinned = isPostPinned(a) ? 1 : 0;
         const bPinned = isPostPinned(b) ? 1 : 0;
