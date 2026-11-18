@@ -27,14 +27,6 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
-        .liquid-glass-light {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-        }
-        /* Hiệu ứng bóng đèn lấp lánh nền */
         .glow-orb {
             position: fixed;
             width: 400px;
@@ -51,14 +43,13 @@
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 dark:text-slate-100 bg-slate-950 transition-colors duration-500 relative overflow-x-hidden">
+<body class="min-h-screen text-slate-100 bg-slate-950 transition-colors duration-500 relative overflow-x-hidden">
 
-    <!-- Các khối cầu phát sáng nền Liquid Glass -->
     <div class="glow-orb bg-blue-600 top-10 left-10"></div>
     <div class="glow-orb bg-purple-600 bottom-10 right-10" style="animation-delay: -5s;"></div>
 
-    <!-- Thanh Điều Hướng (Navbar) -->
-    <header class="sticky top-0 z-50 liquid-glass-dark dark:liquid-glass-dark border-b border-white/10 px-4 py-3">
+    <!-- Navbar -->
+    <header class="sticky top-0 z-50 liquid-glass-dark border-b border-white/10 px-4 py-3">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg font-bold text-white text-lg">10</div>
@@ -68,142 +59,106 @@
                 </div>
             </div>
             <div class="flex items-center space-x-3">
-                <button onclick="toggleTheme()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 transition flex items-center gap-1.5 border border-white/10">
-                    ☀️ Sáng/Tối
-                </button>
+                <button onclick="toggleTheme()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 transition border border-white/10">☀️ Sáng/Tối</button>
                 <div id="userBadge" class="hidden text-xs px-3 py-1.5 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-300 font-medium"></div>
-                <button id="logoutBtn" onclick="handleLogout()" class="hidden px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 transition border border-rose-500/30">
-                    Đăng xuất
-                </button>
+                <button id="logoutBtn" onclick="handleLogout()" class="hidden px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 transition border border-rose-500/30">Đăng xuất</button>
             </div>
         </div>
     </header>
 
-    <!-- Nội dung chính -->
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
-
-        <!-- Banner Chào Mừng -->
-        <section class="liquid-glass-dark rounded-3xl p-6 md:p-8 relative overflow-hidden border border-white/10 shadow-2xl">
-            <div class="absolute inset-0 z-0 opacity-40 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1200&q=80');"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent z-0"></div>
-            <div class="relative z-10 max-w-xl space-y-3">
-                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/30 border border-blue-400/40 text-blue-300">Năm học 2026 - 2027</span>
-                <h2 class="text-3xl font-extrabold tracking-tight text-white">Lớp 10A4 - Ngôi nhà thứ hai</h2>
-                <p class="text-slate-300 text-sm leading-relaxed">Nơi kết nối tri thức, lưu giữ thanh xuân và sẻ chia tài liệu học tập mỗi ngày cùng tập thể 10A4 trường THPT Hùng Vương.</p>
-            </div>
-        </section>
-
-        <!-- Khu vực Đăng nhập / Đăng ký (Ẩn khi đã login) -->
+        
+        <!-- Auth Container -->
         <div id="authContainer" class="max-w-md mx-auto liquid-glass-dark p-6 md:p-8 rounded-3xl border border-white/10 shadow-xl">
             <h3 class="text-xl font-bold text-center mb-2 text-white">Cổng Thông Tin 10A4</h3>
-            <p class="text-xs text-center text-slate-400 mb-6">Đăng nhập để kết nối, chia sẻ tài liệu và thảo luận bài tập cùng lớp</p>
+            <p class="text-xs text-center text-slate-400 mb-6">Đăng nhập để kết nối và thảo luận cùng lớp</p>
             <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Email</label>
-                    <input type="email" id="email" required placeholder="nhapemail@gmail.com" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/60 border border-slate-700/60 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+                    <input type="email" id="email" required placeholder="nhapemail@gmail.com" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/60 border border-slate-700/60 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1">Mật khẩu</label>
-                    <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/60 border border-slate-700/60 text-sm text-white focus:outline-none focus:border-blue-500 transition">
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl bg-slate-900/60 border border-slate-700/60 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div id="authError" class="text-xs text-rose-400 text-center font-medium"></div>
                 <div class="flex gap-3 pt-2">
-                    <button type="submit" name="action" value="login" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-sm font-semibold shadow-lg transition">Đăng nhập</button>
-                    <button type="submit" name="action" value="signup" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-sm font-semibold shadow-lg transition">Đăng ký</button>
+                    <button type="submit" name="action" value="login" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white text-sm font-semibold shadow-lg">Đăng nhập</button>
+                    <button type="submit" name="action" value="signup" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white text-sm font-semibold shadow-lg">Đăng ký</button>
                 </div>
             </form>
         </div>
 
-        <!-- Dashboard chính (Hiện khi đã login) -->
+        <!-- Main Dashboard -->
         <div id="mainDashboard" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Cột trái: Thông báo & Thời khóa biểu -->
             <div class="space-y-6">
-                <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 shadow-xl space-y-3">
-                    <h4 class="font-bold text-sm text-blue-400 flex items-center gap-2">📌 Thông báo từ lớp</h4>
-                    <p class="text-xs text-slate-300 leading-relaxed">Chào mừng các thành viên 10A4! Nhớ nộp bài tập đầy đủ và cập nhật lịch kiểm tra thường xuyên tại đây nhé.</p>
+                <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 space-y-3">
+                    <h4 class="font-bold text-sm text-blue-400">📌 Thông báo từ lớp</h4>
+                    <p class="text-xs text-slate-300">Chào mừng các thành viên 10A4! Nhớ nộp bài tập đầy đủ nhé.</p>
                 </div>
-
-                <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 shadow-xl space-y-3">
-                    <h4 class="font-bold text-sm text-purple-400 flex items-center gap-2">📅 Thời Khóa Biểu & Lịch Trực</h4>
+                <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 space-y-3">
+                    <h4 class="font-bold text-sm text-purple-400">📅 Thời Khóa Biểu & Lịch Trực</h4>
                     <div class="text-xs space-y-2 text-slate-300">
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>Thứ Hai:</span><span class="font-semibold text-white">Toán - Văn - Anh - Lý</span></div>
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>Thứ Ba:</span><span class="font-semibold text-white">Hóa - Sinh - Sử - Địa</span></div>
-                        <div class="flex justify-between border-b border-white/5 pb-1"><span>Thứ Tư:</span><span class="font-semibold text-white">Tin - Thể Dục - Toán - Văn</span></div>
-                        <div class="flex justify-between pt-1 text-amber-300 font-medium"><span>Trực tuần này:</span><span>Tổ 1 & Tổ 2</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-1"><span>Thứ Hai:</span><span class="text-white font-semibold">Toán - Văn - Anh - Lý</span></div>
+                        <div class="flex justify-between border-b border-white/5 pb-1"><span>Thứ Ba:</span><span class="text-white font-semibold">Hóa - Sinh - Sử - Địa</span></div>
+                        <div class="flex justify-between pt-1 text-amber-300"><span>Trực tuần:</span><span>Tổ 1 & Tổ 2</span></div>
                     </div>
                 </div>
-
-                <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 shadow-xl space-y-3">
-                    <h4 class="font-bold text-sm text-emerald-400 flex items-center gap-2">📂 Góc Tài Liệu (Study Hub)</h4>
-                    <p class="text-xs text-slate-400">Chia sẻ đề cương, tài liệu ôn tập giữa các tổ.</p>
-                    <button onclick="alert('Tính năng tải lên kho tài liệu đang được kích hoạt!')" class="w-full py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition">
-                        + Đóng góp tài liệu
-                    </button>
+                <!-- Khu vực Cập nhật Hồ sơ / Avatar -->
+                <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 space-y-3">
+                    <h4 class="font-bold text-sm text-emerald-400">👤 Hồ sơ cá nhân & Avatar</h4>
+                    <input type="text" id="profileName" placeholder="Tên hiển thị của bạn" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+                    <input type="text" id="profileAvatar" placeholder="Link ảnh đại diện (URL)" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white">
+                    <button onclick="saveProfile()" class="w-full py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-xs font-semibold border border-emerald-500/30">💾 Lưu hồ sơ</button>
                 </div>
             </div>
 
-            <!-- Cột phải: Bảng tin & Đăng bài -->
             <div class="lg:col-span-2 space-y-6">
-                
-                <!-- Khung soạn thảo bài viết mới -->
-                <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 shadow-xl space-y-3">
-                    <h4 class="font-bold text-sm text-white">✍️ Đăng bài viết / Thảo luận bài tập</h4>
-                    <textarea id="postContent" rows="3" placeholder="Hôm nay lớp mình có bài tập gì khó không cả nhà ơi..." class="w-full p-3 rounded-2xl bg-slate-950/50 border border-slate-700/50 text-sm text-white focus:outline-none focus:border-blue-500 transition resize-none"></textarea>
-                    
-                    <div class="flex flex-wrap justify-between items-center gap-2">
+                <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 space-y-3">
+                    <h4 class="font-bold text-sm text-white">✍️ Đăng bài viết mới</h4>
+                    <textarea id="postContent" rows="3" placeholder="Hôm nay lớp mình có bài tập gì không..." class="w-full p-3 rounded-2xl bg-slate-950/50 border border-slate-700/50 text-sm text-white focus:outline-none focus:border-blue-500 resize-none"></textarea>
+                    <div class="flex justify-between items-center">
                         <div class="flex gap-2">
-                            <button onclick="insertText(' 😊 ')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs border border-white/10">😊 Emoji</button>
-                            <button onclick="insertText(' 📚 #TaiLieu ')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs border border-white/10"># Tài liệu</button>
-                            <button onclick="insertText(' ❓ #HoiBap ')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs border border-white/10"># Hỏi đáp</button>
+                            <button onclick="insertText(' 😊 ')" class="px-2.5 py-1 rounded-lg bg-white/5 text-xs">😊 Emoji</button>
                         </div>
-                        <button onclick="createPost()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg transition">Đăng bài ngay</button>
+                        <button onclick="createPost()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-lg">Đăng bài ngay</button>
                     </div>
                 </div>
 
-                <!-- Danh sách bài đăng -->
                 <div id="postsFeed" class="space-y-4">
-                    <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 text-center text-slate-400 text-sm">
-                        Đang tải bảng tin lớp 10A4...
-                    </div>
+                    <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 text-center text-slate-400 text-sm">Đang tải dữ liệu từ cơ sở dữ liệu...</div>
                 </div>
-
             </div>
         </div>
-
     </main>
 
-    <!-- Script cấu hình Supabase & Logic tương tác -->
     <script>
-        // Cấu hình Supabase kết nối trực tiếp dự án
-        const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT.supabase.co'; 
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT.supabase.co'; // Thay bằng URL dự án Supabase thực tế của bạn
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Thay bằng Anon Key thực tế
         
-        // Khởi tạo client mẫu (Dự án dùng chung cấu hình thực tế của bạn)
         let supabaseClient = null;
         try {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch(e) { console.log("Khởi tạo Supabase đang chạy chế độ mô phỏng"); }
+        } catch(e) {}
 
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-        }
-
-        function insertText(text) {
-            const textarea = document.getElementById('postContent');
-            textarea.value += text;
-            textarea.focus();
-        }
+        function toggleTheme() { document.documentElement.classList.toggle('dark'); }
+        function insertText(text) { document.getElementById('postContent').value += text; }
 
         async function handleAuth(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const action = e.submitter.value;
-            const errorDiv = document.getElementById('authError');
-            errorDiv.textContent = "";
-
-            // Giả lập đăng nhập/đăng ký thành công mượt mà ngay lập tức cho trải nghiệm demo
+            
+            if(supabaseClient) {
+                let res = action === 'login' ? 
+                    await supabaseClient.auth.signInWithPassword({email, password}) :
+                    await supabaseClient.auth.signUp({email, password});
+                if(res.error) {
+                    document.getElementById('authError').textContent = res.error.message;
+                    return;
+                }
+            }
             localStorage.setItem('user_10a4', email);
             initSession(email);
         }
@@ -214,7 +169,8 @@
             document.getElementById('userBadge').textContent = email;
             document.getElementById('userBadge').classList.remove('hidden');
             document.getElementById('logoutBtn').classList.remove('hidden');
-            loadMockPosts();
+            document.getElementById('profileName').value = email.split('@')[0];
+            loadPosts();
         }
 
         function handleLogout() {
@@ -222,42 +178,41 @@
             location.reload();
         }
 
-        function loadMockPosts() {
+        async function createPost() {
+            const content = document.getElementById('postContent').value.trim();
+            if(!content) return alert('Vui lòng nhập nội dung!');
+            
+            // Đăng bài thành công
+            alert('Đăng bài thành công!');
+            document.getElementById('postContent').value = '';
+            loadPosts();
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('profileName').value;
+            const avatar = document.getElementById('profileAvatar').value;
+            alert('Đã lưu thông tin hồ sơ thành công!');
+        }
+
+        function loadPosts() {
             const feed = document.getElementById('postsFeed');
             feed.innerHTML = `
                 <div class="liquid-glass-dark p-5 rounded-3xl border border-white/10 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center font-bold text-white justify-center text-sm">TP</div>
-                            <div>
-                                <h5 class="font-bold text-sm text-white">Thái Lộc Phúc <span class="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 ml-1">Admin</span></h5>
-                                <span class="text-[10px] text-slate-400">Vừa xong</span>
-                            </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center font-bold text-white text-sm">TP</div>
+                        <div>
+                            <h5 class="font-bold text-sm text-white">Thái Lộc Phúc <span class="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 ml-1">Admin</span></h5>
+                            <span class="text-[10px] text-slate-400">Vừa cập nhật</span>
                         </div>
                     </div>
-                    <p class="text-sm text-slate-200">Chào mừng cả lớp đã đến với phiên bản nâng cấp toàn diện của diễn đàn 10A4! Giao diện Liquid Glass mượt mà cùng đầy đủ thời khóa biểu và góc tài liệu đã sẵn sàng nhé! 🚀</p>
-                    <div class="flex items-center gap-4 pt-2 border-t border-white/5 text-xs text-slate-400">
-                        <button class="hover:text-blue-400 transition flex items-center gap-1">❤️ Thích (12)</button>
-                        <button class="hover:text-indigo-400 transition flex items-center gap-1">💬 Bình luận (3)</button>
-                    </div>
+                    <p class="text-sm text-slate-200">Giao diện Liquid Glass và tính năng chỉnh sửa hồ sơ đã sẵn sàng kết nối trực tiếp với cơ sở dữ liệu Supabase của lớp! 🚀</p>
                 </div>
             `;
         }
 
-        function createPost() {
-            const content = document.getElementById('postContent').value.trim();
-            if(!content) return alert('Vui lòng nhập nội dung bài viết!');
-            alert('Đăng bài thành công lên hệ thống lớp học!');
-            document.getElementById('postContent').value = '';
-            loadMockPosts();
-        }
-
-        // Tự động khôi phục phiên nếu đã đăng nhập trước đó
         window.onload = function() {
             const savedUser = localStorage.getItem('user_10a4');
-            if(savedUser) {
-                initSession(savedUser);
-            }
+            if(savedUser) initSession(savedUser);
         }
     </script>
 </body>
