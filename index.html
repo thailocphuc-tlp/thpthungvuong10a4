@@ -301,6 +301,9 @@
         <button class="btn-primary" onclick="handleLogin()">Đăng nhập</button>
         <button class="btn-success" onclick="handleSignUp()">Đăng ký</button>
       </div>
+      <div style="text-align: right; margin-top: 10px;">
+        <a href="#" onclick="handleForgotPassword(); return false;" style="font-size: 12.5px; color: var(--accent); text-decoration: none;">Quên mật khẩu?</a>
+      </div>
       <p id="auth-msg" style="color: var(--danger); margin-top: 14px; text-align: center; font-size: 13px; font-weight: 600;"></p>
     </div>
   </div>
@@ -526,6 +529,32 @@
       if (session) initApp(session.user);
     });
 
+    /* TÍNH NĂNG QUÊN MẬT KHẨU */
+    async function handleForgotPassword() {
+      const email = document.getElementById('auth-email').value.trim();
+      const msgEl = document.getElementById('auth-msg');
+      if (!email) {
+        msgEl.style.color = "var(--danger)";
+        msgEl.innerText = "Vui lòng nhập email của bạn vào ô email ở trên trước khi bấm Quên mật khẩu!";
+        return;
+      }
+
+      msgEl.style.color = "var(--accent)";
+      msgEl.innerText = "Đang gửi email khôi phục mật khẩu...";
+
+      const { error } = await sb.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.href,
+      });
+
+      if (error) {
+        msgEl.style.color = "var(--danger)";
+        msgEl.innerText = "Lỗi: " + error.message;
+      } else {
+        msgEl.style.color = "var(--success)";
+        msgEl.innerText = "Đã gửi email khôi phục! Vui lòng kiểm tra hộp thư đến (hoặc thư rác).";
+      }
+    }
+
     /* QUẢN LÝ NHẮC VIỆC & HẠN NỘP BÀI TẬP (ĐỒNG BỘ SUPABASE) */
     async function fetchDeadlines() {
       const { data, error } = await sb.from('deadlines').select('*').order('created_at', { ascending: false });
@@ -673,6 +702,7 @@
       const email = document.getElementById('auth-email').value.trim();
       const password = document.getElementById('auth-password').value;
       const msgEl = document.getElementById('auth-msg');
+      msgEl.style.color = "var(--danger)";
       msgEl.innerText = "Đang kiểm tra...";
 
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
@@ -686,13 +716,16 @@
       const msgEl = document.getElementById('auth-msg');
       
       if (!email || password.length < 6) {
+        msgEl.style.color = "var(--danger)";
         msgEl.innerText = "Vui lòng nhập email hợp lệ và mật khẩu từ 6 ký tự trở lên.";
         return;
       }
 
+      msgEl.style.color = "var(--danger)";
       msgEl.innerText = "Đang tạo tài khoản...";
       const { data, error } = await sb.auth.signUp({ email, password });
       if (error) { msgEl.innerText = "Lỗi đăng ký: " + error.message; return; }
+      msgEl.style.color = "var(--success)";
       msgEl.innerText = "Đăng ký thành công! Đang đăng nhập...";
       if (data.user) initApp(data.user);
     }
