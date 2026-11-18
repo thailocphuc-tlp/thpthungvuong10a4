@@ -47,7 +47,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
     body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 70px; position: relative; overflow-x: hidden; }
 
-    /* HIỆU ỨNG LIQUID GLOWING BACKGROUND ORBS NÂNG CẤP */
+    /* HIỆU ỨNG LIQUID GLOWING BACKGROUND ORBS */
     .liquid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: hidden; }
     .liquid-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: floatBlob 12s infinite alternate ease-in-out; }
     .blob-1 { width: 550px; height: 550px; background: #38bdf8; top: -150px; left: -100px; animation-delay: 0s; }
@@ -70,7 +70,7 @@
     .brand span { font-size: 11px; background: var(--notice-bg); padding: 4px 10px; border-radius: 99px; color: var(--accent); border: 1px solid var(--notice-border); font-weight: 600; -webkit-text-fill-color: initial; }
 
     .nav-right { display: flex; align-items: center; gap: 12px; }
-    .container { max-width: 920px; margin: 28px auto; padding: 0 16px; position: relative; z-index: 1; }
+    .container { max-width: 960px; margin: 28px auto; padding: 0 16px; position: relative; z-index: 1; }
 
     /* Banner Khuôn Viên Trường */
     .school-banner {
@@ -87,19 +87,23 @@
     .banner-overlay h3 { font-size: 23px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
     .banner-overlay p { font-size: 13.5px; color: var(--text-muted); }
 
-    /* Layout Lưới Top Mới */
-    .grid-top-section { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    /* Layout Lưới Top */
+    .grid-top-section { display: grid; grid-template-columns: 1fr 1.3fr; gap: 16px; margin-bottom: 24px; }
     @media(max-width: 768px) { .grid-top-section { grid-template-columns: 1fr; } }
 
     .notice-board, .schedule-board {
       background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
       border: 1px solid var(--notice-border); padding: 22px; border-radius: 22px; box-shadow: var(--shadow);
     }
-    .notice-title { font-weight: 700; font-size: 15px; color: var(--accent); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .notice-title { font-weight: 700; font-size: 15px; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
     .notice-content { font-size: 13.5px; color: var(--text-main); line-height: 1.5; }
 
-    .schedule-list { font-size: 13px; color: var(--text-main); display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
-    .schedule-item { display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    /* Bảng Thời Khóa Biểu chi tiết chuẩn ảnh */
+    .schedule-table-wrapper { overflow-x: auto; }
+    .schedule-table { width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: center; }
+    .schedule-table th, .schedule-table td { border: 1px solid var(--border); padding: 5px 4px; }
+    .schedule-table th { background: var(--notice-bg); color: var(--accent); font-weight: 700; }
+    .schedule-table td.session-col { font-weight: 700; background: var(--bg-input); color: var(--text-muted); }
 
     /* Auth Box */
     .auth-box {
@@ -152,7 +156,6 @@
     .create-header { font-weight: 700; font-size: 16px; margin-bottom: 16px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
     .form-row { display: flex; gap: 12px; }
     
-    /* Thanh công cụ soạn thảo thông minh */
     .editor-toolbar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
     .toolbar-btn { background: var(--bg-input); border: 1px solid var(--border); padding: 5px 10px; border-radius: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; font-weight: 600; }
     .toolbar-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--notice-bg); }
@@ -223,7 +226,7 @@
 </head>
 <body>
 
-  <!-- BACKGROUND LIQUID GLOWING BLOBS NÂNG CẤP -->
+  <!-- BACKGROUND LIQUID GLOWING BLOBS -->
   <div class="liquid-bg">
     <div class="liquid-blob blob-1"></div>
     <div class="liquid-blob blob-2"></div>
@@ -272,19 +275,38 @@
       </div>
     </div>
 
-    <!-- HÀNG TRÊN: THÔNG BÁO & THỜI KHÓA BIỂU -->
+    <!-- HÀNG TRÊN: THÔNG BÁO & THỜI KHÓA BIỂU CHÍNH THỨC 10A4 -->
     <div class="grid-top-section">
       <div class="notice-board">
         <div class="notice-title">📌 Thông báo quan trọng từ lớp</div>
-        <div class="notice-content">Chào mừng các thành viên 10A4! Nhớ nộp bài tập đầy đủ và cập nhật lịch kiểm tra thường xuyên tại đây nhé. Chúc cả lớp tuần mới học tập thật tốt! 🚀</div>
+        <div class="notice-content">Chào mừng các thành viên 10A4! Nhớ nộp bài tập đầy đủ và cập nhật lịch kiểm tra, TKB học kỳ I (áp dụng từ 02/11/2026) ngay bên cạnh nhé. Chúc cả lớp tuần mới học tốt! 🚀</div>
       </div>
       <div class="schedule-board">
-        <div class="notice-title">📅 Thời Khóa Biểu & Lịch Trực</div>
-        <div class="schedule-list">
-          <div class="schedule-item"><span>Thứ Hai:</span><strong>Toán - Văn - Anh - Lý</strong></div>
-          <div class="schedule-item"><span>Thứ Ba:</span><strong>Hóa - Sinh - Sử - Địa</strong></div>
-          <div class="schedule-item"><span>Thứ Tư:</span><strong>Tin - Thể Dục - Toán - Văn</strong></div>
-          <div class="schedule-item" style="color: var(--warning); border-bottom: none; padding-top: 4px;"><span>Trực tuần:</span><strong>Tổ 1 & Tổ 2</strong></div>
+        <div class="notice-title">📅 Thời Khóa Biểu 10A4 (Học kỳ I)</div>
+        <div class="schedule-table-wrapper">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th>Tiết</th>
+                <th>Thứ 2</th>
+                <th>Thứ 3</th>
+                <th>Thứ 4</th>
+                <th>Thứ 5</th>
+                <th>Thứ 6</th>
+                <th>Thứ 7</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="session-col">S1</td><td>Chào cờ</td><td>Địa lý</td><td>Anh NN</td><td>Ngữ văn</td><td>Mỹ thuật</td><td>HĐTN-LMS</td></tr>
+              <tr><td class="session-col">S2</td><td>SHL</td><td>Tin học</td><td>Anh NN</td><td>Ngữ văn</td><td>Mỹ thuật</td><td>-</td></tr>
+              <tr><td class="session-col">S3</td><td>Ngữ văn</td><td>Ngữ văn</td><td>GDKT-PL</td><td>Toán</td><td>Tin học</td><td>-</td></tr>
+              <tr><td class="session-col">S4</td><td>Tiếng Anh</td><td>Toán</td><td>GDKT-PL</td><td>Địa lý</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">C1</td><td>-</td><td>ND GDĐP</td><td>Toán</td><td>Lịch sử</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">C2</td><td>-</td><td>GDKT-PL</td><td>Toán</td><td>GD QP-AN</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">C3</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">C4</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
