@@ -253,6 +253,7 @@
     .comment-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
     .comment-btn { background: none; border: none; color: var(--text-muted); font-size: 11.5px; cursor: pointer; padding: 3px 8px; border-radius: 8px; font-weight: 600; }
     .comment-btn:hover { color: var(--accent); background: var(--bg-card); }
+    .comment-btn.liked { color: #f43f5e; background: rgba(244, 63, 94, 0.1); }
 
     .comment-form-wrapper { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
     .comment-form { display: flex; gap: 8px; align-items: center; }
@@ -951,7 +952,8 @@
           post_id: postId, 
           user_email: currentUser.email, 
           content: text,
-          file_url: fileUrl 
+          file_url: fileUrl,
+          likes: []
         }]);
 
         if (error) throw error;
@@ -965,6 +967,29 @@
       } catch (err) {
         alert("Lỗi gửi bình luận: " + err.message);
       }
+    }
+
+    /* TÍNH NĂNG THÍCH BÌNH LUẬN */
+    async function toggleCommentLike(commentId) {
+      const comment = allComments.find(c => c.id === commentId);
+      if (!comment) return;
+
+      let likes = Array.isArray(comment.likes) ? [...comment.likes] : [];
+      const userEmail = currentUser.email;
+
+      if (likes.includes(userEmail)) {
+        likes = likes.filter(e => e !== userEmail);
+      } else {
+        likes.push(userEmail);
+      }
+
+      const { error } = await sb.from('comments').update({ likes }).eq('id', commentId);
+      if (error) {
+        alert("Lỗi thích bình luận: " + error.message);
+        return;
+      }
+
+      await fetchData();
     }
 
     function setReplyTo(postId, authorName) {
@@ -1067,6 +1092,9 @@
           const isCommentEdited = editedItems[`comment_${c.id}`];
           const editedCommentHTML = isCommentEdited ? `<span class="edited-tag" style="font-size: 10px; margin-left: 4px;">(đã chỉnh sửa)</span>` : '';
 
+          const cLikesList = Array.isArray(c.likes) ? c.likes : [];
+          const isCLiked = cLikesList.includes(currentUser.email);
+
           let commentFileHTML = '';
           if (c.file_url) {
             commentFileHTML = `<br><a href="${c.file_url}" target="_blank"><img src="${c.file_url}" class="comment-img" /></a>`;
@@ -1081,6 +1109,9 @@
                 ${commentFileHTML}
               </div>
               <div class="comment-actions">
+                <button class="comment-btn ${isCLiked ? 'liked' : ''}" onclick="toggleCommentLike(${c.id})">
+                  ${isCLiked ? '❤️' : '🤍'} ${cLikesList.length}
+                </button>
                 <button class="comment-btn" onclick="setReplyTo(${post.id}, '${cAuthor.name}')">💬 Trả lời</button>
                 ${isCommentOwner ? `
                   <button class="comment-btn" onclick="editComment(${c.id}, '${escapeHTML(c.content).replace(/'/g, "\\'")}')">✏️ Sửa</button>
