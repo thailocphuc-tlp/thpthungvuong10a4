@@ -483,29 +483,28 @@
       </div>
     </div>
 
-    <!-- TAB 3: ÔN KIỂM TRA (KẾT NỐI TRI THỨC LỚP 10) -->
+    <!-- TAB 3: ÔN KIỂM TRA (MỖI MÔN 20-25 CÂU CỐ ĐỊNH - KNTT LỚP 10) -->
     <div id="view-tab-quiz" class="hidden">
       <div class="k12-card">
         <div class="card-header">
-          <span>🎯 Luyện Trắc Nghiệm Ôn Kiểm Tra (SGK Kết nối tri thức 10)</span>
+          <span>🎯 Luyện Trắc Nghiệm Ôn Kiểm Tra Theo Từng Môn (SGK Lớp 10)</span>
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <select id="quiz-subject-filter" onchange="renderQuizList()" style="width: 170px; margin-bottom: 0; padding: 6px 10px; font-size: 12.5px;">
-              <option value="all">Tất cả môn ôn tập</option>
-              <option value="Tin học">💻 Tin học 10</option>
-              <option value="Toán học">📐 Toán học 10</option>
-              <option value="Ngữ Văn">📖 Ngữ Văn 10</option>
-              <option value="KHXH">🌍 Lịch sử & Địa lý 10</option>
-              <option value="Tiếng Anh">🇬🇧 Tiếng Anh 10</option>
+            <select id="quiz-subject-filter" onchange="renderQuizList()" style="width: 215px; margin-bottom: 0; padding: 6px 10px; font-size: 12.5px;">
+              <option value="Tin học">💻 Tin học 10 - KNTT (22 câu)</option>
+              <option value="Toán học">📐 Toán học 10 - KNTT (22 câu)</option>
+              <option value="Ngữ Văn">📖 Ngữ văn 10 - KNTT (20 câu)</option>
+              <option value="KHXH">🌍 Lịch sử & Địa lý 10 - KNTT (22 câu)</option>
+              <option value="Tiếng Anh">🇬🇧 Tiếng Anh 10 (20 câu)</option>
             </select>
-            <button class="btn-ghost" onclick="resetQuizAttempt()">🔄 Làm lại lượt này</button>
+            <button class="btn-ghost" onclick="resetQuizAttempt()">🔄 Làm lại môn này</button>
           </div>
         </div>
 
         <div class="quiz-score-box">
           <div style="font-size: 13.5px; font-weight: 700;">
-            📊 Kết quả lượt làm: <span id="quiz-score-text" style="color: var(--primary);">0 / 0 câu đúng</span>
+            📊 Điểm của môn đang chọn: <span id="quiz-score-text" style="color: var(--primary);">0 / 0 câu đúng</span>
           </div>
-          <span style="font-size: 12px; color: var(--text-muted);">Bấm chọn 1 đáp án để xem giải thích chi tiết ngay</span>
+          <span style="font-size: 12px; color: var(--text-muted);">Mỗi môn có bộ câu hỏi riêng cố định, không trộn lẫn môn khác</span>
         </div>
 
         <div id="quiz-list-container"></div>
@@ -570,87 +569,125 @@
     const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Bộ câu hỏi trắc nghiệm mẫu bám sát chương trình SGK Kết nối tri thức lớp 10
-    const KNTT_QUIZ_BANK = [
-      {
-        id: 'tin_1',
-        subject: 'Tin học',
-        question: '[Tin học 10 - KNTT] Đặc điểm nổi bật nhất của xã hội tri thức so với xã hội công nghiệp là gì?',
-        options: [
-          'Tri thức trở thành lực lượng sản xuất trực tiếp, công nghệ thông tin gắn liền với mọi hoạt động',
-          'Chỉ dựa vào khai thác tài nguyên khoáng sản và sức lao động cơ bắp',
-          'Không còn sử dụng máy tính trong sản xuất và đời sống',
-          'Chỉ áp dụng cho ngành in ấn sách báo truyền thống'
-        ],
-        answerIndex: 0,
-        explain: 'Trong chương trình Tin học 10 Kết nối tri thức (Chủ đề 1), xã hội tri thức phát triển dựa trên tri thức và công nghệ thông tin - truyền thông (ICT).'
-      },
-      {
-        id: 'tin_2',
-        subject: 'Tin học',
-        question: '[Tin học 10 - KNTT] Khi chia sẻ thông tin trên mạng xã hội, hành vi nào thể hiện tính nhân văn và tuân thủ pháp luật?',
-        options: [
-          'Đăng tải hình ảnh cá nhân của người khác khi chưa được phép',
-          'Kiểm chứng nguồn tin trước khi chia sẻ, tôn trọng bản quyền và quyền riêng tư',
-          'Bình luận ác ý, xúc phạm bạn học để câu tương tác',
-          'Phát tán đường link lạ không rõ nguồn gốc'
-        ],
-        answerIndex: 1,
-        explain: 'Ứng xử có văn hóa, tôn trọng pháp luật và bảo vệ thông tin cá nhân là nội dung trọng tâm về an toàn và đạo đức số trong Tin học 10.'
-      },
-      {
-        id: 'toan_1',
-        subject: 'Toán học',
-        question: '[Toán 10 - KNTT] Phát biểu nào sau đây là một mệnh đề toán học?',
-        options: [
-          'Hôm nay trời đẹp quá!',
-          'x + 2 = 5 có phải là phương trình không?',
-          'Tổng các góc trong một tam giác bằng 180°.',
-          'Hãy làm bài tập về nhà đi!'
-        ],
-        answerIndex: 2,
-        explain: 'Mệnh đề là câu khẳng định có tính đúng hoặc sai xác định; câu cảm thán, câu hỏi, câu mệnh lệnh không phải là mệnh đề.'
-      },
-      {
-        id: 'toan_2',
-        subject: 'Toán học',
-        question: '[Toán 10 - KNTT] Mệnh đề phủ định của mệnh đề P: "∀x ∈ ℝ, x² ≥ 0" là mệnh đề nào?',
-        options: [
-          '∀x ∈ ℝ, x² < 0',
-          '∃x ∈ ℝ, x² < 0',
-          '∃x ∈ ℝ, x² ≤ 0',
-          '∀x ∈ ℝ, x² > 0'
-        ],
-        answerIndex: 1,
-        explain: 'Phủ định của "∀x" là "∃x", và phủ định của "≥" là "<", nên phủ định của P là "∃x ∈ ℝ, x² < 0".'
-      },
-      {
-        id: 'van_1',
-        subject: 'Ngữ Văn',
-        question: '[Ngữ văn 10 - KNTT] Trong văn bản truyện thần thoại, yếu tố "thời gian phiếm chỉ" thường được nhận diện qua các cụm từ nào?',
-        options: [
-          'Vào lúc 8 giờ sáng ngày 19/8/1945',
-          'Ngày xửa ngày xưa, thuở ấy, khi trời đất mới tạo lập',
-          'Trong vòng 30 phút cuối trận đấu',
-          'Theo báo cáo thống kê quý III'
-        ],
-        answerIndex: 1,
-        explain: 'Thần thoại thường mở đầu bằng thời gian phiếm chỉ (không xác định cụ thể) và không gian vũ trụ rộng lớn, kỳ ảo.'
-      },
-      {
-        id: 'su_1',
-        subject: 'KHXH',
-        question: '[Lịch sử 10 - KNTT] Sử học có vai trò cốt lõi nào đối với đời sống và sự phát triển của xã hội hiện đại?',
-        options: [
-          'Giúp con người hiểu cội nguồn, rút ra bài học kinh nghiệm và dự báo xu hướng',
-          'Chỉ ghi chép lại mọi sự kiện mà không cần đối chiếu tư liệu',
-          'Thay thế hoàn toàn các môn khoa học tự nhiên',
-          'Chỉ phục vụ cho việc lưu trữ hồ sơ hành chính'
-        ],
-        answerIndex: 0,
-        explain: 'Bài mở đầu Lịch sử 10 Kết nối tri thức nhấn mạnh mối quan hệ giữa quá khứ, hiện tại và tương lai cùng giá trị giáo dục, nhận thức của sử học.'
-      }
-    ];
+    // Bộ câu hỏi cố định 20-22 câu cho từng môn (SGK Lớp 10)
+    const QUIZ_BY_SUBJECT = {
+      'Tin học': [
+        { q: 'Đặc điểm nổi bật nhất của xã hội tri thức so với xã hội công nghiệp là gì?', opts: ['Tri thức là lực lượng sản xuất chủ yếu, CNTT gắn liền với mọi hoạt động', 'Chỉ dựa vào khai thác tài nguyên thô', 'Không còn sử dụng máy tính', 'Chỉ áp dụng cho ngành xuất bản giấy'], ans: 0, ex: 'Xã hội tri thức lấy tri thức và công nghệ thông tin - truyền thông làm động lực phát triển cốt lõi.' },
+        { q: 'Khái niệm nào sau đây phản ánh đúng nhất "dữ liệu"?', opts: ['Ý nghĩa con người rút ra để ra quyết định', 'Thông tin thô, số liệu, kí hiệu, hình ảnh chưa được xử lí', 'Kinh nghiệm sống lâu năm', 'Phần mềm ứng dụng trên điện thoại'], ans: 1, ex: 'Dữ liệu là sự thể hiện thông tin dưới dạng số, chữ, kí hiệu, âm thanh, hình ảnh... để máy tính tiếp nhận và xử lí.' },
+        { q: 'Khi tiếp nhận và xử lí dữ liệu, con người thu được điều gì?', opts: ['Thông tin có ý nghĩa', 'Tăng dung lượng ổ cứng', 'Thay đổi cấu trúc phần cứng', 'Xóa toàn bộ dữ liệu gốc'], ans: 0, ex: 'Xử lí dữ liệu giúp biến dữ liệu thô thành thông tin mang lại hiểu biết và ý nghĩa cho con người.' },
+        { q: 'Tri thức hình thành như thế nào từ thông tin?', opts: ['Khi thông tin được con người hiểu, tích hợp và vận dụng vào thực tiễn', 'Khi sao chép file sang USB khác', 'Khi tắt nguồn máy tính', 'Khi tăng độ sáng màn hình'], ans: 0, ex: 'Tri thức là những hiểu biết của con người về một lĩnh vực hoặc vấn đề cụ thể, rút ra từ thông tin và kinh nghiệm.' },
+        { q: 'Đơn vị đo lượng thông tin cơ bản nhỏ nhất trong tin học là gì?', opts: ['Byte', 'Bit', 'Kilobyte', 'Megabyte'], ans: 1, ex: 'Bit (viết tắt của binary digit) là đơn vị nhỏ nhất của thông tin, nhận giá trị 0 hoặc 1.' },
+        { q: '1 Byte thông thường gồm bao nhiêu bit?', opts: ['4 bit', '8 bit', '16 bit', '32 bit'], ans: 1, ex: 'Theo chuẩn phổ biến trong tin học, 1 Byte = 8 bit.' },
+        { q: 'Thiết bị nào sau đây là thiết bị vào (nhập dữ liệu)?', opts: ['Màn hình', 'Máy in', 'Bàn phím', 'Loa ngoài'], ans: 2, ex: 'Bàn phím dùng để nhập kí tự, lệnh vào máy tính; màn hình, máy in, loa là thiết bị ra.' },
+        { q: 'Thiết bị nào sau đây là thiết bị ra (xuất thông tin)?', opts: ['Chuột máy tính', 'Máy quét (Scanner)', 'Màn hình', 'Microphone'], ans: 2, ex: 'Màn hình hiển thị kết quả xử lí và giao diện làm việc cho người dùng.' },
+        { q: 'Thành phần nào được ví như "bộ não" xử lí tính toán và điều khiển của máy tính?', opts: ['RAM', 'CPU', 'Ổ cứng SSD', 'Card mạng'], ans: 1, ex: 'CPU (Central Processing Unit) thực hiện các phép tính và điều khiển hoạt động của hệ thống.' },
+        { q: 'Bộ nhớ nào sau đây có tốc độ truy xuất nhanh nhưng dữ liệu thường mất khi tắt điện?', opts: ['RAM', 'HDD', 'SSD', 'Thẻ nhớ SD'], ans: 0, ex: 'RAM là bộ nhớ truy cập ngẫu nhiên, lưu dữ liệu tạm thời khi máy đang hoạt động.' },
+        { q: 'Phần mềm nào thuộc nhóm phần mềm hệ thống?', opts: ['Microsoft Word', 'Windows 11', 'CapCut', 'Trình duyệt Chrome'], ans: 1, ex: 'Hệ điều hành (như Windows, Linux, Android) là phần mềm hệ thống quản lí phần cứng và phần mềm khác.' },
+        { q: 'Phần mềm nào sau đây là phần mềm ứng dụng?', opts: ['BIOS', 'Hệ điều hành macOS', 'Trình soạn thảo văn bản', 'Trình điều khiển card đồ họa'], ans: 2, ex: 'Phần mềm ứng dụng phục vụ trực tiếp nhu cầu công việc, học tập hoặc giải trí của người dùng.' },
+        { q: 'Ứng dụng nổi bật của Tin học trong y tế là gì?', opts: ['Quản lí hồ sơ bệnh án điện tử, chẩn đoán hình ảnh', 'Trồng lúa nước', 'Khai thác mỏ than', 'Dệt vải thủ công'], ans: 1, ex: 'Tin học hỗ trợ lưu trữ bệnh án, đặt lịch khám, phân tích ảnh X-quang, MRI và quản lí thuốc.' },
+        { q: 'Trong giáo dục, Tin học hỗ trợ hiệu quả nhất ở hoạt động nào?', opts: ['Học trực tuyến, mô phỏng thí nghiệm, tra cứu học liệu số', 'Thay thế hoàn toàn tư duy sáng tạo của học sinh', 'Làm hỏng thiết bị học tập', 'Giảm khả năng đọc hiểu'], ans: 0, ex: 'CNTT mở rộng kho học liệu, hỗ trợ học từ xa và trực quan hóa kiến thức.' },
+        { q: 'Hành vi nào thể hiện văn hóa và tuân thủ pháp luật trên không gian mạng?', opts: ['Tôn trọng bản quyền khi dùng tài liệu', ' tung tin giả gây hoang mang', 'Xâm nhập trái phép tài khoản người khác', 'Bắt nạt trực tuyến bạn học'], ans: 0, ex: 'Cần tôn trọng quyền tác giả, quyền riêng tư và ứng xử có trách nhiệm khi tham gia mạng.' },
+        { q: 'Rủi ro phổ biến khi bấm vào đường link lạ gửi qua tin nhắn là gì?', opts: ['Bị đánh cắp tài khoản hoặc cài mã độc', 'Máy tính tự động nâng cấp RAM miễn phí', 'Tăng dung lượng pin gấp đôi', 'Tự động làm xong bài tập'], ans: 0, ex: 'Liên kết giả mạo (phishing) thường dẫn tới trang đánh cắp mật khẩu hoặc phát tán mã độc.' },
+        { q: 'Cách đặt mật khẩu tài khoản an toàn nhất là gì?', opts: ['Dùng 123456 cho dễ nhớ', 'Kết hợp chữ hoa, chữ thường, số và kí tự đặc biệt; không dùng chung một mật khẩu cho mọi nơi', 'Dùng ngày sinh của bản thân', 'Chia sẻ mật khẩu cho nhiều người'], ans: 1, ex: 'Mật khẩu mạnh, đủ dài và khác nhau giữa các dịch vụ giúp giảm nguy cơ bị dò hoặc lộ lọt.' },
+        { q: 'Dấu hiệu nào cho thấy một thông tin trên mạng cần được kiểm chứng kỹ?', opts: ['Giật tít cực đoan, không rõ tác giả hoặc nguồn chính thống', 'Có dẫn nguồn rõ ràng và nhiều cơ quan uy tín xác nhận', 'Phù hợp với kiến thức khoa học đã kiểm chứng', 'Có ngày đăng và tác giả minh bạch'], ans: 0, ex: 'Tin đồn, tin giả thường dùng tiêu đề gây sốc, thiếu nguồn kiểm chứng đáng tin cậy.' },
+        { q: 'Khi đăng ảnh bạn bè lên mạng xã hội, điều nên làm trước tiên là gì?', opts: ['Hỏi ý kiến và được sự đồng ý của bạn đó', 'Đăng ngay kèm bình luận trêu chọc', 'Chỉnh sửa ảnh gây hiểu lầm', 'Gắn thẻ bừa bãi'], ans: 0, ex: 'Tôn trọng quyền riêng tư và hình ảnh cá nhân của người khác là nguyên tắc ứng xử văn minh.' },
+        { q: 'Tác hại của việc sử dụng thiết bị số quá nhiều vào ban đêm là gì?', opts: ['Giảm chất lượng giấc ngủ, mỏi mắt và giảm tập trung hôm sau', 'Tăng cường thị lực', 'Giúp ngủ sâu hơn ngay lập tức', 'Không ảnh hưởng gì tới sức khỏe'], ans: 0, ex: 'Ánh sáng xanh và thói quen dùng thiết bị khuya dễ làm rối loạn giấc ngủ và mệt mỏi.' },
+        { q: 'Dữ liệu số có ưu điểm gì nổi bật so với lưu trữ giấy truyền thống?', opts: ['Dễ tìm kiếm, sao lưu và chia sẻ nhanh chóng', 'Không bao giờ cần sao lưu dự phòng', 'Không thể bị chỉnh sửa hay xóa nhầm', 'Không cần thiết bị điện tử'], ans: 0, ex: 'Dữ liệu số dễ tổ chức, tìm kiếm và truyền tải, nhưng vẫn cần sao lưu và bảo mật cẩn thận.' },
+        { q: 'Nghề nghiệp nào gắn trực tiếp với lĩnh vực Công nghệ thông tin?', opts: ['Kĩ sư phần mềm, chuyên viên an ninh mạng', 'Giáo viên Thể dục', 'Đầu bếp', 'Kiến trúc sư cảnh quan'], ans: 0, ex: 'Phát triển phần mềm, quản trị hệ thống, khoa học dữ liệu và an ninh mạng là các nhóm nghề trọng tâm của CNTT.' }
+      ],
+      'Toán học': [
+        { q: 'Phát biểu nào sau đây là một mệnh đề?', opts: ['Hôm nay trời đẹp quá!', '3 + 5 = 8.', 'x là số chẵn phải không?', 'Hãy mở sách trang 10!'], ans: 1, ex: '"3 + 5 = 8" là câu khẳng định có tính đúng xác định nên là mệnh đề.' },
+        { q: 'Mệnh đề nào sau đây là mệnh đề sai?', opts: ['π là một số vô tỉ.', 'Tổng hai số lẻ là một số chẵn.', '2 là số nguyên tố.', '5 là số chẵn.'], ans: 3, ex: '5 chia cho 2 dư 1 nên 5 là số lẻ, do đó khẳng định "5 là số chẵn" là mệnh đề sai.' },
+        { q: 'Mệnh đề phủ định của mệnh đề P: "∀x ∈ ℝ, x² + 1 > 0" là gì?', opts: ['∃x ∈ ℝ, x² + 1 ≤ 0', '∀x ∈ ℝ, x² + 1 ≤ 0', '∃x ∈ ℝ, x² + 1 < 0', '∀x ∈ ℝ, x² + 1 = 0'], ans: 0, ex: 'Phủ định của "∀" là "∃" và phủ định của ">" là "≤".' },
+        { q: 'Cho mệnh đề kéo theo P ⇒ Q: "Nếu tam giác ABC đều thì tam giác ABC cân". Mệnh đề này đúng hay sai?', opts: ['Đúng', 'Sai', 'Vừa đúng vừa sai', 'Không xác định'], ans: 0, ex: 'Mọi tam giác đều đều có ba cạnh bằng nhau nên chắc chắn là tam giác cân.' },
+        { q: 'Kí hiệu nào biểu diễn "x thuộc tập hợp A"?', opts: ['x ∉ A', 'x ∈ A', 'A ⊂ x', 'x ⊂ A'], ans: 1, ex: 'Kí hiệu "∈" đọc là "thuộc", "∉" đọc là "không thuộc".' },
+        { q: 'Cho A = {1; 2; 3} và B = {2; 3; 4}. Tập hợp A ∩ B là tập hợp nào?', opts: ['{1; 4}', '{2; 3}', '{1; 2; 3; 4}', '∅'], ans: 1, ex: 'Giao của hai tập hợp A ∩ B gồm các phần tử thuộc cả A và B, đó là 2 và 3.' },
+        { q: 'Cho A = {1; 2} và B = {2; 3}. Tập hợp A ∪ B là tập hợp nào?', opts: ['{2}', '{1; 3}', '{1; 2; 3}', '{1; 2}'], ans: 2, ex: 'Hợp của hai tập hợp A ∪ B gồm tất cả phần tử thuộc A hoặc thuộc B.' },
+        { q: 'Cho A = {1; 2; 3; 4} và B = {3; 4; 5}. Tập hợp A \\ B là tập hợp nào?', opts: ['{1; 2}', '{5}', '{3; 4}', '{1; 2; 5}'], ans: 0, ex: 'A \\ B gồm các phần tử thuộc A nhưng không thuộc B, tức là 1 và 2.' },
+        { q: 'Nửa khoảng [-2; 5) gồm các số thực x thỏa mãn điều kiện nào?', opts: ['-2 < x < 5', '-2 ≤ x < 5', '-2 ≤ x ≤ 5', '-2 < x ≤ 5'], ans: 1, ex: 'Móc vuông "[" tính đầu mút (-2 ≤ x), ngoặc tròn ")" không tính đầu mút (x < 5).' },
+        { q: 'Khoảng (1; 4) chứa bao nhiêu số nguyên?', opts: ['1', '2', '3', '4'], ans: 1, ex: 'Các số nguyên nằm giữa 1 và 4 là 2 và 3 (có 2 số nguyên).' },
+        { q: 'Bất phương trình nào sau đây là bất phương trình bậc nhất hai ẩn?', opts: ['2x - 3y ≤ 6', 'x² + y ≤ 1', 'xy > 4', '2x - 3y + z ≥ 0'], ans: 0, ex: 'Bất phương trình bậc nhất hai ẩn x, y có dạng ax + by ≤ c (hoặc <, >, ≥) với a, b không đồng thời bằng 0.' },
+        { q: 'Cặp số (x; y) = (1; 2) là nghiệm của bất phương trình nào dưới đây?', opts: ['3x - y > 5', '2x + y - 4 ≤ 0', 'x + y < 2', '5x - 2y > 10'], ans: 1, ex: 'Thay x = 1, y = 2 vào 2x + y - 4 ta được 2(1) + 2 - 4 = 0 ≤ 0 (thỏa mãn).' },
+        { q: 'Miền nghiệm của bất phương trình ax + by < c trên mặt phẳng tọa độ là gì?', opts: ['Một đường thẳng', 'Một nửa mặt phẳng (không kể bờ)', 'Một parabol', 'Một điểm duy nhất'], ans: 1, ex: 'Bất phương trình bậc nhất hai ẩn có miền nghiệm là một nửa mặt phẳng.' },
+        { q: 'Đường thẳng d: x + y = 3 chia mặt phẳng tọa độ thành mấy phần (không kể d)?', opts: ['1 phần', '2 phần', '3 phần', '4 phần'], ans: 1, ex: 'Một đường thẳng chia mặt phẳng thành hai nửa mặt phẳng đối nhau.' },
+        { q: 'Điểm O(0; 0) có thuộc miền nghiệm của bất phương trình x + 2y > 1 không?', opts: ['Có', 'Không', 'Chỉ khi y = 1', 'Chỉ khi x = 1'], ans: 1, ex: 'Thay (0; 0) ta được 0 + 0 = 0 > 1 (sai), nên O không thuộc miền nghiệm.' },
+        { q: 'Hệ bất phương trình bậc nhất hai ẩn gồm bao nhiêu bất phương trình bậc nhất hai ẩn?', opts: ['Chỉ 1 bất phương trình', 'Từ hai bất phương trình trở lên', 'Luôn đúng 2 bất phương trình', 'Không có bất phương trình nào'], ans: 1, ex: 'Hệ bất phương trình bậc nhất hai ẩn gồm hai hay nhiều bất phương trình bậc nhất hai ẩn.' },
+        { q: 'Nghiệm chung của tất cả các bất phương trình trong hệ gọi là gì?', opts: ['Hệ số của hệ', 'Nghiệm của hệ bất phương trình', 'Bờ miền nghiệm', 'Tập xác định'], ans: 1, ex: 'Mỗi cặp (x; y) thỏa mãn đồng thời mọi bất phương trình trong hệ là một nghiệm của hệ.' },
+        { q: 'Biểu diễn miền nghiệm của hệ bất phương trình trên mặt phẳng tọa độ là gì?', opts: ['Phần giao của các miền nghiệm từng bất phương trình', 'Phần hợp của các miền nghiệm', 'Đường thẳng chia đôi mặt phẳng', 'Tập rỗng với mọi hệ'], ans: 0, ex: 'Miền nghiệm của hệ là giao của các miền nghiệm tương ứng với từng bất phương trình.' },
+        { q: 'Cho tập hợp A = {x ∈ ℝ | -1 ≤ x ≤ 3}. Cách viết nào tương đương?', opts: ['A = (-1; 3)', 'A = [-1; 3]', 'A = [-1; 3)', 'A = (-1; 3]'], ans: 1, ex: 'Cả hai đầu mút -1 và 3 đều có dấu "≤" nên dùng ngoặc vuông [-1; 3].' },
+        { q: 'Phát biểu "Tồn tại số thực x sao cho x + 1 = 0" viết bằng kí hiệu là gì?', opts: ['∀x ∈ ℝ, x + 1 = 0', '∃x ∈ ℝ, x + 1 = 0', '∃x ∈ ℝ, x + 1 ≠ 0', '∀x ∈ ℝ, x + 1 > 0'], ans: 1, ex: '"Tồn tại số thực x" kí hiệu là ∃x ∈ ℝ.' },
+        { q: 'Nếu A ⊂ B và B ⊂ C thì kết luận nào sau đây luôn đúng?', opts: ['A ⊂ C', 'C ⊂ A', 'A = C', 'A ∩ C = ∅'], ans: 0, ex: 'Quan hệ bao hàm có tính bắc cầu: nếu A là tập con của B và B là tập con của C thì A là tập con của C.' },
+        { q: 'Trong bài toán tối ưu sản xuất trên K12/Toán 10, giá trị lớn nhất hoặc nhỏ nhất của biểu thức F(x; y) thường đạt được ở đâu?', opts: ['Tại các đỉnh của miền đa giác nghiệm', 'Chỉ ở ngoài miền nghiệm', 'Trên trục tung bất kì', 'Không bao giờ xác định được'], ans: 0, ex: 'Với miền nghiệm là đa giác lồi, giá trị lớn nhất/nhỏ nhất của biểu thức bậc nhất thường đạt tại các đỉnh của đa giác.' }
+      ],
+      'Ngữ Văn': [
+        { q: 'Đặc trưng nổi bật của nhân vật trong truyện thần thoại là gì?', opts: ['Thường là các vị thần hoặc nhân vật có sức mạnh siêu nhiên, kì ảo', 'Luôn là người nông dân bình thường không phép thuật', 'Chỉ nói về đời sống cung đình phong kiến', 'Nhân vật luôn có tâm lí giằng xé nội tâm hiện đại'], ans: 0, ex: 'Thần thoại giải thích nguồn gốc tự nhiên và đời sống thông qua các vị thần và kì tích siêu nhiên.' },
+        { q: 'Không gian trong truyện thần thoại thường có đặc điểm gì?', opts: ['Không gian vũ trụ rộng lớn, mang tính tạo lập thế giới', 'Chỉ gói gọn trong một căn phòng', 'Không gian đô thị hiện đại', 'Không gian phòng thí nghiệm'], ans: 0, ex: 'Thần thoại thường mở ra không gian vũ trụ bao la với trời, đất, biển, núi sông...' },
+        { q: 'Thời gian trong truyện thần thoại thường là loại thời gian nào?', opts: ['Thời gian phiếm chỉ, xa xưa ("ngày xửa ngày xưa", "thuở ấy")', 'Thời gian tính bằng giây, phút chính xác', 'Thời gian tương lai khoa học viễn tưởng', 'Thời gian lịch sử ghi năm cụ thể'], ans: 0, ex: 'Thời gian thần thoại là thời gian cổ sơ, phiếm chỉ, chưa gắn với lịch sử thành văn.' },
+        { q: 'Trong sử thi, nhân vật anh hùng thường đại diện cho điều gì?', opts: ['Lí tưởng, sức mạnh và danh dự của cả cộng đồng', 'Lợi ích cá nhân vụ lợi', 'Sự buông xuôi, yếu đuối', 'Sự châm biếm đời thường'], ans: 0, ex: 'Người anh hùng sử thi mang tầm vóc lớn lao, gắn bó chặt chẽ với cộng đồng, bộ tộc.' },
+        { q: 'Ngôn ngữ trong sử thi thường mang sắc thái nào?', opts: ['Trang trọng, hào hùng, giàu nhịp điệu và hình ảnh phóng đại', 'Nói lắp, khẩu ngữ suồng sã', 'Khô khan như văn bản hành chính', 'Mật mã kĩ thuật'], ans: 0, ex: 'Lời kể sử thi trang trọng, giàu tính nhạc và thường sử dụng lối so sánh, phóng đại.' },
+        { q: 'Văn bản nghị luận có mục đích chính là gì?', opts: ['Trình bày ý kiến, lí lẽ và bằng chứng để thuyết phục người đọc', 'Kể chuyện cổ tích giải trí', 'Mô tả chi tiết một món ăn', 'Lập bảng thống kê số liệu thuần túy'], ans: 0, ex: 'Văn bản nghị luận tập trung làm sáng tỏ một luận điểm bằng hệ thống lí lẽ và bằng chứng thuyết phục.' },
+        { q: 'Luận điểm trong văn bản nghị luận là gì?', opts: ['Ý kiến thể hiện tư tưởng, quan điểm của người viết về vấn đề nghị luận', 'Một câu cảm thán bất kì', 'Tên tác giả ở cuối bài', 'Số trang của cuốn sách'], ans: 0, ex: 'Luận điểm là tư tưởng, quan điểm chính mà người viết muốn khẳng định và bảo vệ.' },
+        { q: 'Bằng chứng trong văn bản nghị luận dùng để làm gì?', opts: ['Làm sáng tỏ, củng cố độ tin cậy cho lí lẽ và luận điểm', 'Trang trí cho bài viết dài thêm', 'Thay thế hoàn toàn luận điểm', 'Gây khó hiểu cho người đọc'], ans: 0, ex: 'Bằng chứng (sự kiện, số liệu, dẫn chứng thực tế) giúp lí lẽ có sức thuyết phục cao hơn.' },
+        { q: 'Lỗi dùng từ không đúng nghĩa thường xảy ra khi nào?', opts: ['Nhầm lẫn giữa các từ gần âm hoặc gần nghĩa mà không chú ý ngữ cảnh', 'Dùng từ chuẩn xác theo từ điển', 'Viết hoa đầu câu', 'Dùng dấu chấm hết câu'], ans: 0, ex: 'Chọn từ sai sắc thái hoặc không hợp kết hợp ngữ cảnh sẽ làm câu văn tối nghĩa, sai ý.' },
+        { q: 'Lỗi câu mơ hồ (đa nghĩa ngoài ý muốn) thường do nguyên nhân nào?', opts: ['Cấu tạo ngữ pháp hoặc cách sắp xếp từ ngữ khiến câu hiểu theo nhiều nghĩa', 'Câu văn quá ngắn gọn', 'Dùng dấu phẩy đúng chỗ', 'Có chủ ngữ rõ ràng'], ans: 0, ex: 'Khi sắp xếp từ thiếu mạch lạc hoặc thiếu dấu câu, câu có thể gây hiểu nhầm nhiều cách.' },
+        { q: 'Khi sửa lỗi câu sai ngữ pháp, việc đầu tiên cần làm là gì?', opts: ['Xác định đúng thành phần câu và chỗ sai (thiếu chủ ngữ, vị ngữ, sai quan hệ từ...)', 'Xóa toàn bộ đoạn văn', 'Đổi sang viết chữ in hoa hết', 'Bỏ qua không cần sửa'], ans: 0, ex: 'Phải chẩn đoán đúng "bệnh" của câu thì mới sửa trúng và giữ được ý cần diễn đạt.' },
+        { q: 'Thơ trữ tình chú trọng thể hiện điều gì hơn cả?', opts: ['Tâm trạng, cảm xúc, rung động nội tâm của chủ thể trữ tình', 'Diễn biến vụ án trinh thám', 'Hướng dẫn sử dụng thiết bị', 'Thống kê dân số'], ans: 0, ex: 'Thơ trữ tình bộc lộ thế giới nội tâm, cảm xúc và thái độ của nhân vật trữ tình trước cuộc đời.' },
+        { q: 'Hình ảnh thơ có đặc điểm gì nổi bật?', opts: ['Gợi cảm, giàu sức liên tưởng, biểu đạt chiều sâu cảm xúc', 'Chỉ sao chép nguyên si hình ảnh chụp thực tế', 'Khó hiểu một cách cố ý', 'Không liên quan đến chủ đề'], ans: 0, ex: 'Hình ảnh trong thơ vừa cụ thể vừa giàu ý nghĩa biểu tượng, gợi nhiều liên tưởng.' },
+        { q: 'Khi đọc hiểu một văn bản thông tin, ta cần chú ý yếu tố nào?', opts: ['Thông tin chính, cách triển khai ý, nhan đề, sơ đồ/bảng biểu kèm theo', 'Chỉ đếm số lượng dấu câu', 'Chỉ xem màu chữ', 'Bỏ qua phần chú thích'], ans: 0, ex: 'Văn bản thông tin cung cấp tri thức khách quan nên cần nắm thông tin cốt lõi và cách tổ chức thông tin.' },
+        { q: 'Thái độ tôn trọng sự khác biệt trong thảo luận nhóm thể hiện ở đâu?', opts: ['Lắng nghe ý kiến người khác, phản biện lịch sự dựa trên lí lẽ', 'Ngắt lời và công kích cá nhân', 'Gạt bỏ mọi ý kiến trái chiều', 'Im lặng không đóng góp gì'], ans: 0, ex: 'Thảo luận văn minh cần lắng nghe, tôn trọng người đối thoại và trao đổi mang tính xây dựng.' },
+        { q: 'Trong bài văn nghị luận xã hội, phần mở bài cần làm gì?', opts: ['Giới thiệu vấn đề nghị luận và định hướng quan điểm của người viết', 'Trình bày toàn bộ kết luận cuối bài', 'Kể một câu chuyện không liên quan', 'Liệt kê mục lục'], ans: 0, ex: 'Mở bài nêu vấn đề và khơi gợi hứng thú, mở đường cho phần triển khai lí lẽ – bằng chứng.' },
+        { q: 'Phần kết bài của văn bản nghị luận có vai trò gì?', opts: ['Khẳng định lại vấn đề, rút ra bài học nhận thức và hành động', 'Đặt thêm câu hỏi mới chưa giải quyết', 'Lặp lại nguyên văn toàn bộ thân bài', 'Kết thúc đột ngột không ý nghĩa'], ans: 0, ex: 'Kết bài khép lại vấn đề một cách gọn ghẽ, đọng lại thông điệp hoặc lời nhắn nhủ.' },
+        { q: 'Biện pháp tu từ liệt kê giúp ích gì cho diễn đạt?', opts: ['Làm rõ hơn, đầy đủ và nhấn mạnh nhiều khía cạnh của sự vật, hiện tượng', 'Làm câu văn cụt ngủn', 'Làm mất trọng tâm ý chính', 'Thay thế dấu chấm than'], ans: 0, ex: 'Liệt kê giúp tăng tính cụ thể, sinh động và nhấn mạnh sắc thái biểu cảm.' },
+        { q: 'Khi trích dẫn lời nói hoặc ý kiến của người khác, cần chú ý điều gì?', opts: ['Trích dẫn trung thực, ghi rõ nguồn hoặc đặt trong ngoặc kép phù hợp', 'Tự sửa đổi nội dung rồi gán cho người khác', 'Sao chép nguyên bài mà không ghi nguồn', 'Bóp méo ý gốc'], ans: 0, ex: 'Tính trung thực học thuật đòi hỏi trích dẫn đúng và tôn trọng nguồn gốc tư liệu.' },
+        { q: 'Mục đích của việc rèn luyện kĩ năng viết bài nghị luận ở lớp 10 là gì?', opts: ['Biết suy nghĩ độc lập, lập luận chặt chẽ và bày tỏ chính kiến thuyết phục', 'Học thuộc lòng một bài văn mẫu duy nhất', 'Viết thật dài cho đủ trang', 'Tránh nêu quan điểm cá nhân'], ans: 0, ex: 'Nghị luận rèn tư duy phản biện, lập luận logic và khả năng diễn đạt rõ ràng trong học tập, cuộc sống.' }
+      ],
+      'KHXH': [
+        { q: 'Khái niệm "Lịch sử" thường được hiểu theo những nghĩa cơ bản nào?', opts: ['Những gì đã diễn ra trong quá khứ và khoa học tìm hiểu quá khứ loài người', 'Chỉ là những câu chuyện tưởng tượng', 'Chỉ là các con số thống kê hiện tại', 'Chỉ là dự đoán tương lai'], ans: 0, ex: 'Lịch sử vừa là hiện thực khách quan đã diễn ra trong quá khứ, vừa là môn khoa học nghiên cứu quá khứ.' },
+        { q: 'Sử học có vai trò quan trọng nào đối với đời sống hiện tại?', opts: ['Giúp hiểu cội nguồn, rút bài học kinh nghiệm và định hướng tương lai', 'Chỉ phục vụ cho việc thi cử thuần túy', 'Thay thế mọi môn khoa học khác', 'Không liên quan tới văn hóa'], ans: 0, ex: 'Nhìn lại quá khứ giúp con người trân trọng di sản, tránh lặp lại sai lầm và hành động khôn ngoan hơn.' },
+        { q: 'Sử liệu là gì trong nghiên cứu lịch sử?', opts: ['Những tư liệu còn lưu lại giúp con người nhận thức và phục dựng quá khứ', 'Chỉ là các bức ảnh chụp ngày hôm nay', 'Chỉ là truyện cười dân gian', 'Là suy đoán cá nhân không căn cứ'], ans: 0, ex: 'Sử liệu (hiện vật, chữ viết, truyền khẩu...) là nguồn tư liệu để tìm hiểu lịch sử.' },
+        { q: 'Nhóm sử liệu nào gồm di tích khảo cổ, công cụ lao động, đồ gốm, tiền cổ?', opts: ['Sử liệu hiện vật', 'Sử liệu truyền khẩu', 'Sử liệu thành văn', 'Sử liệu điện tử'], ans: 0, ex: 'Sử liệu hiện vật là các di vật, di tích vật chất còn giữ lại từ quá khứ.' },
+        { q: 'Một trong những thành tựu tiêu biểu của văn minh Ai Cập cổ đại là gì?', opts: ['Chữ tượng hình, kim tự tháp, kiến thức hình học và thiên văn', 'La bàn và thuốc súng', 'Chữ cái Latinh hiện đại', 'Động cơ hơi nước'], ans: 0, ex: 'Ai Cập cổ đại nổi tiếng với chữ tượng hình, kim tự tháp và kĩ thuật ướp xác, đo đạc ruộng đất.' },
+        { q: 'Văn minh Lưỡng Hà cổ đại hình thành bên lưu vực hai con sông nào?', opts: ['Sông Ti-grơ và sông Ơ-phrat', 'Sông Nin và sông Hằng', 'Sông Hoàng Hà và sông Trường Giang', 'Sông Mê Kông và sông Hồng'], ans: 0, ex: 'Lưỡng Hà nằm giữa hai con sông Ti-grơ và Ơ-phrat, nổi tiếng với bộ luật Ham-mu-ra-bi.' },
+        { q: 'Văn minh Ấn Độ cổ đại gắn liền với các tôn giáo lớn nào?', opts: ['Hin-đu giáo (Ấn Độ giáo) và Phật giáo', 'Thiên Chúa giáo và Hồi giáo', 'Đạo Tin Lành', 'Do Thái giáo'], ans: 0, ex: 'Ấn Độ là cái nôi của Hin-đu giáo và Phật giáo, có nhiều công trình kiến trúc và chữ viết cổ.' },
+        { q: 'Văn minh Trung Hoa cổ đại có các phát minh nào nổi bật?', opts: ['Giấy viết, kĩ thuật in, la bàn, thuốc súng', 'Máy bay và điện thoại', 'Kính hiển vi điện tử', 'Tàu ngầm hạt nhân'], ans: 0, ex: 'Tứ đại phát minh của Trung Hoa cổ đại gồm làm giấy, in ấn, la bàn và thuốc súng.' },
+        { q: 'Bảo tồn di sản văn hóa có ý nghĩa gì đối với cộng đồng?', opts: ['Gìn giữ bản sắc, bồi đắp lòng tự hào và phát triển du lịch bền vững', 'Làm cản trở giao lưu quốc tế', 'Chỉ tốn kém không mang lại giá trị', 'Xóa bỏ nét riêng của địa phương'], ans: 0, ex: 'Di sản văn hóa là tài sản vô giá gắn kết cộng đồng và tạo nguồn lực văn hóa - kinh tế.' },
+        { q: 'Trên bản đồ, "tỉ lệ bản đồ" cho biết điều gì?', opts: ['Mức độ thu nhỏ của khoảng cách trên bản đồ so với thực địa', 'Độ cao tuyệt đối của đỉnh núi', 'Hướng gió thổi trong năm', 'Nhiệt độ trung bình tháng'], ans: 0, ex: 'Tỉ lệ bản đồ cho biết 1 đơn vị đo trên bản đồ ứng với bao nhiêu đơn vị đo ngoài thực tế.' },
+        { q: 'Tỉ lệ bản đồ 1 : 100.000 có nghĩa là gì?', opts: ['1 cm trên bản đồ ứng với 100.000 cm (1 km) trên thực địa', '1 cm trên bản đồ ứng với 100 m trên thực địa', '1 cm trên bản đồ ứng với 10 km trên thực địa', '1 m trên bản đồ ứng với 100 km trên thực địa'], ans: 0, ex: '100.000 cm = 1.000 m = 1 km, nên 1 cm trên bản đồ tương ứng 1 km ngoài thực tế.' },
+        { q: 'Phương pháp kí hiệu trên bản đồ thường dùng để biểu hiện đối tượng nào?', opts: ['Các đối tượng phân bố theo điểm cụ thể như mỏ khoáng sản, cảng biển, nhà máy', 'Sự dịch chuyển dòng người di cư', 'Sự thay đổi màu sắc ngẫu nhiên', 'Tốc độ quay của Trái Đất'], ans: 0, ex: 'Phương pháp kí hiệu thể hiện chính xác vị trí và đặc điểm của các đối tượng phân bố theo điểm.' },
+        { q: 'Đường đồng mức trên bản đồ địa hình nối các điểm có đặc điểm gì?', opts: ['Có cùng độ cao', 'Có cùng lượng mưa năm', 'Có cùng dân số', 'Có cùng múi giờ'], ans: 0, ex: 'Đường bình độ (đồng mức) là đường nối các điểm có cùng độ cao so với mực nước biển.' },
+        { q: 'Khi các đường đồng mức càng xích lại gần nhau, địa hình có đặc điểm gì?', opts: ['Độ dốc càng lớn', 'Địa hình hoàn toàn bằng phẳng', 'Là mặt hồ tĩnh lặng', 'Không có độ cao'], ans: 0, ex: 'Đường đồng mức càng dày/gần nhau thì độ chênh cao trên một khoảng ngắn càng lớn, nghĩa là sườn càng dốc.' },
+        { q: 'Hệ thống lưới kinh, vĩ tuyến trên bản đồ giúp xác định yếu tố nào?', opts: ['Tọa độ địa lí và phương hướng trên bản đồ', 'Màu sắc của bầu trời', 'Giá cả hàng hóa', 'Tên các tác phẩm văn học'], ans: 0, ex: 'Kinh tuyến chỉ hướng Bắc - Nam, vĩ tuyến chỉ hướng Đông - Tây và giúp xác định tọa độ địa lí.' },
+        { q: 'Trái Đất tự quay quanh trục theo hướng nào?', opts: ['Từ Tây sang Đông', 'Từ Đông sang Tây', 'Từ Bắc xuống Nam', 'Từ Nam lên Bắc'], ans: 0, ex: 'Trái Đất tự quay quanh trục từ Tây sang Đông, tạo nên hiện tượng ngày và đêm luân phiên.' },
+        { q: 'Hệ quả trực tiếp của chuyển động tự quay quanh trục của Trái Đất là gì?', opts: ['Sự luân phiên ngày đêm, giờ trên Trái Đất và lệch hướng chuyển động (Cô-ri-ô-lít)', 'Sự thay đổi các mùa trong năm', 'Sự thay đổi độ dài ngày đêm theo mùa', 'Hiện tượng nhật thực toàn phần'], ans: 0, ex: 'Tự quay quanh trục sinh ra ngày đêm, giờ địa phương - giờ múi và lực Cô-ri-ô-lít.' },
+        { q: 'Nguyên nhân chính sinh ra các mùa Xuân, Hạ, Thu, Đông trên Trái Đất là gì?', opts: ['Trục Trái Đất nghiêng 23°27\' và không đổi hướng khi chuyển động quanh Mặt Trời', 'Mặt Trời ngừng chiếu sáng vào mùa đông', 'Khoảng cách Trái Đất - Mặt Trời thay đổi đột ngột mỗi tuần', 'Trái Đất ngừng tự quay'], ans: 0, ex: 'Trục nghiêng kết hợp với chuyển động tịnh tiến quanh Mặt Trời làm góc nhập xạ và thời gian chiếu sáng thay đổi theo mùa.' },
+        { q: 'Khu vực Xích đạo có đặc điểm gì về độ dài ngày và đêm quanh năm?', opts: ['Ngày và đêm luôn dài bằng nhau (khoảng 12 giờ)', 'Ngày dài suốt 24 giờ quanh năm', 'Đêm dài suốt 24 giờ quanh năm', 'Không có ban ngày'], ans: 0, ex: 'Đường Xích đạo luôn được phân chia thành hai phần bằng nhau bởi đường sáng tối nên ngày đêm dài bằng nhau.' },
+        { q: 'Lớp vỏ địa lí là nơi diễn ra hoạt động của đối tượng nào?', opts: ['Nơi các quyển (khí quyển, thạch quyển, thủy quyển, sinh quyển, thổ nhưỡng quyển) xâm nhập và tác động lẫn nhau', 'Chỉ có lớp đá nóng chảy sâu dưới tâm Trái Đất', 'Chỉ có tầng bình lưu', 'Không có sự sống'], ans: 0, ex: 'Lớp vỏ địa lí là lớp vỏ tự nhiên ở bề mặt Trái Đất, nơi các quyển tương tác mật thiết và có sự sống.' },
+        { q: 'Khi tìm hiểu lịch sử và địa lí địa phương (như quê hương, tỉnh/thành của mình), nguồn nào rất hữu ích?', opts: ['Bảo tàng địa phương, di tích lịch sử, tư liệu địa chí và thực tế địa phương', 'Chỉ đoán mò không kiểm chứng', 'Chỉ đọc một mẩu tin đồn', 'Bỏ qua thực tế tại địa phương'], ans: 0, ex: 'Kết hợp tư liệu địa chí, di tích, bảo tàng và quan sát thực tế giúp hiểu sâu sắc lịch sử - địa lí địa phương.' },
+        { q: 'Kĩ năng đọc lược đồ/bản đồ giúp ích gì trong học tập và đời sống?', opts: ['Định hướng không gian, nhận diện phân bố đối tượng và đọc hiểu thông tin trực quan', 'Thay thế việc ghi chép bài học', 'Làm bản đồ mất tính chính xác', 'Chỉ dùng khi đi du lịch nước ngoài'], ans: 0, ex: 'Đọc bản đồ là kĩ năng cốt lõi giúp nắm bắt nhanh không gian, vị trí và mối liên hệ địa lí.' }
+      ],
+      'Tiếng Anh': [
+        { q: 'Choose the best answer: My dad usually ______ the heavy lifting in our family.', opts: ['do', 'does', 'is doing', 'did'], ans: 1, ex: '"My dad" là ngôi thứ 3 số ít và có trạng từ tần suất "usually" -> dùng thì hiện tại đơn: does.' },
+        { q: 'Choose the best answer: Listen! Someone ______ the piano in the next room.', opts: ['plays', 'is playing', 'played', 'play'], ans: 1, ex: 'Dấu hiệu "Listen!" diễn tả hành động đang xảy ra ngay lúc nói -> hiện tại tiếp diễn: is playing.' },
+        { q: 'Choose the best answer: Doing housework helps children develop ______ skills.', opts: ['life', 'live', 'alive', 'lively'], ans: 0, ex: '"Life skills" là cụm từ cố định nghĩa là "kĩ năng sống".' },
+        { q: 'Choose the best answer: We should ______ plastic waste to protect the environment.', opts: ['increase', 'reduce', 'waste', 'destroy'], ans: 1, ex: '"Reduce plastic waste" nghĩa là giảm thiểu rác thải nhựa.' },
+        { q: 'Choose the best answer: A lot of trees ______ in our schoolyard every spring.', opts: ['plant', 'are planted', 'planted', 'is planting'], ans: 1, ex: 'Chủ ngữ "A lot of trees" chịu tác động của hành động trồng và có "every spring" -> bị động hiện tại đơn: are planted.' },
+        { q: 'Choose the best answer: She is capable ______ finishing the project on time.', opts: ['of', 'in', 'at', 'for'], ans: 0, ex: 'Cấu trúc "be capable of + V-ing" nghĩa là có khả năng làm gì.' },
+        { q: 'Choose the best answer: They ______ a volunteer campaign at the moment.', opts: ['run', 'are running', 'runs', 'ran'], ans: 1, ex: '"At the moment" là dấu hiệu của thì hiện tại tiếp diễn: are running.' },
+        { q: 'Choose the best answer: Air pollution is a serious ______ in big cities.', opts: ['issue', 'solution', 'benefit', 'habit'], ans: 0, ex: '"A serious issue" nghĩa là một vấn đề nghiêm trọng.' },
+        { q: 'Choose the best answer: Turn ______ the lights when you leave the room to save electricity.', opts: ['off', 'on', 'up', 'into'], ans: 0, ex: '"Turn off" nghĩa là tắt (đèn, thiết bị điện).' },
+        { q: 'Choose the best answer: My brother is interested ______ playing guitar in his free time.', opts: ['in', 'on', 'to', 'with'], ans: 0, ex: 'Cấu trúc "be interested in + V-ing" nghĩa là thích thú/quan tâm đến việc gì.' },
+        { q: 'Choose the best answer: Which word has the underlined part pronounced differently? (A: cat, B: map, C: name, D: hat)', opts: ['cat', 'map', 'name', 'hat'], ans: 2, ex: '"Name" có nguyên âm /eɪ/, trong khi cat, map, hat có âm /æ/.' },
+        { q: 'Choose the best answer: Which word has the underlined part pronounced differently? (A: clean, B: teach, C: bread, D: speak)', opts: ['clean', 'teach', 'bread', 'speak'], ans: 2, ex: '"Bread" phát âm là /e/, còn clean, teach, speak phát âm là /iː/.' },
+        { q: 'Choose the best answer: Sharing household chores makes family members feel ______.', opts: ['closer', 'farther', 'angrier', 'lonelier'], ans: 0, ex: 'Chia sẻ việc nhà giúp các thành viên gắn kết, gần gũi nhau hơn (closer).' },
+        { q: 'Choose the best answer: Solar energy and wind energy are ______ sources of energy.', opts: ['renewable', 'non-renewable', 'harmful', 'polluted'], ans: 0, ex: '"Renewable energy" là năng lượng tái tạo (mặt trời, gió...).' },
+        { q: 'Choose the best answer: I don\'t mind ______ you with your English homework.', opts: ['help', 'helping', 'to help', 'helped'], ans: 1, ex: 'Sau "don\'t mind" dùng danh động từ V-ing: helping.' },
+        { q: 'Choose the best answer: What time ______ the train leave tomorrow morning?', opts: ['do', 'does', 'is', 'has'], ans: 1, ex: 'Lịch trình tàu xe thường dùng thì hiện tại đơn; chủ ngữ "the train" số ít -> does.' },
+        { q: 'Choose the best answer: Recycling helps conserve natural ______.', opts: ['resources', 'problems', 'accidents', 'storms'], ans: 0, ex: '"Conserve natural resources" nghĩa là bảo tồn tài nguyên thiên nhiên.' },
+        { q: 'Choose the best answer: Lan is very ______; she always helps her classmates.', opts: ['helpful', 'selfish', 'lazy', 'careless'], ans: 0, ex: '"Helpful" nghĩa là hay giúp đỡ, có ích.' },
+        { q: 'Choose the best answer: We must ______ awareness of protecting endangered animals.', opts: ['raise', 'drop', 'hide', 'forget'], ans: 0, ex: '"Raise awareness" là cụm từ chuẩn nghĩa là nâng cao nhận thức.' },
+        { q: 'Choose the best answer: The students are preparing ______ the upcoming mid-term test.', opts: ['for', 'at', 'of', 'to'], ans: 0, ex: '"Prepare for something" nghĩa là chuẩn bị cho việc gì.' }
+      ]
+    };
 
     let currentUser = null;
     let allPosts = [];
@@ -718,44 +755,44 @@
       if (session) initApp(session.user);
     });
 
-    /* TÍNH NĂNG ÔN KIỂM TRA */
-    function selectQuizOption(questionId, optIndex) {
-      quizAnswers[questionId] = optIndex;
+    /* TÍNH NĂNG ÔN KIỂM TRA THEO TỪNG MÔN RIÊNG BIỆT */
+    function selectQuizOption(questionKey, optIndex) {
+      quizAnswers[questionKey] = optIndex;
       renderQuizList();
     }
 
     function resetQuizAttempt() {
-      const subjectFilter = document.getElementById('quiz-subject-filter')?.value || 'all';
-      KNTT_QUIZ_BANK.forEach(q => {
-        if (subjectFilter === 'all' || q.subject === subjectFilter) {
-          delete quizAnswers[q.id];
-        }
+      const subject = document.getElementById('quiz-subject-filter')?.value || 'Tin học';
+      const questions = QUIZ_BY_SUBJECT[subject] || [];
+      questions.forEach((_, idx) => {
+        delete quizAnswers[`${subject}_${idx}`];
       });
       renderQuizList();
     }
 
     function renderQuizList() {
       const container = document.getElementById('quiz-list-container');
-      const subjectFilter = document.getElementById('quiz-subject-filter')?.value || 'all';
+      const subject = document.getElementById('quiz-subject-filter')?.value || 'Tin học';
       if (!container) return;
 
-      const list = KNTT_QUIZ_BANK.filter(q => subjectFilter === 'all' || q.subject === subjectFilter);
+      const list = QUIZ_BY_SUBJECT[subject] || [];
       let correctCount = 0;
 
-      container.innerHTML = list.map((q, idx) => {
-        const chosen = quizAnswers[q.id];
+      container.innerHTML = list.map((item, idx) => {
+        const key = `${subject}_${idx}`;
+        const chosen = quizAnswers[key];
         const hasAnswered = chosen !== undefined;
-        if (hasAnswered && chosen === q.answerIndex) correctCount += 1;
+        if (hasAnswered && chosen === item.ans) correctCount += 1;
 
         const labels = ['A', 'B', 'C', 'D'];
-        const optionsHTML = q.options.map((opt, optIdx) => {
+        const optionsHTML = item.opts.map((opt, optIdx) => {
           let extraClass = '';
           if (hasAnswered) {
-            if (optIdx === q.answerIndex) extraClass = 'correct';
+            if (optIdx === item.ans) extraClass = 'correct';
             else if (optIdx === chosen) extraClass = 'wrong';
           }
           return `
-            <button type="button" class="quiz-opt-btn ${extraClass}" onclick="selectQuizOption('${q.id}', ${optIdx})">
+            <button type="button" class="quiz-opt-btn ${extraClass}" onclick="selectQuizOption('${key}', ${optIdx})">
               <b>${labels[optIdx]}.</b> ${escapeHTML(opt)}
             </button>
           `;
@@ -763,18 +800,18 @@
 
         const explainHTML = hasAnswered
           ? `<div class="quiz-explain">
-               <b>${chosen === q.answerIndex ? '✅ Chính xác!' : `❌ Chưa đúng (Đáp án đúng: ${labels[q.answerIndex]}).`}</b>
-               ${escapeHTML(q.explain)}
+               <b>${chosen === item.ans ? '✅ Chính xác!' : `❌ Chưa đúng (Đáp án đúng: ${labels[item.ans]}).`}</b>
+               ${escapeHTML(item.ex)}
              </div>`
           : '';
 
         return `
           <div class="quiz-card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <span class="badge">${escapeHTML(q.subject)}</span>
+              <span class="badge">${escapeHTML(subject)}</span>
               <span style="font-size: 11.5px; color: var(--text-muted);">Câu ${idx + 1}/${list.length}</span>
             </div>
-            <div class="quiz-question">${escapeHTML(q.question)}</div>
+            <div class="quiz-question">${escapeHTML(item.q)}</div>
             <div class="quiz-options">${optionsHTML}</div>
             ${explainHTML}
           </div>
@@ -783,7 +820,7 @@
 
       const scoreEl = document.getElementById('quiz-score-text');
       if (scoreEl) {
-        scoreEl.innerText = `${correctCount} / ${list.length} câu đúng`;
+        scoreEl.innerText = `${correctCount} / ${list.length} câu đúng (${subject})`;
       }
     }
 
