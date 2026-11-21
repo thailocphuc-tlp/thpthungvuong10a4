@@ -121,7 +121,8 @@
 
     .leaderboard-list { display: flex; flex-direction: column; gap: 10px; }
     .leader-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border); }
-    .leader-left { display: flex; align-items: center; gap: 10px; }
+    .leader-left { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .leader-left:hover .leader-name { color: var(--primary); text-decoration: underline; }
     .rank-medal { font-size: 18px; width: 24px; text-align: center; font-weight: 800; }
     .leader-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--primary); }
     .leader-name { font-size: 13.5px; font-weight: 700; color: var(--text-main); }
@@ -143,7 +144,6 @@
     .deadline-add-row select { margin-bottom: 0; padding: 9px; font-size: 13px; width: 145px; }
     .deadline-add-row button { padding: 9px 14px; font-size: 13px; width: auto; }
 
-    /* Ôn kiểm tra kiểu lưới thẻ & phòng thi K12 Online */
     .exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
     .exam-card {
       background: var(--bg-input); border: 1px solid var(--border); border-radius: 14px;
@@ -237,6 +237,9 @@
 
     .post-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
     .author-info { display: flex; align-items: center; gap: 12px; }
+    .profile-trigger { display: flex; align-items: center; gap: 12px; cursor: pointer; border-radius: 12px; padding: 2px 6px 2px 2px; }
+    .profile-trigger:hover { background: var(--primary-light); }
+    .profile-trigger:hover .author-name-text { color: var(--primary); text-decoration: underline; }
     .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--primary); }
     .author-name { font-weight: 700; font-size: 14.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .post-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
@@ -259,7 +262,8 @@
     .comments-area { margin-top: 14px; padding: 14px; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border); }
     .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .comment-item:last-child { border-bottom: none; }
-    .comment-author { font-weight: 700; color: var(--primary); margin-right: 4px; }
+    .comment-author { font-weight: 700; color: var(--primary); margin-right: 4px; cursor: pointer; }
+    .comment-author:hover { text-decoration: underline; }
     .comment-img { max-width: 150px; max-height: 150px; border-radius: 8px; margin-top: 6px; display: block; }
     .comment-actions { display: flex; gap: 4px; flex-shrink: 0; }
     .comment-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; padding: 2px 6px; border-radius: 6px; }
@@ -278,6 +282,48 @@
 
     .user-avatar-lg { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
     .hidden { display: none !important; }
+
+    /* Modal xem profile riêng & Bio */
+    .profile-modal-backdrop {
+      position: fixed; inset: 0; background: rgba(6, 11, 22, 0.65);
+      backdrop-filter: blur(4px); z-index: 300; display: flex;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .profile-modal-card {
+      width: 100%; max-width: 470px; max-height: 88vh; overflow-y: auto;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 22px; box-shadow: var(--shadow);
+    }
+    .profile-modal-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+    }
+    .profile-modal-hero { display: flex; align-items: center; gap: 14px; }
+    .profile-modal-avatar {
+      width: 62px; height: 62px; border-radius: 50%; object-fit: cover;
+      border: 2px solid var(--primary); flex-shrink: 0;
+    }
+    .profile-bio-box {
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-left: 3px solid var(--primary); border-radius: 12px;
+      padding: 12px 14px; font-size: 13.5px; color: var(--text-main);
+      margin-bottom: 14px; white-space: pre-wrap;
+    }
+    .profile-mini-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;
+    }
+    .profile-mini-stat {
+      background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px;
+      padding: 10px; text-align: center;
+    }
+    .profile-mini-stat strong { display: block; font-size: 16px; color: var(--primary); font-weight: 800; }
+    .profile-mini-stat span { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+    .profile-recent-post {
+      background: var(--bg-input); border: 1px solid var(--border); border-radius: 11px;
+      padding: 10px 12px; margin-bottom: 8px; cursor: pointer;
+    }
+    .profile-recent-post:hover { border-color: var(--primary); }
   </style>
 </head>
 <body>
@@ -294,7 +340,7 @@
       <a href="https://k12online.vn" target="_blank" rel="noopener noreferrer" class="btn-ghost">🔗 Mở K12 Online</a>
       <button class="btn-ghost" onclick="toggleTheme()" id="theme-btn">🌓 Giao diện</button>
       <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 10px;">
-        <span id="display-username" style="font-size: 13px; color: var(--text-main); font-weight: 700;"></span>
+        <span id="display-username" onclick="openUserProfileModal(currentUser?.email)" style="font-size: 13px; color: var(--text-main); font-weight: 700; cursor: pointer;" title="Xem hồ sơ cá nhân của bạn"></span>
         <button class="btn-danger" onclick="handleLogout()">Đăng xuất</button>
       </div>
     </div>
@@ -597,12 +643,51 @@
 
   </div>
 
+  <!-- MODAL XEM PROFILE RIÊNG & BIO KHI BẤM VÀO TÁC GIẢ -->
+  <div id="user-profile-modal" class="profile-modal-backdrop hidden" onclick="if(event.target === this) closeUserProfileModal()">
+    <div class="profile-modal-card">
+      <div class="profile-modal-top">
+        <div class="profile-modal-hero">
+          <img id="modal-user-avatar" src="" alt="Avatar" class="profile-modal-avatar" />
+          <div>
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <strong id="modal-user-name" style="font-size: 18px; color: var(--text-main);"></strong>
+              <span id="modal-user-role-badge"></span>
+            </div>
+            <div id="modal-user-email" style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;"></div>
+          </div>
+        </div>
+        <button type="button" class="btn-ghost" onclick="closeUserProfileModal()">✕ Đóng</button>
+      </div>
+
+      <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">📝 TIỂU SỬ (BIO)</div>
+      <div id="modal-user-bio" class="profile-bio-box"></div>
+
+      <div class="profile-mini-stats">
+        <div class="profile-mini-stat">
+          <strong id="modal-stat-posts">0</strong>
+          <span>Bài đăng</span>
+        </div>
+        <div class="profile-mini-stat">
+          <strong id="modal-stat-comments">0</strong>
+          <span>Bình luận</span>
+        </div>
+        <div class="profile-mini-stat">
+          <strong id="modal-stat-likes">0</strong>
+          <span>Lượt thích</span>
+        </div>
+      </div>
+
+      <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">📌 BÀI VIẾT GẦN ĐÂY</div>
+      <div id="modal-user-posts"></div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = 'https://kafwlqcqqtvodzjgqdsw.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Danh sách bài ôn tập theo từng môn
     const EXAM_MODULES = [
       {
         id: 'exam_tin_10',
@@ -796,7 +881,6 @@
     let allDeadlines = [];
     let userProfiles = {};
 
-    // Trạng thái phòng ôn kiểm tra
     let activeExam = null;
     let examSelectedAnswers = {};
     let examSubmitted = false;
@@ -809,6 +893,65 @@
 
     function normalizeEmail(email) {
       return (email || '').trim().toLowerCase();
+    }
+
+    function openUserProfileModal(email) {
+      const key = normalizeEmail(email);
+      if (!key) return;
+
+      const info = getAuthorInfo(key);
+      const isAdmin = key.includes('thailocphuc');
+      const userPosts = allPosts.filter(p => normalizeEmail(p.user_email) === key);
+      const userComments = allComments.filter(c => normalizeEmail(c.user_email) === key);
+      const totalLikesReceived = userPosts.reduce((sum, p) => sum + (Array.isArray(p.likes) ? p.likes.length : 0), 0);
+
+      document.getElementById('modal-user-avatar').src = info.avatar;
+      document.getElementById('modal-user-name').innerText = info.name;
+      document.getElementById('modal-user-email').innerText = key;
+      document.getElementById('modal-user-role-badge').innerHTML = isAdmin
+        ? '<span class="admin-badge">Admin</span>'
+        : '<span class="badge">Thành viên 10A4</span>';
+
+      const bioEl = document.getElementById('modal-user-bio');
+      bioEl.innerText = info.bio ? info.bio : 'Thành viên này chưa cập nhật tiểu sử (Bio).';
+
+      document.getElementById('modal-stat-posts').innerText = userPosts.length;
+      document.getElementById('modal-stat-comments').innerText = userComments.length;
+      document.getElementById('modal-stat-likes').innerText = totalLikesReceived;
+
+      const recentPostsEl = document.getElementById('modal-user-posts');
+      if (userPosts.length === 0) {
+        recentPostsEl.innerHTML = `<div style="font-size: 12.5px; color: var(--text-muted); text-align: center; padding: 12px;">Chưa có bài đăng nào.</div>`;
+      } else {
+        recentPostsEl.innerHTML = userPosts.slice(0, 5).map(p => `
+          <div class="profile-recent-post" onclick="jumpToPostFromProfile('${escapeHTML(p.title || '').replace(/'/g, "\\'")}')">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <strong style="font-size: 13px; color: var(--text-main);">${escapeHTML(p.title || 'Thảo luận chung')}</strong>
+              <span class="badge">${escapeHTML(p.category || 'Thảo luận')}</span>
+            </div>
+            <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px;">
+              ${new Date(p.created_at).toLocaleDateString('vi-VN')} • ❤️ ${Array.isArray(p.likes) ? p.likes.length : 0} thích
+            </div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('user-profile-modal').classList.remove('hidden');
+    }
+
+    function closeUserProfileModal() {
+      document.getElementById('user-profile-modal').classList.add('hidden');
+    }
+
+    function jumpToPostFromProfile(postTitle) {
+      closeUserProfileModal();
+      switchTab('home');
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.value = postTitle;
+        applyFilters();
+        searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
 
     function parseDeadlineSubject(item) {
@@ -863,7 +1006,6 @@
       if (session) initApp(session.user);
     });
 
-    /* TÍNH NĂNG ÔN KIỂM TRA KIỂU K12 ONLINE */
     function renderExamCatalog() {
       const grid = document.getElementById('exam-catalog-grid');
       const subjFilter = document.getElementById('quiz-subject-filter')?.value || 'all';
@@ -1180,7 +1322,7 @@
         const info = getAuthorInfo(u.email);
         return `
           <div class="leader-item">
-            <div class="leader-left">
+            <div class="leader-left" onclick="openUserProfileModal('${escapeHTML(u.email)}')" title="Xem hồ sơ & Bio">
               <span class="rank-medal">${medals[idx]}</span>
               <img src="${info.avatar}" alt="Avatar" class="leader-avatar" />
               <div>
@@ -1566,7 +1708,7 @@
                 <span style="font-size: 11px; color: var(--text-muted);">${new Date(doc.created_at).toLocaleDateString('vi-VN')}</span>
               </div>
               <div style="font-weight: 700; font-size: 14.5px; margin-bottom: 6px;">${escapeHTML(doc.title)}</div>
-              <div style="font-size: 12px; color: var(--text-muted);">Đăng bởi: <b>${escapeHTML(author.name)}</b></div>
+              <div style="font-size: 12px; color: var(--text-muted);">Đăng bởi: <b style="cursor:pointer; color:var(--primary);" onclick="openUserProfileModal('${escapeHTML(doc.user_email)}')">${escapeHTML(author.name)}</b></div>
             </div>
             <a class="file-pill" href="${doc.file_url}" target="_blank" style="justify-content: center;">
               ${isImg ? '🖼️ Xem hình ảnh tài liệu' : `📥 Tải về: ${escapeHTML(doc.file_name || 'Tệp đính kèm')}`}
@@ -1657,7 +1799,7 @@
           return `
             <div class="comment-item">
               <div>
-                <span class="comment-author">${escapeHTML(cAuthor.name)}</span>
+                <span class="comment-author" onclick="openUserProfileModal('${escapeHTML(cEmail)}')" title="Xem hồ sơ & Bio">${escapeHTML(cAuthor.name)}</span>
                 <span>${escapeHTML(c.content)}</span>
                 ${editedCommentHTML}
                 ${commentFileHTML}
@@ -1681,16 +1823,18 @@
             ${pinned ? `<div class="pin-banner">📌 Bài viết quan trọng được ghim bởi Admin</div>` : ''}
             <div class="post-top">
               <div class="author-info">
-                <img src="${author.avatar}" alt="Avatar" class="avatar" />
-                <div>
-                  <span class="author-name">
-                    ${escapeHTML(author.name)} 
-                    ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
-                    <span class="badge">${post.category}</span>
-                  </span>
-                  <div class="post-meta">
-                    <span>${timeStr}</span>
-                    ${editedPostHTML}
+                <div class="profile-trigger" onclick="openUserProfileModal('${escapeHTML(postEmail)}')" title="Bấm để xem hồ sơ & Bio">
+                  <img src="${author.avatar}" alt="Avatar" class="avatar" />
+                  <div>
+                    <span class="author-name">
+                      <span class="author-name-text">${escapeHTML(author.name)}</span>
+                      ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
+                      <span class="badge">${post.category}</span>
+                    </span>
+                    <div class="post-meta">
+                      <span>${timeStr}</span>
+                      ${editedPostHTML}
+                    </div>
                   </div>
                 </div>
               </div>
