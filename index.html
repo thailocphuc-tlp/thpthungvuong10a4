@@ -1,334 +1,434 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html lang="vi" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diễn Đàn Học Tập Lớp 10A4 - THPT Hùng Vương</title>
+  <title>Cổng Học Tập Trực Tuyến 10A4 - THPT Hùng Vương</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    :root[data-theme="light"] {
+      --bg-main: #f0f4f8;
+      --bg-card: #ffffff;
+      --bg-input: #f8fafc;
+      --primary: #0056b3;
+      --primary-light: #e6f0fa;
+      --accent: #0284c7;
+      --accent-gradient: linear-gradient(135deg, #0056b3 0%, #0284c7 100%);
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --border-glow: rgba(2, 132, 199, 0.2);
+      --danger: #dc2626;
+      --success: #059669;
+      --warning: #d97706;
+      --pin-bg: #fffbeb;
+      --pin-border: #f59e0b;
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    }
+
     :root[data-theme="dark"] {
-      --bg-main: #040812;
-      --bg-card: rgba(15, 23, 42, 0.72);
-      --bg-input: rgba(7, 11, 20, 0.82);
+      --bg-main: #060b16;
+      --bg-card: #0f172a;
+      --bg-input: #1e293b;
+      --primary: #38bdf8;
+      --primary-light: rgba(56, 189, 248, 0.12);
       --accent: #38bdf8;
-      --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
-      --text-main: #f8fafc;
+      --accent-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
+      --text-main: #f1f5f9;
       --text-muted: #94a3b8;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-glow: rgba(56, 189, 248, 0.35);
+      --border: rgba(255, 255, 255, 0.1);
+      --border-glow: rgba(56, 189, 248, 0.25);
       --danger: #ef4444;
       --success: #10b981;
       --warning: #f59e0b;
       --pin-bg: rgba(245, 158, 11, 0.08);
       --pin-border: rgba(245, 158, 11, 0.45);
-      --notice-bg: rgba(56, 189, 248, 0.08);
-      --notice-border: rgba(56, 189, 248, 0.25);
-      --shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-      --glass-blur: blur(24px);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
-    :root[data-theme="light"] {
-      --bg-main: #f1f5f9;
-      --bg-card: rgba(255, 255, 255, 0.82);
-      --bg-input: rgba(248, 250, 252, 0.92);
-      --accent: #0284c7;
-      --accent-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border: rgba(0, 0, 0, 0.06);
-      --border-glow: rgba(2, 132, 199, 0.25);
-      --danger: #dc2626;
-      --success: #059669;
-      --warning: #d97706;
-      --pin-bg: rgba(245, 158, 11, 0.07);
-      --pin-border: rgba(217, 119, 6, 0.4);
-      --notice-bg: rgba(2, 132, 199, 0.05);
-      --notice-border: rgba(2, 132, 199, 0.15);
-      --shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
-      --glass-blur: blur(24px);
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; transition: background-color 0.25s, color 0.25s, border-color 0.25s; }
+    body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 70px; }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
-    body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 70px; position: relative; overflow-x: hidden; }
-
-    /* HIỆU ỨNG LIQUID GLOWING BACKGROUND ORBS */
-    .liquid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; overflow: hidden; }
-    .liquid-blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: floatBlob 12s infinite alternate ease-in-out; }
-    .blob-1 { width: 550px; height: 550px; background: #38bdf8; top: -150px; left: -100px; animation-delay: 0s; }
-    .blob-2 { width: 500px; height: 500px; background: #6366f1; bottom: -120px; right: -100px; animation-delay: -4s; }
-    .blob-3 { width: 450px; height: 450px; background: #c084fc; top: 40%; left: 30%; animation-delay: -8s; opacity: 0.3; }
-
-    @keyframes floatBlob {
-      0% { transform: translate(0px, 0px) scale(1); }
-      100% { transform: translate(80px, 90px) scale(1.2); }
-    }
-
-    /* Navbar Liquid Glass */
     .navbar {
-      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      border-bottom: 1px solid var(--border); padding: 14px 28px; position: sticky; top: 0; z-index: 100;
-      display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);
+      background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 24px;
+      position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center;
+      box-shadow: var(--shadow);
     }
-    .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 20px; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; border: 2px solid var(--accent); }
-    .brand span { font-size: 11px; background: var(--notice-bg); padding: 4px 10px; border-radius: 99px; color: var(--accent); border: 1px solid var(--notice-border); font-weight: 600; -webkit-text-fill-color: initial; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; border: 2px solid var(--primary); }
+    .brand-text h1 { font-size: 17px; font-weight: 800; color: var(--primary); line-height: 1.2; }
+    .brand-text span { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
 
-    .nav-right { display: flex; align-items: center; gap: 12px; }
-    .container { max-width: 980px; margin: 28px auto; padding: 0 16px; position: relative; z-index: 1; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
 
-    /* Banner Khuôn Viên Trường */
+    .k12-tabs-bar {
+      background: var(--bg-card); border-bottom: 1px solid var(--border);
+      position: sticky; top: 67px; z-index: 90; padding: 0 16px;
+      display: flex; justify-content: center; gap: 6px; overflow-x: auto;
+    }
+    .k12-tab {
+      padding: 13px 18px; font-size: 13.5px; font-weight: 700; color: var(--text-muted);
+      background: transparent; border: none; border-bottom: 3px solid transparent; border-radius: 0;
+      cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 7px;
+    }
+    .k12-tab:hover { color: var(--primary); background: var(--primary-light); }
+    .k12-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
+
+    .container { max-width: 1020px; margin: 22px auto; padding: 0 16px; }
+
     .school-banner {
-      width: 100%; height: 260px; border-radius: 24px; overflow: hidden; margin-bottom: 24px;
+      width: 100%; height: 210px; border-radius: 18px; overflow: hidden; margin-bottom: 20px;
       border: 1px solid var(--border); box-shadow: var(--shadow); position: relative;
     }
-    .school-banner img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.92); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-    .school-banner:hover img { transform: scale(1.03); }
+    .school-banner img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.88); }
     .banner-overlay {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      background: linear-gradient(to top, var(--bg-main) 10%, transparent 90%);
-      padding: 26px; color: var(--text-main);
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(6, 11, 22, 0.85) 20%, rgba(6, 11, 22, 0.25) 100%);
+      padding: 26px; display: flex; flex-direction: column; justify-content: center; color: #fff;
     }
-    .banner-overlay h3 { font-size: 23px; font-weight: 800; color: var(--accent); margin-bottom: 6px; }
-    .banner-overlay p { font-size: 13.5px; color: var(--text-muted); }
+    .banner-tag { display: inline-block; width: fit-content; background: #0284c7; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .banner-overlay h3 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .banner-overlay p { font-size: 13px; color: #e2e8f0; max-width: 540px; }
 
-    /* Layout Lưới Top & Tiện ích 2.1 */
-    .grid-top-section { display: grid; grid-template-columns: 1fr 1.35fr; gap: 16px; margin-bottom: 20px; }
-    .grid-widgets-section { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-    @media(max-width: 768px) { 
-      .grid-top-section, .grid-widgets-section { grid-template-columns: 1fr; } 
+    .k12-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+    @media(max-width: 768px) { .k12-stats-row { grid-template-columns: repeat(2, 1fr); } }
+    .k12-stat-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 16px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 12px;
+    }
+    .stat-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .stat-info span { display: block; font-size: 12px; color: var(--text-muted); font-weight: 600; }
+    .stat-info strong { font-size: 20px; font-weight: 800; color: var(--text-main); }
+
+    .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+    @media(max-width: 768px) { .grid-2-col { grid-template-columns: 1fr; } }
+
+    .k12-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 20px; box-shadow: var(--shadow); margin-bottom: 20px;
+    }
+    .card-header {
+      font-weight: 800; font-size: 15.5px; color: var(--primary); margin-bottom: 14px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
     }
 
-    .glass-box {
-      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--notice-border); padding: 22px; border-radius: 22px; box-shadow: var(--shadow);
-    }
-    .box-title { font-weight: 700; font-size: 15px; color: var(--accent); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .notice-content { font-size: 13.5px; color: var(--text-main); line-height: 1.5; }
-
-    /* Bảng Thời Khóa Biểu chi tiết */
     .schedule-table-wrapper { overflow-x: auto; }
-    .schedule-table { width: 100%; border-collapse: collapse; font-size: 11.5px; text-align: center; }
-    .schedule-table th, .schedule-table td { border: 1px solid var(--border); padding: 5px 4px; }
-    .schedule-table th { background: var(--notice-bg); color: var(--accent); font-weight: 700; }
+    .schedule-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; }
+    .schedule-table th, .schedule-table td { border: 1px solid var(--border); padding: 7px 5px; }
+    .schedule-table th { background: var(--primary-light); color: var(--primary); font-weight: 700; }
     .schedule-table td.session-col { font-weight: 700; background: var(--bg-input); color: var(--text-muted); }
 
-    /* Bảng Xếp Hạng Thành Viên Tích Cực (Leaderboard) */
     .leaderboard-list { display: flex; flex-direction: column; gap: 10px; }
-    .leader-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 10px 14px; border-radius: 14px; border: 1px solid var(--border); }
+    .leader-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border); }
     .leader-left { display: flex; align-items: center; gap: 10px; }
     .rank-medal { font-size: 18px; width: 24px; text-align: center; font-weight: 800; }
-    .leader-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--accent); }
+    .leader-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--primary); }
     .leader-name { font-size: 13.5px; font-weight: 700; color: var(--text-main); }
     .leader-stats { font-size: 11px; color: var(--text-muted); }
-    .leader-score { font-size: 12px; font-weight: 800; color: var(--warning); background: rgba(245, 158, 11, 0.12); padding: 4px 10px; border-radius: 99px; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .leader-score { font-size: 12px; font-weight: 800; color: var(--warning); background: rgba(245, 158, 11, 0.12); padding: 4px 10px; border-radius: 99px; }
 
-    /* Danh Sách Nhắc Việc & Hạn Nộp Bài Tập (Cloud Synced) */
-    .deadline-list { display: flex; flex-direction: column; gap: 8px; max-height: 185px; overflow-y: auto; padding-right: 4px; }
-    .deadline-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 9px 12px; border-radius: 12px; border: 1px solid var(--border); font-size: 12.5px; gap: 8px; }
-    .deadline-item.done { opacity: 0.55; text-decoration: line-through; }
-    .deadline-tag { font-size: 10.5px; padding: 2px 8px; border-radius: 6px; font-weight: 700; margin-right: 6px; white-space: nowrap; }
-    .tag-urgent { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
-    .tag-normal { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
-    .deadline-add-row { display: flex; gap: 6px; margin-top: 10px; }
-    .deadline-add-row input { margin-bottom: 0; padding: 8px 12px; font-size: 12px; }
-    .deadline-add-row button { padding: 8px 12px; font-size: 12px; width: auto; flex-shrink: 0; }
-    .sync-badge { font-size: 10px; background: rgba(16, 185, 129, 0.15); color: var(--success); padding: 2px 8px; border-radius: 99px; border: 1px solid rgba(16, 185, 129, 0.3); }
-
-    /* Auth Box */
-    .auth-box {
-      max-width: 440px; margin: 80px auto; background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      padding: 36px; border-radius: 26px; border: 1px solid var(--border); box-shadow: var(--shadow);
+    .deadline-list { display: flex; flex-direction: column; gap: 8px; max-height: 290px; overflow-y: auto; }
+    .deadline-item {
+      display: flex; align-items: center; justify-content: space-between; background: var(--bg-input);
+      padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border); font-size: 13px; gap: 10px;
     }
-    .auth-box h2 { text-align: center; margin-bottom: 8px; font-weight: 800; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .auth-box p { text-align: center; color: var(--text-muted); font-size: 13.5px; margin-bottom: 24px; }
+    .deadline-item.done { opacity: 0.6; text-decoration: line-through; background: transparent; }
+    .deadline-tag { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 700; margin-right: 6px; white-space: nowrap; }
+    .tag-urgent { background: rgba(220, 38, 38, 0.12); color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.25); }
+    .tag-normal { background: var(--primary-light); color: var(--primary); border: 1px solid rgba(2, 132, 199, 0.25); }
+    .subject-chip { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 700; background: rgba(5, 150, 105, 0.12); color: var(--success); border: 1px solid rgba(5, 150, 105, 0.25); margin-right: 6px; white-space: nowrap; }
+    .deadline-add-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .deadline-add-row input { margin-bottom: 0; padding: 9px 12px; font-size: 13px; flex: 2; min-width: 180px; }
+    .deadline-add-row select { margin-bottom: 0; padding: 9px; font-size: 13px; width: 145px; }
+    .deadline-add-row button { padding: 9px 14px; font-size: 13px; width: auto; }
 
     input, select, textarea {
-      width: 100%; padding: 13px 16px; margin-bottom: 14px; border-radius: 14px;
-      border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main); font-size: 14px; backdrop-filter: blur(10px);
+      width: 100%; padding: 11px 14px; margin-bottom: 12px; border-radius: 10px;
+      border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main); font-size: 14px;
     }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--border-glow); }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--border-glow); }
 
     button {
-      padding: 11px 18px; border-radius: 14px; border: none; font-weight: 600; font-size: 14px;
-      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 16px; border-radius: 10px; border: none; font-weight: 600; font-size: 13.5px;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     }
-    .btn-primary { background: var(--accent-gradient); color: #fff; width: 100%; box-shadow: 0 4px 20px rgba(56, 189, 248, 0.35); }
-    .btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
-    .btn-success { background: var(--success); color: white; width: 100%; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
-    .btn-pin { background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 6px 10px; font-size: 12px; border-radius: 10px; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .btn-pin:hover, .btn-pin.active { background: var(--warning); color: #fff; }
-    .btn-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); padding: 6px 12px; font-size: 12px; border-radius: 10px; }
-    .btn-warning:hover { background: var(--warning); color: white; }
-    .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); padding: 6px 12px; font-size: 12px; border-radius: 10px; }
-    .btn-danger:hover { background: var(--danger); color: white; }
-    .btn-ghost { background: transparent; color: var(--text-muted); padding: 8px 14px; border: 1px solid var(--border); border-radius: 12px; }
-    .btn-ghost:hover { color: var(--text-main); border-color: var(--text-muted); background: var(--bg-input); }
+    .btn-primary { background: var(--accent-gradient); color: #fff; width: 100%; }
+    .btn-primary:hover { opacity: 0.92; }
+    .btn-success { background: var(--success); color: white; width: 100%; }
+    .btn-pin { background: rgba(245, 158, 11, 0.12); color: var(--warning); padding: 5px 10px; font-size: 12px; border-radius: 8px; }
+    .btn-pin.active { background: var(--warning); color: #fff; }
+    .btn-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 5px 10px; font-size: 12px; border-radius: 8px; }
+    .btn-danger { background: rgba(220, 38, 38, 0.15); color: var(--danger); padding: 5px 10px; font-size: 12px; border-radius: 8px; }
+    .btn-ghost { background: transparent; color: var(--text-muted); padding: 7px 12px; border: 1px solid var(--border); border-radius: 9px; }
+    .btn-ghost:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-light); }
 
-    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
-    .stat-card {
-      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      padding: 18px 22px; border-radius: 20px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);
+    .auth-box {
+      max-width: 420px; margin: 70px auto; background: var(--bg-card);
+      padding: 32px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow);
     }
-    .stat-card span { color: var(--text-muted); font-size: 13px; font-weight: 500; }
-    .stat-card strong { font-size: 22px; font-weight: 800; color: var(--accent); }
+    .auth-box h2 { text-align: center; margin-bottom: 6px; font-weight: 800; color: var(--primary); }
+    .auth-box p { text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 22px; }
 
-    .profile-card {
-      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      padding: 22px; border-radius: 22px; border: 1px solid var(--border); margin-bottom: 24px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: var(--shadow);
-    }
-    .profile-info { display: flex; align-items: center; gap: 14px; }
-    .user-avatar-lg { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: #fff; box-shadow: 0 0 15px var(--border-glow); }
+    .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .editor-toolbar { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+    .toolbar-btn { background: var(--bg-input); border: 1px solid var(--border); padding: 4px 10px; border-radius: 7px; font-size: 12px; color: var(--text-muted); }
+    .toolbar-btn:hover { color: var(--primary); border-color: var(--primary); }
 
-    .create-card {
-      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      padding: 26px; border-radius: 24px; border: 1px solid var(--border); margin-bottom: 24px; box-shadow: var(--shadow);
-    }
-    .create-header { font-weight: 700; font-size: 16px; margin-bottom: 16px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-    .form-row { display: flex; gap: 12px; }
-    
-    .editor-toolbar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-    .toolbar-btn { background: var(--bg-input); border: 1px solid var(--border); padding: 5px 10px; border-radius: 8px; font-size: 12px; color: var(--text-muted); cursor: pointer; font-weight: 600; }
-    .toolbar-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--notice-bg); }
-
-    .file-upload-box { border: 2px dashed var(--border); padding: 16px; border-radius: 16px; margin-bottom: 16px; background: var(--bg-input); text-align: center; }
-    .file-upload-box label { font-size: 13px; color: var(--text-muted); display: block; cursor: pointer; }
+    .file-upload-box { border: 1.5px dashed var(--border); padding: 14px; border-radius: 12px; margin-bottom: 14px; background: var(--bg-input); text-align: center; }
     .file-upload-box input[type="file"] { display: none; }
-    .custom-file-upload { display: inline-block; padding: 8px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--accent); font-weight: 600; cursor: pointer; margin-top: 6px; }
+    .custom-file-upload { display: inline-block; padding: 7px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--primary); font-weight: 600; cursor: pointer; margin-top: 6px; font-size: 13px; }
 
-    .filter-bar {
-      display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
-      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      padding: 16px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow);
-    }
+    .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: var(--bg-card); padding: 14px; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--shadow); }
     .filter-bar input { flex: 2; min-width: 180px; margin-bottom: 0; }
     .filter-bar select { flex: 1; min-width: 140px; margin-bottom: 0; }
 
-    /* Post Card & Pinned Post Style */
     .post-card {
-      background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-      border: 1px solid var(--border); border-radius: 24px; padding: 26px; margin-bottom: 22px; box-shadow: var(--shadow);
-      transition: border-color 0.3s, transform 0.2s;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 22px; margin-bottom: 18px; box-shadow: var(--shadow);
     }
-    .post-card:hover { border-color: var(--border-glow); }
-    .post-card.pinned-post {
-      background: linear-gradient(145deg, var(--bg-card), var(--pin-bg));
-      border: 1.5px solid var(--pin-border);
-      box-shadow: 0 12px 32px rgba(245, 158, 11, 0.12);
-    }
-    .pin-banner {
-      display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 800;
-      color: var(--warning); background: rgba(245, 158, 11, 0.15); padding: 4px 12px; border-radius: 99px;
-      margin-bottom: 12px; border: 1px solid rgba(245, 158, 11, 0.3);
-    }
+    .post-card.pinned-post { background: var(--pin-bg); border: 1.5px solid var(--pin-border); }
+    .pin-banner { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--warning); background: rgba(245, 158, 11, 0.15); padding: 3px 10px; border-radius: 99px; margin-bottom: 10px; }
 
-    .post-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+    .post-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
     .author-info { display: flex; align-items: center; gap: 12px; }
-    .avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--bg-input); color: var(--accent); font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 15px; }
-    .author-name { font-weight: 700; font-size: 15px; display: block; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .post-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--primary); }
+    .author-name { font-weight: 700; font-size: 14.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .post-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
     .edited-tag { font-size: 11px; color: var(--text-muted); font-style: italic; }
-    .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; background: var(--notice-bg); color: var(--accent); border: 1px solid var(--notice-border); }
-    .admin-badge { font-size: 10px; background: rgba(16, 185, 129, 0.15); color: var(--success); padding: 2px 6px; border-radius: 6px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge { padding: 2px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; background: var(--primary-light); color: var(--primary); }
+    .admin-badge { font-size: 10px; background: rgba(5, 150, 105, 0.15); color: var(--success); padding: 2px 6px; border-radius: 5px; font-weight: 700; }
 
-    .post-title { font-size: 18.5px; font-weight: 800; margin-bottom: 10px; color: var(--text-main); }
-    .post-body { font-size: 15px; color: var(--text-main); white-space: pre-wrap; word-break: break-word; margin-bottom: 16px; }
+    .post-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
+    .post-body { font-size: 14.5px; white-space: pre-wrap; word-break: break-word; margin-bottom: 14px; }
 
-    .attachment-box { margin-bottom: 16px; }
-    .attachment-box img { max-width: 100%; max-height: 420px; border-radius: 16px; border: 1px solid var(--border); display: block; }
-    .file-pill { display: inline-flex; align-items: center; gap: 10px; background: var(--bg-input); border: 1px solid var(--border); padding: 12px 16px; border-radius: 14px; color: var(--accent); text-decoration: none; font-size: 13.5px; font-weight: 600; }
-    .file-pill:hover { border-color: var(--accent); }
+    .attachment-box { margin-bottom: 14px; }
+    .attachment-box img { max-width: 100%; max-height: 400px; border-radius: 12px; border: 1px solid var(--border); }
+    .file-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-light); border: 1px solid var(--border); padding: 10px 14px; border-radius: 10px; color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 600; }
 
-    .post-actions { display: flex; gap: 12px; padding-top: 14px; border-top: 1px solid var(--border); align-items: center; }
-    .action-btn { background: transparent; color: var(--text-muted); padding: 8px 14px; border-radius: 12px; font-size: 13.5px; font-weight: 600; }
-    .action-btn:hover { background: var(--notice-bg); color: var(--text-main); }
-    .action-btn.liked { color: #f43f5e; background: rgba(244, 63, 94, 0.12); }
+    .post-actions { display: flex; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .action-btn { background: transparent; color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 13px; }
+    .action-btn:hover { background: var(--primary-light); color: var(--primary); }
+    .action-btn.liked { color: #e11d48; background: rgba(225, 29, 72, 0.1); }
 
-    /* Comments Area */
-    .comments-area { margin-top: 16px; padding: 16px; border-top: 1px dashed var(--border); background: var(--bg-input); border-radius: 18px; }
-    .comment-item { font-size: 13.5px; padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .comments-area { margin-top: 14px; padding: 14px; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border); }
+    .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .comment-item:last-child { border-bottom: none; }
-    .comment-author { font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 6px; }
-    .comment-img { max-width: 160px; max-height: 160px; border-radius: 10px; margin-top: 6px; display: block; border: 1px solid var(--border); }
-    .comment-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-    .comment-btn { background: none; border: none; color: var(--text-muted); font-size: 11.5px; cursor: pointer; padding: 3px 8px; border-radius: 8px; font-weight: 600; }
-    .comment-btn:hover { color: var(--accent); background: var(--bg-card); }
-    .comment-btn.liked { color: #f43f5e; background: rgba(244, 63, 94, 0.1); }
+    .comment-author { font-weight: 700; color: var(--primary); margin-right: 4px; }
+    .comment-img { max-width: 150px; max-height: 150px; border-radius: 8px; margin-top: 6px; display: block; }
+    .comment-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .comment-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; padding: 2px 6px; border-radius: 6px; }
+    .comment-btn:hover { color: var(--primary); background: var(--bg-card); }
+    .comment-btn.liked { color: #e11d48; }
 
-    .comment-form-wrapper { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
-    .comment-form { display: flex; gap: 8px; align-items: center; }
-    .comment-form input { margin-bottom: 0; padding: 10px 14px; font-size: 13px; flex: 1; }
-    .comment-form button { padding: 10px 16px; width: auto; border-radius: 12px; }
-    
-    .comment-file-label { font-size: 12px; color: var(--text-muted); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
-    .comment-file-label:hover { color: var(--accent); }
+    .comment-form { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+    .comment-form input { margin-bottom: 0; padding: 8px 12px; font-size: 13px; flex: 1; }
+    .comment-form button { padding: 8px 14px; width: auto; }
 
+    .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .resource-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px;
+      box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+    }
+
+    .user-avatar-lg { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
     .hidden { display: none !important; }
-    #loading-overlay { text-align: center; padding: 40px; color: var(--text-muted); }
   </style>
 </head>
 <body>
 
-  <!-- BACKGROUND LIQUID GLOWING BLOBS -->
-  <div class="liquid-bg">
-    <div class="liquid-blob blob-1"></div>
-    <div class="liquid-blob blob-2"></div>
-    <div class="liquid-blob blob-3"></div>
-  </div>
-
-  <!-- THANH ĐIỀU HƯỚNG -->
   <nav class="navbar">
     <div class="brand">
       <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/logo.png" alt="Logo" />
-      DIỄN ĐÀN 10A4 <span>THPT Hùng Vương</span>
+      <div class="brand-text">
+        <h1>K12 PORTAL • LỚP 10A4</h1>
+        <span>THPT Hùng Vương • Năm học 2026 - 2027</span>
+      </div>
     </div>
     <div class="nav-right">
-      <button class="btn-ghost" onclick="toggleTheme()" id="theme-btn">☀️ Sáng/Tối</button>
-      <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 12px;">
-        <span id="display-username" style="font-size: 13.5px; color: var(--text-muted); font-weight: 600;"></span>
-        <button class="btn-danger" onclick="handleLogout()" style="padding: 6px 12px; font-size: 12px;">Đăng xuất</button>
+      <button class="btn-ghost" onclick="toggleTheme()" id="theme-btn">🌓 Giao diện</button>
+      <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 10px;">
+        <span id="display-username" style="font-size: 13px; color: var(--text-main); font-weight: 700;"></span>
+        <button class="btn-danger" onclick="handleLogout()">Đăng xuất</button>
       </div>
     </div>
   </nav>
 
-  <!-- MÀN HÌNH ĐĂNG NHẬP -->
+  <div id="k12-nav-tabs" class="k12-tabs-bar hidden">
+    <button class="k12-tab active" id="tab-btn-home" onclick="switchTab('home')">🏠 Bảng tin & Thảo luận</button>
+    <button class="k12-tab" id="tab-btn-study" onclick="switchTab('study')">📝 Bài tập & Thời khóa biểu</button>
+    <button class="k12-tab" id="tab-btn-docs" onclick="switchTab('docs')">📚 Kho học liệu lớp</button>
+    <button class="k12-tab" id="tab-btn-profile" onclick="switchTab('profile')">👤 Hồ sơ cá nhân</button>
+  </div>
+
   <div id="auth-view" class="container">
     <div class="auth-box">
-      <h2>Cổng Thông Tin 10A4</h2>
-      <p>Đăng nhập để kết nối, chia sẻ tài liệu và thảo luận bài tập cùng lớp</p>
-      <input type="email" id="auth-email" placeholder="Email của bạn (VD: tenban@gmail.com)" />
+      <h2>Cổng Học Tập 10A4</h2>
+      <p>Đăng nhập để xem thời khóa biểu, nộp bài tập và trao đổi tài liệu cùng lớp</p>
+      <input type="email" id="auth-email" placeholder="Email học sinh (VD: tenban@gmail.com)" />
       <input type="password" id="auth-password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" />
-      <div style="display: flex; gap: 10px; margin-top: 8px;">
+      <div style="display: flex; gap: 10px; margin-top: 6px;">
         <button class="btn-primary" onclick="handleLogin()">Đăng nhập</button>
         <button class="btn-success" onclick="handleSignUp()">Đăng ký</button>
       </div>
       <div style="text-align: right; margin-top: 10px;">
-        <a href="#" onclick="handleForgotPassword(); return false;" style="font-size: 12.5px; color: var(--accent); text-decoration: none;">Quên mật khẩu?</a>
+        <a href="#" onclick="handleForgotPassword(); return false;" style="font-size: 12.5px; color: var(--primary); text-decoration: none; font-weight: 600;">Quên mật khẩu?</a>
       </div>
-      <p id="auth-msg" style="color: var(--danger); margin-top: 14px; text-align: center; font-size: 13px; font-weight: 600;"></p>
+      <p id="auth-msg" style="color: var(--danger); margin-top: 12px; text-align: center; font-size: 13px; font-weight: 600;"></p>
     </div>
   </div>
 
-  <!-- MÀN HÌNH CHÍNH -->
   <div id="forum-view" class="container hidden">
-    
-    <!-- BANNER KHUÔN VIÊN TRƯỜNG -->
     <div class="school-banner">
-      <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/banner.jpg" alt="Khuôn viên THPT Hùng Vương" />
+      <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/banner.jpg" alt="THPT Hùng Vương" />
       <div class="banner-overlay">
-        <h3>Lớp 10A4 - Ngôi nhà thứ hai</h3>
-        <p>GVCN: Cô Nguyễn Như Ngọc • Nơi kết nối tri thức, lưu giữ thanh xuân và sẻ chia tài liệu học tập.</p>
+        <span class="banner-tag">HỆ THỐNG QUẢN LÝ HỌC TẬP NỘI BỘ</span>
+        <h3>Tập thể Lớp 10A4 - THPT Hùng Vương</h3>
+        <p>GVCN: Cô Nguyễn Như Ngọc • Cập nhật bài tập, thời khóa biểu, tài liệu ôn tập và góc sinh hoạt chung của lớp.</p>
       </div>
     </div>
 
-    <!-- HÀNG 1: THÔNG BÁO & THỜI KHÓA BIỂU CHÍNH THỨC 10A4 -->
-    <div class="grid-top-section">
-      <div class="glass-box">
-        <div class="box-title">📌 Thông báo quan trọng từ lớp</div>
-        <div class="notice-content">Chào mừng các thành viên 10A4! Nhớ nộp bài tập đầy đủ và cập nhật lịch kiểm tra, TKB học kỳ I (áp dụng từ 02/11/2026) ngay bên cạnh nhé. Các bài viết quan trọng được ghim sẽ luôn hiển thị trên đầu bảng tin! 🚀</div>
+    <div class="k12-stats-row">
+      <div class="k12-stat-card">
+        <div class="stat-icon">💬</div>
+        <div class="stat-info"><span>Bài thảo luận</span><strong id="stat-posts">0</strong></div>
       </div>
-      <div class="glass-box">
-        <div class="box-title">📅 Thời Khóa Biểu 10A4 (Học kỳ I)</div>
+      <div class="k12-stat-card">
+        <div class="stat-icon">📁</div>
+        <div class="stat-info"><span>Học liệu & Đề cương</span><strong id="stat-files">0</strong></div>
+      </div>
+      <div class="k12-stat-card">
+        <div class="stat-icon">⏰</div>
+        <div class="stat-info"><span>Bài tập đang mở</span><strong id="stat-tasks">0</strong></div>
+      </div>
+      <div class="k12-stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info"><span>Đã hoàn thành</span><strong id="stat-tasks-done">0</strong></div>
+      </div>
+    </div>
+
+    <!-- TAB 1: BẢNG TIN & THẢO LUẬN -->
+    <div id="view-tab-home">
+      <div class="grid-2-col">
+        <div class="k12-card" style="margin-bottom: 0;">
+          <div class="card-header">📌 Thông báo từ Ban cán sự lớp</div>
+          <p style="font-size: 13.5px; color: var(--text-main);">Chào mừng các thành viên 10A4! Các bạn kiểm tra mục <b>Bài tập & Thời khóa biểu</b> thường xuyên để không bị trễ hạn nộp bài nhé. Các tài liệu ôn tập được tổng hợp gọn ở tab <b>Kho học liệu</b>. 🚀</p>
+        </div>
+        <div class="k12-card" style="margin-bottom: 0;">
+          <div class="card-header">
+            <span>🏆 Bảng vàng tích cực</span>
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Top 3 đóng góp</span>
+          </div>
+          <div id="leaderboard-container" class="leaderboard-list"></div>
+        </div>
+      </div>
+
+      <div class="k12-card">
+        <div class="card-header">✍️ Đăng bài thảo luận / Chia sẻ tài liệu mới</div>
+        <div class="form-row">
+          <input type="text" id="post-title" placeholder="Tiêu đề bài viết (VD: Đề cương Toán giữa kỳ...)" style="flex: 2;" />
+          <select id="post-category" style="flex: 1;">
+            <option value="Thảo luận">💬 Thảo luận chung</option>
+            <option value="Toán học">📐 Toán học</option>
+            <option value="Ngữ Văn">📖 Ngữ Văn</option>
+            <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
+            <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
+            <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+            <option value="Tin học">💻 Tin học</option>
+            <option value="GDĐP">📚 Giáo dục địa phương</option>
+            <option value="Giải trí">📸 Góc giải trí & Meme</option>
+          </select>
+        </div>
+
+        <div class="editor-toolbar">
+          <button type="button" class="toolbar-btn" onclick="insertContent(' 😊 ')">😊 Emoji</button>
+          <button type="button" class="toolbar-btn" onclick="insertContent(' 📚 #TaiLieu ')"># Tài liệu</button>
+          <button type="button" class="toolbar-btn" onclick="insertContent(' ❓ #HoiBai ')"># Hỏi bài</button>
+          <button type="button" class="toolbar-btn" onclick="insertContent(' 📸 #GiaiTri ')"># Giải trí</button>
+        </div>
+
+        <textarea id="post-content" rows="3" placeholder="Nhập nội dung câu hỏi, bài giảng hoặc chia sẻ của bạn..."></textarea>
+        
+        <div class="file-upload-box">
+          <span style="font-size: 12.5px; color: var(--text-muted); display: block;">📎 Đính kèm ảnh, PDF, Word, PowerPoint, ZIP...</span>
+          <label for="post-file" class="custom-file-upload">Chọn tệp từ máy</label>
+          <input type="file" id="post-file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar" onchange="document.getElementById('post-file-chosen').innerText = this.files[0] ? this.files[0].name : '';" />
+          <div id="post-file-chosen" style="font-size: 12px; color: var(--primary); margin-top: 6px; font-weight: 600;"></div>
+        </div>
+
+        <button id="btn-submit-post" class="btn-primary" onclick="createPost()">🚀 Đăng lên cổng học tập</button>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="search-input" onkeyup="applyFilters()" placeholder="🔍 Tìm kiếm tiêu đề, nội dung hoặc tác giả..." />
+        <select id="filter-category" onchange="applyFilters()">
+          <option value="all">Tất cả môn & chuyên mục</option>
+          <option value="Thảo luận">💬 Thảo luận chung</option>
+          <option value="Toán học">📐 Toán học</option>
+          <option value="Ngữ Văn">📖 Ngữ Văn</option>
+          <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
+          <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
+          <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+          <option value="Tin học">💻 Tin học</option>
+          <option value="GDĐP">📚 Giáo dục địa phương</option>
+          <option value="Giải trí">📸 Góc giải trí & Meme</option>
+        </select>
+        <select id="sort-order" onchange="applyFilters()">
+          <option value="newest">🕒 Mới nhất</option>
+          <option value="popular">❤️ Nhiều thích nhất</option>
+        </select>
+      </div>
+
+      <div id="posts-list"></div>
+    </div>
+
+    <!-- TAB 2: BÀI TẬP & THỜI KHÓA BIỂU -->
+    <div id="view-tab-study" class="hidden">
+      <div class="k12-card">
+        <div class="card-header">
+          <span>📝 Nhiệm vụ học tập & Hạn nộp bài theo môn</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <select id="deadline-subject-filter" onchange="renderDeadlines()" style="width: 155px; margin-bottom: 0; padding: 5px 10px; font-size: 12px;">
+              <option value="all">Tất cả môn học</option>
+              <option value="Toán học">📐 Toán học</option>
+              <option value="Ngữ Văn">📖 Ngữ Văn</option>
+              <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
+              <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
+              <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+              <option value="Tin học">💻 Tin học</option>
+              <option value="GDĐP">📚 Giáo dục địa phương</option>
+              <option value="Thảo luận">💬 Chung</option>
+            </select>
+            <select id="deadline-filter" onchange="renderDeadlines()" style="width: 140px; margin-bottom: 0; padding: 5px 10px; font-size: 12px;">
+              <option value="all">Mọi trạng thái</option>
+              <option value="pending">⏳ Chưa xong</option>
+              <option value="done">✅ Đã xong</option>
+            </select>
+          </div>
+        </div>
+        <div id="deadline-list" class="deadline-list"></div>
+        <div class="deadline-add-row">
+          <select id="new-deadline-subject" style="width: 150px;">
+            <option value="Toán học">📐 Toán học</option>
+            <option value="Ngữ Văn">📖 Ngữ Văn</option>
+            <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
+            <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
+            <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+            <option value="Tin học">💻 Tin học</option>
+            <option value="GDĐP">📚 Giáo dục địa phương</option>
+            <option value="Thảo luận">💬 Chung</option>
+          </select>
+          <input type="text" id="new-deadline-text" placeholder="VD: Làm bài tập trang 45 trước thứ 6..." onkeypress="if(event.key==='Enter') addDeadline()" />
+          <select id="new-deadline-type">
+            <option value="urgent">🔥 Hạn gấp</option>
+            <option value="normal">📘 Bài tập</option>
+          </select>
+          <button id="btn-add-deadline" class="btn-primary" onclick="addDeadline()">+ Giao việc</button>
+        </div>
+      </div>
+
+      <div class="k12-card">
+        <div class="card-header">📅 Thời Khóa Biểu Chính Thức Lớp 10A4 (Học kỳ I)</div>
         <div class="schedule-table-wrapper">
           <table class="schedule-table">
             <thead>
@@ -343,153 +443,71 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td class="session-col">S1</td><td>Chào cờ</td><td>Địa lý</td><td>Anh NN</td><td>Ngữ văn</td><td>Mỹ thuật</td><td>HĐTN-LMS</td></tr>
-              <tr><td class="session-col">S2</td><td>SHL</td><td>Tin học</td><td>Anh NN</td><td>Ngữ văn</td><td>Mỹ thuật</td><td>-</td></tr>
-              <tr><td class="session-col">S3</td><td>Ngữ văn</td><td>Ngữ văn</td><td>GDKT-PL</td><td>Toán</td><td>Tin học</td><td>-</td></tr>
-              <tr><td class="session-col">S4</td><td>Tiếng Anh</td><td>Toán</td><td>GDKT-PL</td><td>Địa lý</td><td>-</td><td>-</td></tr>
-              <tr><td class="session-col">C1</td><td>-</td><td>GDĐP</td><td>Toán</td><td>Lịch sử</td><td>-</td><td>-</td></tr>
-              <tr><td class="session-col">C2</td><td>-</td><td>GDKT-PL</td><td>Toán</td><td>GD QP-AN</td><td>-</td><td>-</td></tr>
-              <tr><td class="session-col">C3</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-              <tr><td class="session-col">C4</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">Sáng 1</td><td>Chào cờ</td><td>Địa lý</td><td>Anh NN</td><td>Ngữ văn</td><td>Mỹ thuật</td><td>HĐTN-LMS</td></tr>
+              <tr><td class="session-col">Sáng 2</td><td>SHL</td><td>Tin học</td><td>Anh NN</td><td>Ngữ văn</td><td>Mỹ thuật</td><td>-</td></tr>
+              <tr><td class="session-col">Sáng 3</td><td>Ngữ văn</td><td>Ngữ văn</td><td>GDKT-PL</td><td>Toán</td><td>Tin học</td><td>-</td></tr>
+              <tr><td class="session-col">Sáng 4</td><td>Tiếng Anh</td><td>Toán</td><td>GDKT-PL</td><td>Địa lý</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">Chiều 1</td><td>-</td><td>GDĐP</td><td>Toán</td><td>Lịch sử</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">Chiều 2</td><td>-</td><td>GDKT-PL</td><td>Toán</td><td>GD QP-AN</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">Chiều 3</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+              <tr><td class="session-col">Chiều 4</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- HÀNG 2: BẢNG XẾP HẠNG & NHẮC VIỆC ĐỒNG BỘ -->
-    <div class="grid-widgets-section">
-      <div class="glass-box">
-        <div class="box-title">
-          <span>🏆 Top 3 Thành Viên Tích Cực</span>
-          <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Tính theo bài & bình luận</span>
-        </div>
-        <div id="leaderboard-container" class="leaderboard-list">
-          <div style="font-size: 12.5px; color: var(--text-muted); text-align: center; padding: 16px;">Đang tổng hợp bảng xếp hạng...</div>
-        </div>
-      </div>
-
-      <div class="glass-box">
-        <div class="box-title">
-          <span>⏰ Nhắc Việc & Hạn Nộp Bài Tập</span>
-          <span class="sync-badge">☁️ Đồng bộ cả lớp</span>
-        </div>
-        <div id="deadline-list" class="deadline-list">
-          <div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px;">⏳ Đang tải danh sách nhắc việc...</div>
-        </div>
-        <div class="deadline-add-row">
-          <input type="text" id="new-deadline-text" placeholder="VD: Thứ 6 nộp bài tập Toán..." onkeypress="if(event.key==='Enter') addDeadline()" />
-          <select id="new-deadline-type" style="width: 105px; margin-bottom: 0; padding: 8px; font-size: 12px;">
-            <option value="urgent">🔥 Gấp</option>
-            <option value="normal">📘 Thường</option>
+    <!-- TAB 3: KHO HỌC LIỆU LỚP -->
+    <div id="view-tab-docs" class="hidden">
+      <div class="k12-card">
+        <div class="card-header">
+          <span>📚 Kho Tài Liệu, Đề Cương & Bài Giảng 10A4</span>
+          <select id="docs-subject-filter" onchange="renderDocsLibrary()" style="width: 180px; margin-bottom: 0; padding: 6px 10px; font-size: 12.5px;">
+            <option value="all">Tất cả môn học</option>
+            <option value="Toán học">📐 Toán học</option>
+            <option value="Ngữ Văn">📖 Ngữ Văn</option>
+            <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
+            <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
+            <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+            <option value="Tin học">💻 Tin học</option>
+            <option value="GDĐP">📚 Giáo dục địa phương</option>
+            <option value="Thảo luận">💬 Chung</option>
           </select>
-          <button id="btn-add-deadline" class="btn-primary" onclick="addDeadline()">+ Thêm</button>
+        </div>
+        <div id="docs-library-grid" class="resource-grid"></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: HỒ SƠ CÁ NHÂN -->
+    <div id="view-tab-profile" class="hidden">
+      <div class="k12-card">
+        <div class="card-header">👤 Thông tin hồ sơ học sinh 10A4</div>
+        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+          <img id="profile-avatar-preview" src="" alt="Avatar" class="user-avatar-lg" />
+          <div>
+            <strong id="profile-display-name" style="font-size: 18px; display: block;">Học sinh 10A4</strong>
+            <span id="profile-email-txt" style="font-size: 13px; color: var(--text-muted); display: block;"></span>
+            <p id="profile-bio-txt" style="font-size: 13.5px; color: var(--primary); font-style: italic; margin-top: 6px;"></p>
+          </div>
+        </div>
+        <div style="max-width: 480px;">
+          <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Tên hiển thị trên cổng học tập</label>
+          <input type="text" id="input-new-name" placeholder="Nhập họ tên hoặc biệt danh..." />
+          
+          <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Tiểu sử / Giới thiệu ngắn (Bio)</label>
+          <input type="text" id="input-new-bio" placeholder="VD: Thành viên 10A4 • Đam mê Toán & Tin học..." />
+          
+          <div style="margin-bottom: 14px;">
+            <label for="input-avatar-file" class="custom-file-upload">📁 Tải ảnh đại diện mới</label>
+            <input type="file" id="input-avatar-file" accept="image/*" style="display:none;" onchange="document.getElementById('file-chosen-txt').innerText = this.files[0] ? this.files[0].name : '';" />
+            <span id="file-chosen-txt" style="font-size: 12px; color: var(--text-muted); margin-left: 8px;"></span>
+          </div>
+          
+          <button class="btn-success" onclick="saveProfile()" style="width: auto; padding: 10px 22px;">💾 Lưu thay đổi hồ sơ</button>
         </div>
       </div>
     </div>
 
-    <!-- KHUNG CÀI ĐẶT TÀI KHOẢN CÁ NHÂN (PROFILE MỞ RỘNG VỚI TIỂU SỬ) -->
-    <div class="profile-card">
-      <div class="profile-info" style="align-items: flex-start;">
-        <img id="profile-avatar-preview" src="" alt="Avatar" class="user-avatar-lg" />
-        <div>
-          <strong id="profile-display-name" style="font-size: 16px; display: block; font-weight: 800;">Hồ sơ cá nhân</strong>
-          <span style="font-size: 12.5px; color: var(--text-muted); display: block; margin-bottom: 4px;" id="profile-email-txt"></span>
-          <p id="profile-bio-txt" style="font-size: 13px; color: var(--accent); font-style: italic; margin-top: 4px;">Chưa có tiểu sử. Hãy viết vài dòng về bạn đi nào! ✨</p>
-        </div>
-      </div>
-      <div style="display: flex; gap: 8px; flex-direction: column; align-items: flex-end; width: 260px;">
-        <input type="text" id="input-new-name" placeholder="Tên hiển thị mới..." style="width: 100%; margin-bottom: 6px; padding: 8px 12px; font-size: 13px;" />
-        <input type="text" id="input-new-bio" placeholder="Tiểu sử / Bio (VD: Fan cứng 10A4...)" style="width: 100%; margin-bottom: 6px; padding: 8px 12px; font-size: 13px;" />
-        <div style="display: flex; gap: 8px; align-items: center; width: 100%; justify-content: space-between;">
-          <label for="input-avatar-file" class="custom-file-upload" style="margin-top:0; padding: 6px 10px; font-size: 11.5px;">📁 Đổi ảnh</label>
-          <input type="file" id="input-avatar-file" accept="image/*" style="display:none;" onchange="document.getElementById('file-chosen-txt').innerText = this.files[0] ? this.files[0].name : 'Đã chọn';" />
-          <span id="file-chosen-txt" style="font-size: 11px; color: var(--text-muted); max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></span>
-          <button class="btn-success" onclick="saveProfile()" style="padding: 6px 14px; width: auto; font-size: 12px;">💾 Lưu</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Thống kê lớp -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span>📝 Tổng số bài thảo luận</span>
-        <strong id="stat-posts">0</strong>
-      </div>
-      <div class="stat-card">
-        <span>📁 Tài liệu & Hình ảnh chia sẻ</span>
-        <strong id="stat-files">0</strong>
-      </div>
-    </div>
-
-    <!-- Khung tạo bài viết tích hợp thanh công cụ thông minh -->
-    <div class="create-card">
-      <div class="create-header">✍️ Tạo bài viết / Hỏi bài mới</div>
-      <div class="form-row">
-        <input type="text" id="post-title" placeholder="Tiêu đề bài viết (VD: Đề cương Toán giữa kỳ...)" style="flex: 2;" />
-        <select id="post-category" style="flex: 1;">
-          <option value="Thảo luận">💬 Thảo luận chung</option>
-          <option value="Toán học">📐 Toán học</option>
-          <option value="Ngữ Văn">📖 Ngữ Văn</option>
-          <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-          <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
-          <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
-          <option value="Tin học">💻 Tin học</option>
-          <option value="GDĐP">📚 Giáo dục địa phương</option>
-          <option value="Giải trí">📸 Góc giải trí & Meme</option>
-        </select>
-      </div>
-
-      <!-- Thanh công cụ chèn nhanh -->
-      <div class="editor-toolbar">
-        <button type="button" class="toolbar-btn" onclick="insertContent(' 😊 ')">😊 Thả Emoji</button>
-        <button type="button" class="toolbar-btn" onclick="insertContent(' 📚 #TaiLieu ')"># Tài liệu</button>
-        <button type="button" class="toolbar-btn" onclick="insertContent(' ❓ #HoiBap ')"># Hỏi đáp bài tập</button>
-        <button type="button" class="toolbar-btn" onclick="insertContent(' 🔥 #ThongBao ')"># Thông báo</button>
-        <button type="button" class="toolbar-btn" onclick="insertContent(' 📸 #GiaiTri ')"># Giải trí</button>
-      </div>
-
-      <textarea id="post-content" rows="3" placeholder="Nhập nội dung chi tiết câu hỏi hoặc chia sẻ của bạn..."></textarea>
-      
-      <div class="file-upload-box">
-        <label for="post-file">📎 Đính kèm tài liệu học tập hoặc hình ảnh (Ảnh, PDF, Word, PPT, ZIP...)</label>
-        <label for="post-file" class="custom-file-upload">Chọn tệp đính kèm</label>
-        <input type="file" id="post-file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar" onchange="document.getElementById('post-file-chosen').innerText = this.files[0] ? this.files[0].name : '';" />
-        <div id="post-file-chosen" style="font-size: 12px; color: var(--accent); margin-top: 6px; font-weight: 600;"></div>
-      </div>
-
-      <button id="btn-submit-post" class="btn-primary" onclick="createPost()">🚀 Đăng bài lên diễn đàn</button>
-    </div>
-
-    <!-- Thanh Tìm kiếm & Bộ lọc -->
-    <div class="filter-bar">
-      <input type="text" id="search-input" onkeyup="applyFilters()" placeholder="🔍 Tìm kiếm bài viết, nội dung hoặc tác giả..." />
-      <select id="filter-category" onchange="applyFilters()">
-        <option value="all">Tất cả danh mục</option>
-        <option value="Thảo luận">💬 Thảo luận chung</option>
-        <option value="Toán học">📐 Toán học</option>
-        <option value="Ngữ Văn">📖 Ngữ Văn</option>
-        <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-        <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
-        <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
-        <option value="Tin học">💻 Tin học</option>
-        <option value="GDĐP">📚 Giáo dục địa phương</option>
-        <option value="Giải trí">📸 Góc giải trí & Meme</option>
-      </select>
-      <select id="filter-type" onchange="applyFilters()">
-        <option value="all">Tất cả bài viết</option>
-        <option value="has-file">📁 Chỉ bài có đính kèm file</option>
-      </select>
-      <select id="sort-order" onchange="applyFilters()">
-        <option value="newest">🕒 Mới nhất</option>
-        <option value="popular">❤️ Nhiều tim nhất</option>
-      </select>
-    </div>
-
-    <!-- Danh sách bài đăng -->
-    <div id="posts-list">
-      <div id="loading-overlay">⏳ Đang tải dữ liệu diễn đàn...</div>
-    </div>
   </div>
 
   <script>
@@ -502,13 +520,44 @@
     let allComments = [];
     let allDeadlines = [];
     let userProfiles = {};
+    let deadlineSubjects = JSON.parse(localStorage.getItem('class_deadline_subjects') || '{}');
     let editedItems = JSON.parse(localStorage.getItem('class_edited_items') || '{}');
     let localPinnedPosts = JSON.parse(localStorage.getItem('class_pinned_posts') || '[]');
+
+    function normalizeEmail(email) {
+      return (email || '').trim().toLowerCase();
+    }
+
+    function parseDeadlineSubject(item) {
+      if (item.subject) return item.subject;
+      if (deadlineSubjects[item.id]) return deadlineSubjects[item.id];
+      const match = (item.text || '').match(/^\[([^\]]+)\]\s*(.*)$/);
+      if (match) return match[1];
+      return 'Thảo luận';
+    }
+
+    function cleanDeadlineText(item) {
+      if (!item.subject && !deadlineSubjects[item.id]) {
+        const match = (item.text || '').match(/^\[([^\]]+)\]\s*(.*)$/);
+        if (match) return match[2];
+      }
+      return item.text || '';
+    }
+
+    function switchTab(tabName) {
+      ['home', 'study', 'docs', 'profile'].forEach(t => {
+        document.getElementById(`view-tab-${t}`).classList.add('hidden');
+        document.getElementById(`tab-btn-${t}`).classList.remove('active');
+      });
+      document.getElementById(`view-tab-${tabName}`).classList.remove('hidden');
+      document.getElementById(`tab-btn-${tabName}`).classList.add('active');
+      if (tabName === 'docs') renderDocsLibrary();
+    }
 
     function toggleTheme() {
       const html = document.documentElement;
       const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
       html.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
     }
@@ -520,7 +569,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      const savedTheme = localStorage.getItem('theme') || 'dark';
+      const savedTheme = localStorage.getItem('theme') || 'light';
       document.documentElement.setAttribute('data-theme', savedTheme);
 
       const savedProfiles = localStorage.getItem('class_user_profiles');
@@ -530,21 +579,19 @@
       if (session) initApp(session.user);
     });
 
-    /* TÍNH NĂNG QUÊN MẬT KHẨU */
     async function handleForgotPassword() {
-      const email = document.getElementById('auth-email').value.trim();
+      const email = normalizeEmail(document.getElementById('auth-email').value);
       const msgEl = document.getElementById('auth-msg');
       if (!email) {
         msgEl.style.color = "var(--danger)";
-        msgEl.innerText = "Vui lòng nhập email của bạn vào ô email ở trên trước khi bấm Quên mật khẩu!";
+        msgEl.innerText = "Vui lòng nhập email của bạn vào ô email ở trên trước!";
         return;
       }
-
-      msgEl.style.color = "var(--accent)";
+      msgEl.style.color = "var(--primary)";
       msgEl.innerText = "Đang gửi email khôi phục mật khẩu...";
 
       const { error } = await sb.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.href,
+        redirectTo: window.location.origin,
       });
 
       if (error) {
@@ -552,66 +599,86 @@
         msgEl.innerText = "Lỗi: " + error.message;
       } else {
         msgEl.style.color = "var(--success)";
-        msgEl.innerText = "Đã gửi email khôi phục! Vui lòng kiểm tra hộp thư đến (hoặc thư rác).";
+        msgEl.innerText = "Đã gửi email khôi phục! Kiểm tra hộp thư đến hoặc thư rác nhé.";
       }
     }
 
-    /* QUẢN LÝ NHẮC VIỆC & HẠN NỘP BÀI TẬP (ĐỒNG BỘ SUPABASE) */
     async function fetchDeadlines() {
       const { data, error } = await sb.from('deadlines').select('*').order('created_at', { ascending: false });
-      if (error) {
-        console.warn("Chưa tạo bảng deadlines trên Supabase:", error.message);
-        document.getElementById('deadline-list').innerHTML = `
-          <div style="font-size: 11.5px; color: var(--warning); text-align: center; padding: 10px;">
-            ⚠️ Hãy chạy lệnh SQL tạo bảng <b>deadlines</b> trên Supabase để bật đồng bộ nhắc việc nhé!
-          </div>`;
-        return;
-      }
+      if (error) return;
       allDeadlines = data || [];
+      document.getElementById('stat-tasks').innerText = allDeadlines.filter(d => !d.done).length;
+      document.getElementById('stat-tasks-done').innerText = allDeadlines.filter(d => d.done).length;
       renderDeadlines();
     }
 
     function renderDeadlines() {
       const listEl = document.getElementById('deadline-list');
+      const statusFilter = document.getElementById('deadline-filter')?.value || 'all';
+      const subjectFilter = document.getElementById('deadline-subject-filter')?.value || 'all';
       if (!listEl) return;
-      if (allDeadlines.length === 0) {
-        listEl.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 12px;">Chưa có nhắc việc nào. Cả lớp thảnh thơi! 🎉</div>`;
+
+      const filtered = allDeadlines.filter(item => {
+        const matchStatus = (statusFilter === 'all') ||
+          (statusFilter === 'pending' && !item.done) ||
+          (statusFilter === 'done' && item.done);
+        const subj = parseDeadlineSubject(item);
+        const matchSubject = (subjectFilter === 'all') || (subj === subjectFilter);
+        return matchStatus && matchSubject;
+      });
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 18px;">Không có bài tập nào khớp với bộ lọc! 🎉</div>`;
         return;
       }
-      listEl.innerHTML = allDeadlines.map(item => `
-        <div class="deadline-item ${item.done ? 'done' : ''}" onclick="toggleDeadline(${item.id}, ${item.done})" style="cursor: pointer;">
-          <div style="flex: 1;">
-            <span class="deadline-tag ${item.type === 'urgent' ? 'tag-urgent' : 'tag-normal'}">${item.type === 'urgent' ? '🔥 Gấp' : '📘 Nhắc'}</span>
-            <span>${escapeHTML(item.text)}</span>
+
+      listEl.innerHTML = filtered.map(item => {
+        const subj = parseDeadlineSubject(item);
+        const contentText = cleanDeadlineText(item);
+        return `
+          <div class="deadline-item ${item.done ? 'done' : ''}" onclick="toggleDeadline(${item.id}, ${item.done})" style="cursor: pointer;">
+            <div style="flex: 1;">
+              <span class="deadline-tag ${item.type === 'urgent' ? 'tag-urgent' : 'tag-normal'}">${item.type === 'urgent' ? '🔥 Hạn gấp' : '📘 Bài tập'}</span>
+              <span class="subject-chip">${escapeHTML(subj)}</span>
+              <span>${escapeHTML(contentText)}</span>
+            </div>
+            <button onclick="event.stopPropagation(); deleteDeadline(${item.id})" style="background:none; border:none; color: var(--text-muted); font-size: 13px; padding: 2px 6px;" title="Xóa">✕</button>
           </div>
-          <button onclick="event.stopPropagation(); deleteDeadline(${item.id})" style="background:none; border:none; color: var(--text-muted); font-size: 12px; padding: 2px 6px;" title="Xóa">✕</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function addDeadline() {
+      const subjectSelect = document.getElementById('new-deadline-subject');
       const textInput = document.getElementById('new-deadline-text');
       const typeSelect = document.getElementById('new-deadline-type');
       const btn = document.getElementById('btn-add-deadline');
       const text = textInput.value.trim();
+      const subject = subjectSelect.value;
       if (!text) return;
 
       btn.disabled = true;
       btn.innerText = "⏳";
 
-      const { error } = await sb.from('deadlines').insert([{
-        text: text,
+      const formattedText = `[${subject}] ${text}`;
+      const { data, error } = await sb.from('deadlines').insert([{
+        text: formattedText,
         type: typeSelect.value,
         done: false,
-        user_email: currentUser.email
-      }]);
+        user_email: normalizeEmail(currentUser.email)
+      }]).select();
 
       btn.disabled = false;
-      btn.innerText = "+ Thêm";
+      btn.innerText = "+ Giao việc";
 
       if (error) {
-        alert("Lỗi lưu nhắc việc lên Supabase: " + error.message);
+        alert("Lỗi lưu nhiệm vụ: " + error.message);
         return;
+      }
+
+      if (Array.isArray(data) && data[0]) {
+        deadlineSubjects[data[0].id] = subject;
+        localStorage.setItem('class_deadline_subjects', JSON.stringify(deadlineSubjects));
       }
 
       textInput.value = '';
@@ -625,24 +692,27 @@
 
     async function deleteDeadline(id) {
       const { error } = await sb.from('deadlines').delete().eq('id', id);
-      if (!error) await fetchDeadlines();
+      if (!error) {
+        delete deadlineSubjects[id];
+        localStorage.setItem('class_deadline_subjects', JSON.stringify(deadlineSubjects));
+        await fetchDeadlines();
+      }
     }
 
-    /* BẢNG XẾP HẠNG THÀNH VIÊN TÍCH CỰC */
     function renderLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       if (!container) return;
 
       const scores = {};
       allPosts.forEach(p => {
-        const email = p.user_email;
+        const email = normalizeEmail(p.user_email);
         if (!scores[email]) scores[email] = { email, posts: 0, comments: 0, likes: 0, total: 0 };
         scores[email].posts += 1;
         scores[email].likes += (Array.isArray(p.likes) ? p.likes.length : 0);
       });
 
       allComments.forEach(c => {
-        const email = c.user_email;
+        const email = normalizeEmail(c.user_email);
         if (!scores[email]) scores[email] = { email, posts: 0, comments: 0, likes: 0, total: 0 };
         scores[email].comments += 1;
       });
@@ -653,7 +723,7 @@
       }).sort((a, b) => b.total - a.total).slice(0, 3);
 
       if (ranked.length === 0) {
-        container.innerHTML = `<div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 14px;">Chưa có dữ liệu đóng góp. Hãy là người đầu tiên đăng bài!</div>`;
+        container.innerHTML = `<div style="font-size: 12.5px; color: var(--text-muted); text-align: center; padding: 12px;">Chưa có dữ liệu đóng góp.</div>`;
         return;
       }
 
@@ -667,16 +737,15 @@
               <img src="${info.avatar}" alt="Avatar" class="leader-avatar" />
               <div>
                 <div class="leader-name">${escapeHTML(info.name)}</div>
-                <div class="leader-stats">${u.posts} bài • ${u.comments} bình luận • ${u.likes} tim</div>
+                <div class="leader-stats">${u.posts} bài • ${u.comments} bình luận • ${u.likes} thích</div>
               </div>
             </div>
-            <div class="leader-score">${u.total} điểm</div>
+            <div class="leader-score">${u.total} đ</div>
           </div>
         `;
       }).join('');
     }
 
-    /* GHIM BÀI VIẾT QUAN TRỌNG */
     function isPostPinned(post) {
       if (typeof post.is_pinned === 'boolean') return post.is_pinned;
       return localPinnedPosts.includes(post.id);
@@ -685,13 +754,9 @@
     async function togglePinPost(postId, currentPinState) {
       const newPinState = !currentPinState;
       const { error } = await sb.from('posts').update({ is_pinned: newPinState }).eq('id', postId);
-      
       if (error) {
-        if (localPinnedPosts.includes(postId)) {
-          localPinnedPosts = localPinnedPosts.filter(id => id !== postId);
-        } else {
-          localPinnedPosts.push(postId);
-        }
+        if (localPinnedPosts.includes(postId)) localPinnedPosts = localPinnedPosts.filter(id => id !== postId);
+        else localPinnedPosts.push(postId);
         localStorage.setItem('class_pinned_posts', JSON.stringify(localPinnedPosts));
         applyFilters();
       } else {
@@ -700,34 +765,31 @@
     }
 
     async function handleLogin() {
-      const email = document.getElementById('auth-email').value.trim();
+      const email = normalizeEmail(document.getElementById('auth-email').value);
       const password = document.getElementById('auth-password').value;
       const msgEl = document.getElementById('auth-msg');
-      msgEl.style.color = "var(--danger)";
-      msgEl.innerText = "Đang kiểm tra...";
+      msgEl.style.color = "var(--primary)";
+      msgEl.innerText = "Đang đăng nhập...";
 
       const { data, error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) { msgEl.innerText = "Lỗi: " + error.message; return; }
+      if (error) { msgEl.style.color = "var(--danger)"; msgEl.innerText = "Lỗi: " + error.message; return; }
       initApp(data.user);
     }
 
     async function handleSignUp() {
-      const email = document.getElementById('auth-email').value.trim();
+      const email = normalizeEmail(document.getElementById('auth-email').value);
       const password = document.getElementById('auth-password').value;
       const msgEl = document.getElementById('auth-msg');
-      
       if (!email || password.length < 6) {
         msgEl.style.color = "var(--danger)";
         msgEl.innerText = "Vui lòng nhập email hợp lệ và mật khẩu từ 6 ký tự trở lên.";
         return;
       }
-
-      msgEl.style.color = "var(--danger)";
       msgEl.innerText = "Đang tạo tài khoản...";
       const { data, error } = await sb.auth.signUp({ email, password });
-      if (error) { msgEl.innerText = "Lỗi đăng ký: " + error.message; return; }
+      if (error) { msgEl.style.color = "var(--danger)"; msgEl.innerText = "Lỗi đăng ký: " + error.message; return; }
       msgEl.style.color = "var(--success)";
-      msgEl.innerText = "Đăng ký thành công! Đang đăng nhập...";
+      msgEl.innerText = "Đăng ký thành công! Đang vào cổng học tập...";
       if (data.user) initApp(data.user);
     }
 
@@ -741,8 +803,9 @@
       document.getElementById('auth-view').classList.add('hidden');
       document.getElementById('forum-view').classList.remove('hidden');
       document.getElementById('nav-user-info').classList.remove('hidden');
-      
-      const emailKey = user.email;
+      document.getElementById('k12-nav-tabs').classList.remove('hidden');
+
+      const emailKey = normalizeEmail(user.email);
       if (!userProfiles[emailKey]) {
         const defaultName = emailKey.split('@')[0];
         userProfiles[emailKey] = {
@@ -758,20 +821,22 @@
     }
 
     function updateProfileUI() {
-      const profile = userProfiles[currentUser.email] || { name: currentUser.email.split('@')[0], bio: '', avatar: '' };
+      const emailKey = normalizeEmail(currentUser.email);
+      const profile = userProfiles[emailKey] || { name: emailKey.split('@')[0], bio: '', avatar: '' };
       document.getElementById('display-username').innerText = `👋 ${profile.name}`;
       document.getElementById('profile-display-name').innerText = profile.name;
-      document.getElementById('profile-email-txt').innerText = currentUser.email;
+      document.getElementById('profile-email-txt').innerText = emailKey;
       document.getElementById('profile-avatar-preview').src = profile.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${profile.name}`;
       
       const bioEl = document.getElementById('profile-bio-txt');
-      bioEl.innerText = profile.bio ? `"${profile.bio}"` : 'Chưa có tiểu sử. Hãy viết vài dòng về bạn đi nào! ✨';
+      bioEl.innerText = profile.bio ? `"${profile.bio}"` : 'Chưa có tiểu sử. Hãy cập nhật giới thiệu bản thân bên dưới!';
 
       document.getElementById('input-new-name').value = profile.name;
       document.getElementById('input-new-bio').value = profile.bio || '';
     }
 
     async function saveProfile() {
+      const emailKey = normalizeEmail(currentUser.email);
       const newName = document.getElementById('input-new-name').value.trim();
       const newBio = document.getElementById('input-new-bio').value.trim();
       const avatarFileInput = document.getElementById('input-avatar-file');
@@ -781,7 +846,7 @@
         return;
       }
 
-      let currentProfile = userProfiles[currentUser.email] || {};
+      let currentProfile = userProfiles[emailKey] || {};
       let avatarUrl = currentProfile.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${newName}`;
 
       try {
@@ -798,20 +863,21 @@
           avatarUrl = pubData.publicUrl;
         }
 
-        userProfiles[currentUser.email] = { name: newName, bio: newBio, avatar: avatarUrl };
+        userProfiles[emailKey] = { name: newName, bio: newBio, avatar: avatarUrl };
         localStorage.setItem('class_user_profiles', JSON.stringify(userProfiles));
         updateProfileUI();
         renderLeaderboard();
         applyFilters();
-        alert("Đã cập nhật hồ sơ cá nhân thành công!");
+        alert("Đã cập nhật hồ sơ thành công!");
       } catch (err) {
         alert("Lỗi lưu hồ sơ: " + err.message);
       }
     }
 
     function getAuthorInfo(email) {
-      if (userProfiles[email]) return userProfiles[email];
-      const short = email.split('@')[0];
+      const key = normalizeEmail(email);
+      if (userProfiles[key]) return userProfiles[key];
+      const short = key.split('@')[0];
       return { name: short, bio: '', avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${short}` };
     }
 
@@ -829,6 +895,7 @@
       document.getElementById('stat-files').innerText = allPosts.filter(p => p.file_url).length;
       renderLeaderboard();
       applyFilters();
+      renderDocsLibrary();
     }
 
     async function uploadAttachment(file) {
@@ -851,7 +918,7 @@
       const btn = document.getElementById('btn-submit-post');
 
       if (!content && fileInput.files.length === 0) {
-        alert("Bạn cần nhập nội dung hoặc đính kèm file!");
+        alert("Bạn cần nhập nội dung hoặc đính kèm tệp!");
         return;
       }
 
@@ -864,15 +931,17 @@
           fileData = await uploadAttachment(fileInput.files[0]);
         }
 
-        await sb.from('posts').insert([{
+        const { error } = await sb.from('posts').insert([{
           title: title || 'Thảo luận chung',
           category: category,
           content: content,
-          user_email: currentUser.email,
+          user_email: normalizeEmail(currentUser.email),
           file_url: fileData ? fileData.url : null,
           file_name: fileData ? fileData.name : null,
           likes: []
         }]);
+
+        if (error) throw error;
 
         document.getElementById('post-title').value = '';
         document.getElementById('post-content').value = '';
@@ -880,17 +949,20 @@
         document.getElementById('post-file-chosen').innerText = '';
         await fetchData();
       } catch (err) {
-        alert("Lỗi: " + err.message);
+        alert("Lỗi đăng bài: " + err.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = "🚀 Đăng bài lên diễn đàn";
+        btn.innerText = "🚀 Đăng lên cổng học tập";
       }
     }
 
-    async function editPost(postId, oldTitle, oldContent) {
-      const newTitle = prompt("Sửa tiêu đề bài viết:", oldTitle);
+    async function editPost(postId) {
+      const post = allPosts.find(p => p.id === postId);
+      if (!post) return;
+
+      const newTitle = prompt("Sửa tiêu đề bài viết:", post.title || '');
       if (newTitle === null) return;
-      const newContent = prompt("Sửa nội dung bài viết:", oldContent);
+      const newContent = prompt("Sửa nội dung bài viết:", post.content || '');
       if (newContent === null) return;
 
       const { error } = await sb.from('posts').update({ 
@@ -899,31 +971,32 @@
       }).eq('id', postId);
 
       if (error) {
-        alert("Lỗi sửa bài viết: " + error.message);
+        alert("Lỗi sửa bài viết (kiểm tra quyền RLS UPDATE trên Supabase): " + error.message);
       } else {
         editedItems[`post_${postId}`] = true;
         localStorage.setItem('class_edited_items', JSON.stringify(editedItems));
-        fetchData();
+        await fetchData();
       }
     }
 
     async function deletePost(postId) {
       if (!confirm("Bạn có chắc muốn xóa bài viết này?")) return;
-      await sb.from('posts').delete().eq('id', postId);
-      fetchData();
+      const { error } = await sb.from('posts').delete().eq('id', postId);
+      if (error) alert("Lỗi xóa bài viết: " + error.message);
+      else await fetchData();
     }
 
     async function toggleLike(postId) {
       const post = allPosts.find(p => p.id === postId);
       if (!post) return;
       let likes = Array.isArray(post.likes) ? [...post.likes] : [];
-      const userEmail = currentUser.email;
+      const userEmail = normalizeEmail(currentUser.email);
 
       if (likes.includes(userEmail)) likes = likes.filter(e => e !== userEmail);
       else likes.push(userEmail);
 
       await sb.from('posts').update({ likes }).eq('id', postId);
-      fetchData();
+      await fetchData();
     }
 
     async function addComment(postId) {
@@ -950,7 +1023,7 @@
 
         const { error } = await sb.from('comments').insert([{ 
           post_id: postId, 
-          user_email: currentUser.email, 
+          user_email: normalizeEmail(currentUser.email), 
           content: text,
           file_url: fileUrl,
           likes: []
@@ -969,27 +1042,18 @@
       }
     }
 
-    /* TÍNH NĂNG THÍCH BÌNH LUẬN */
     async function toggleCommentLike(commentId) {
       const comment = allComments.find(c => c.id === commentId);
       if (!comment) return;
 
       let likes = Array.isArray(comment.likes) ? [...comment.likes] : [];
-      const userEmail = currentUser.email;
+      const userEmail = normalizeEmail(currentUser.email);
 
-      if (likes.includes(userEmail)) {
-        likes = likes.filter(e => e !== userEmail);
-      } else {
-        likes.push(userEmail);
-      }
+      if (likes.includes(userEmail)) likes = likes.filter(e => e !== userEmail);
+      else likes.push(userEmail);
 
       const { error } = await sb.from('comments').update({ likes }).eq('id', commentId);
-      if (error) {
-        alert("Lỗi thích bình luận: " + error.message);
-        return;
-      }
-
-      await fetchData();
+      if (!error) await fetchData();
     }
 
     function setReplyTo(postId, authorName) {
@@ -999,8 +1063,11 @@
       inputEl.focus();
     }
 
-    async function editComment(commentId, oldContent) {
-      const newContent = prompt("Sửa nội dung bình luận:", oldContent);
+    async function editComment(commentId) {
+      const comment = allComments.find(c => c.id === commentId);
+      if (!comment) return;
+
+      const newContent = prompt("Sửa nội dung bình luận:", comment.content || '');
       if (newContent === null || !newContent.trim()) return;
 
       const { error } = await sb.from('comments').update({ 
@@ -1008,11 +1075,11 @@
       }).eq('id', commentId);
 
       if (error) {
-        alert("Lỗi sửa bình luận: " + error.message);
+        alert("Lỗi sửa bình luận (kiểm tra quyền RLS UPDATE trên Supabase): " + error.message);
       } else {
         editedItems[`comment_${commentId}`] = true;
         localStorage.setItem('class_edited_items', JSON.stringify(editedItems));
-        fetchData();
+        await fetchData();
       }
     }
 
@@ -1020,23 +1087,58 @@
       if (!confirm("Bạn có chắc muốn xóa bình luận này?")) return;
       const { error } = await sb.from('comments').delete().eq('id', commentId);
       if (error) alert("Lỗi xóa bình luận: " + error.message);
-      else fetchData();
+      else await fetchData();
+    }
+
+    function renderDocsLibrary() {
+      const grid = document.getElementById('docs-library-grid');
+      const subjectFilter = document.getElementById('docs-subject-filter')?.value || 'all';
+      if (!grid) return;
+
+      const docs = allPosts.filter(p => {
+        if (!p.file_url) return false;
+        if (subjectFilter === 'all') return true;
+        return p.category === subjectFilter;
+      });
+
+      if (docs.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 30px; color: var(--text-muted);">Chưa có tài liệu đính kèm nào trong môn này.</div>`;
+        return;
+      }
+
+      grid.innerHTML = docs.map(doc => {
+        const author = getAuthorInfo(doc.user_email);
+        const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(doc.file_url);
+        return `
+          <div class="resource-card">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="badge">${doc.category}</span>
+                <span style="font-size: 11px; color: var(--text-muted);">${new Date(doc.created_at).toLocaleDateString('vi-VN')}</span>
+              </div>
+              <div style="font-weight: 700; font-size: 14.5px; margin-bottom: 6px;">${escapeHTML(doc.title)}</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Đăng bởi: <b>${escapeHTML(author.name)}</b></div>
+            </div>
+            <a class="file-pill" href="${doc.file_url}" target="_blank" style="justify-content: center;">
+              ${isImg ? '🖼️ Xem hình ảnh tài liệu' : `📥 Tải về: ${escapeHTML(doc.file_name || 'Tệp đính kèm')}`}
+            </a>
+          </div>
+        `;
+      }).join('');
     }
 
     function applyFilters() {
       const keyword = document.getElementById('search-input').value.toLowerCase().trim();
       const catFilter = document.getElementById('filter-category').value;
-      const typeFilter = document.getElementById('filter-type').value;
       const sortOrder = document.getElementById('sort-order').value;
 
       let filtered = allPosts.filter(post => {
         const matchCat = (catFilter === 'all') || (post.category === catFilter);
-        const matchType = (typeFilter === 'all') || (typeFilter === 'has-file' && post.file_url);
         const matchKey = !keyword || 
           (post.title && post.title.toLowerCase().includes(keyword)) ||
           (post.content && post.content.toLowerCase().includes(keyword)) ||
           (post.user_email && post.user_email.toLowerCase().includes(keyword));
-        return matchCat && matchType && matchKey;
+        return matchCat && matchKey;
       });
 
       filtered.sort((a, b) => {
@@ -1056,23 +1158,25 @@
     function renderPosts(posts) {
       const listEl = document.getElementById('posts-list');
       if (posts.length === 0) {
-        listEl.innerHTML = `<div style="text-align:center; padding: 40px; color: var(--text-muted); background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border);">Không tìm thấy bài viết nào!</div>`;
+        listEl.innerHTML = `<div style="text-align:center; padding: 36px; color: var(--text-muted); background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);">Không tìm thấy bài viết nào!</div>`;
         return;
       }
 
-      const isCurrentUserAdmin = currentUser.email.includes('thailocphuc');
+      const currentEmail = normalizeEmail(currentUser.email);
+      const isCurrentUserAdmin = currentEmail.includes('thailocphuc');
 
       listEl.innerHTML = posts.map(post => {
-        const author = getAuthorInfo(post.user_email);
+        const postEmail = normalizeEmail(post.user_email);
+        const author = getAuthorInfo(postEmail);
         const timeStr = new Date(post.created_at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
         
         const isPostEdited = editedItems[`post_${post.id}`];
         const editedPostHTML = isPostEdited ? `<span class="edited-tag">(đã chỉnh sửa)</span>` : '';
         
-        const likesList = Array.isArray(post.likes) ? post.likes : [];
-        const isLiked = likesList.includes(currentUser.email);
-        const isOwner = post.user_email === currentUser.email;
-        const isAdmin = post.user_email.includes('thailocphuc');
+        const likesList = Array.isArray(post.likes) ? post.likes.map(normalizeEmail) : [];
+        const isLiked = likesList.includes(currentEmail);
+        const isOwner = postEmail === currentEmail;
+        const isAdmin = postEmail.includes('thailocphuc');
         const pinned = isPostPinned(post);
 
         let attachmentHTML = '';
@@ -1081,19 +1185,20 @@
           if (isImg) {
             attachmentHTML = `<div class="attachment-box"><a href="${post.file_url}" target="_blank"><img src="${post.file_url}" alt="Ảnh đính kèm" loading="lazy" /></a></div>`;
           } else {
-            attachmentHTML = `<div class="attachment-box"><a class="file-pill" href="${post.file_url}" target="_blank">📄 Tải tài liệu: ${post.file_name || 'Tệp đính kèm'}</a></div>`;
+            attachmentHTML = `<div class="attachment-box"><a class="file-pill" href="${post.file_url}" target="_blank">📄 Tải tài liệu: ${escapeHTML(post.file_name || 'Tệp đính kèm')}</a></div>`;
           }
         }
 
         const postComments = allComments.filter(c => c.post_id === post.id);
         const commentsHTML = postComments.map(c => {
-          const cAuthor = getAuthorInfo(c.user_email);
-          const isCommentOwner = c.user_email === currentUser.email;
+          const cEmail = normalizeEmail(c.user_email);
+          const cAuthor = getAuthorInfo(cEmail);
+          const isCommentOwner = cEmail === currentEmail;
           const isCommentEdited = editedItems[`comment_${c.id}`];
           const editedCommentHTML = isCommentEdited ? `<span class="edited-tag" style="font-size: 10px; margin-left: 4px;">(đã chỉnh sửa)</span>` : '';
 
-          const cLikesList = Array.isArray(c.likes) ? c.likes : [];
-          const isCLiked = cLikesList.includes(currentUser.email);
+          const cLikesList = Array.isArray(c.likes) ? c.likes.map(normalizeEmail) : [];
+          const isCLiked = cLikesList.includes(currentEmail);
 
           let commentFileHTML = '';
           if (c.file_url) {
@@ -1103,7 +1208,7 @@
           return `
             <div class="comment-item">
               <div>
-                <span class="comment-author">${cAuthor.name}</span>
+                <span class="comment-author">${escapeHTML(cAuthor.name)}</span>
                 <span>${escapeHTML(c.content)}</span>
                 ${editedCommentHTML}
                 ${commentFileHTML}
@@ -1112,9 +1217,9 @@
                 <button class="comment-btn ${isCLiked ? 'liked' : ''}" onclick="toggleCommentLike(${c.id})">
                   ${isCLiked ? '❤️' : '🤍'} ${cLikesList.length}
                 </button>
-                <button class="comment-btn" onclick="setReplyTo(${post.id}, '${cAuthor.name}')">💬 Trả lời</button>
+                <button class="comment-btn" onclick="setReplyTo(${post.id}, '${escapeHTML(cAuthor.name).replace(/'/g, "\\'")}')">💬 Trả lời</button>
                 ${isCommentOwner ? `
-                  <button class="comment-btn" onclick="editComment(${c.id}, '${escapeHTML(c.content).replace(/'/g, "\\'")}')">✏️ Sửa</button>
+                  <button class="comment-btn" onclick="editComment(${c.id})">✏️ Sửa</button>
                   <button class="comment-btn" style="color: var(--danger);" onclick="deleteComment(${c.id})">🗑️ Xóa</button>
                 ` : ''}
               </div>
@@ -1130,7 +1235,7 @@
                 <img src="${author.avatar}" alt="Avatar" class="avatar" />
                 <div>
                   <span class="author-name">
-                    ${author.name} 
+                    ${escapeHTML(author.name)} 
                     ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
                     <span class="badge">${post.category}</span>
                   </span>
@@ -1145,7 +1250,7 @@
                   <button class="btn-pin ${pinned ? 'active' : ''}" onclick="togglePinPost(${post.id}, ${pinned})">📌 ${pinned ? 'Bỏ ghim' : 'Ghim'}</button>
                 ` : ''}
                 ${isOwner ? `
-                  <button class="btn-warning" onclick="editPost(${post.id}, '${escapeHTML(post.title).replace(/'/g, "\\'")}', '${escapeHTML(post.content).replace(/'/g, "\\'")}')">✏️ Sửa</button>
+                  <button class="btn-warning" onclick="editPost(${post.id})">✏️ Sửa</button>
                   <button class="btn-danger" onclick="deletePost(${post.id})">🗑️ Xóa</button>
                 ` : ''}
               </div>
@@ -1166,13 +1271,11 @@
 
             <div class="comments-area">
               ${commentsHTML || '<div style="font-size: 12px; color: var(--text-muted);">Chưa có bình luận nào.</div>'}
-              <div class="comment-form-wrapper">
-                <div class="comment-form">
-                  <input type="text" id="comment-input-${post.id}" placeholder="Viết bình luận..." onkeypress="if(event.key==='Enter') addComment(${post.id})" />
-                  <label for="comment-file-${post.id}" class="comment-file-label" title="Đính kèm ảnh bình luận">📷 <span id="comment-file-name-${post.id}"></span></label>
-                  <input type="file" id="comment-file-${post.id}" accept="image/*" style="display:none;" onchange="document.getElementById('comment-file-name-${post.id}').innerText = this.files[0] ? 'Đã chọn ảnh' : ''" />
-                  <button class="btn-ghost" onclick="addComment(${post.id})">Gửi</button>
-                </div>
+              <div class="comment-form">
+                <input type="text" id="comment-input-${post.id}" placeholder="Viết bình luận..." onkeypress="if(event.key==='Enter') addComment(${post.id})" />
+                <label for="comment-file-${post.id}" style="font-size: 13px; cursor: pointer; color: var(--text-muted);" title="Đính kèm ảnh">📷 <span id="comment-file-name-${post.id}"></span></label>
+                <input type="file" id="comment-file-${post.id}" accept="image/*" style="display:none;" onchange="document.getElementById('comment-file-name-${post.id}').innerText = this.files[0] ? '1 ảnh' : ''" />
+                <button class="btn-ghost" onclick="addComment(${post.id})">Gửi</button>
               </div>
             </div>
           </div>
