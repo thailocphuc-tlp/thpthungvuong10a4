@@ -379,7 +379,8 @@
             <option value="Toán học">📐 Toán học</option>
             <option value="Ngữ Văn">📖 Ngữ Văn</option>
             <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-            <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+            <option value="Lịch sử">🏛️ Lịch sử</option>
+            <option value="Địa lý">🗺️ Địa lý</option>
             <option value="Tin học">💻 Tin học</option>
             <option value="GDĐP">📚 Giáo dục địa phương</option>
             <option value="Giải trí">📸 Góc giải trí & Meme</option>
@@ -413,7 +414,8 @@
           <option value="Toán học">📐 Toán học</option>
           <option value="Ngữ Văn">📖 Ngữ Văn</option>
           <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-          <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+          <option value="Lịch sử">🏛️ Lịch sử</option>
+          <option value="Địa lý">🗺️ Địa lý</option>
           <option value="Tin học">💻 Tin học</option>
           <option value="GDĐP">📚 Giáo dục địa phương</option>
           <option value="Giải trí">📸 Góc giải trí & Meme</option>
@@ -438,7 +440,8 @@
               <option value="Toán học">📐 Toán học</option>
               <option value="Ngữ Văn">📖 Ngữ Văn</option>
               <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-              <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+              <option value="Lịch sử">🏛️ Lịch sử</option>
+              <option value="Địa lý">🗺️ Địa lý</option>
               <option value="Tin học">💻 Tin học</option>
               <option value="GDĐP">📚 Giáo dục địa phương</option>
               <option value="Thảo luận">💬 Chung</option>
@@ -456,7 +459,8 @@
             <option value="Toán học">📐 Toán học</option>
             <option value="Ngữ Văn">📖 Ngữ Văn</option>
             <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-            <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+            <option value="Lịch sử">🏛️ Lịch sử</option>
+            <option value="Địa lý">🗺️ Địa lý</option>
             <option value="Tin học">💻 Tin học</option>
             <option value="GDĐP">📚 Giáo dục địa phương</option>
             <option value="Thảo luận">💬 Chung</option>
@@ -510,7 +514,8 @@
             <option value="Tin học">💻 Tin học 10 - KNTT</option>
             <option value="Toán học">📐 Toán học 10 - KNTT</option>
             <option value="Ngữ Văn">📖 Ngữ văn 10 - KNTT</option>
-            <option value="KHXH">🌍 Lịch sử & Địa lý 10 - KNTT</option>
+            <option value="Lịch sử">🏛️ Lịch sử 10 - KNTT</option>
+            <option value="Địa lý">🗺️ Địa lý 10 - KNTT</option>
             <option value="Tiếng Anh">🇬🇧 Tiếng Anh 10</option>
           </select>
         </div>
@@ -549,7 +554,8 @@
             <option value="Toán học">📐 Toán học</option>
             <option value="Ngữ Văn">📖 Ngữ Văn</option>
             <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-            <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
+            <option value="Lịch sử">🏛️ Lịch sử</option>
+            <option value="Địa lý">🗺️ Địa lý</option>
             <option value="Tin học">💻 Tin học</option>
             <option value="GDĐP">📚 Giáo dục địa phương</option>
             <option value="Thảo luận">💬 Chung</option>
@@ -596,7 +602,7 @@
     const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Danh sách bài ôn tập theo từng môn (đã bỏ Sinh học, Vật lí, Hóa học)
+    // Danh sách bài ôn tập theo từng môn
     const EXAM_MODULES = [
       {
         id: 'exam_tin_10',
@@ -693,9 +699,9 @@
         ]
       },
       {
-        id: 'exam_khxh_10',
-        subject: 'KHXH',
-        title: 'Ôn kiểm tra Lịch sử & Địa lý 10 - Văn minh & Bản đồ',
+        id: 'exam_su_10',
+        subject: 'Lịch sử',
+        title: 'Ôn kiểm tra Lịch sử 10 - Sử học & Văn minh cổ đại',
         durationMinutes: 25,
         curriculum: 'SGK Kết nối tri thức 10',
         attemptRule: 'Không giới hạn lượt ôn',
@@ -709,6 +715,27 @@
           { q: 'Văn minh Ấn Độ cổ đại gắn liền với các tôn giáo lớn nào?', opts: ['Hin-đu giáo (Ấn Độ giáo) và Phật giáo', 'Thiên Chúa giáo và Hồi giáo', 'Đạo Tin Lành', 'Do Thái giáo'], ans: 0, ex: 'Ấn Độ là cái nôi của Hin-đu giáo và Phật giáo, có nhiều công trình kiến trúc và chữ viết cổ.' },
           { q: 'Văn minh Trung Hoa cổ đại có các phát minh nào nổi bật?', opts: ['Giấy viết, kĩ thuật in, la bàn, thuốc súng', 'Máy bay và điện thoại', 'Kính hiển vi điện tử', 'Tàu ngầm hạt nhân'], ans: 0, ex: 'Tứ đại phát minh của Trung Hoa cổ đại gồm làm giấy, in ấn, la bàn và thuốc súng.' },
           { q: 'Bảo tồn di sản văn hóa có ý nghĩa gì đối với cộng đồng?', opts: ['Gìn giữ bản sắc, bồi đắp lòng tự hào và phát triển du lịch bền vững', 'Làm cản trở giao lưu quốc tế', 'Chỉ tốn kém không mang lại giá trị', 'Xóa bỏ nét riêng của địa phương'], ans: 0, ex: 'Di sản văn hóa là tài sản vô giá gắn kết cộng đồng và tạo nguồn lực văn hóa - kinh tế.' },
+          { q: 'Sử liệu thành văn là loại tư liệu nào?', opts: ['Các ghi chép bằng chữ viết trên giấy, bia đá, mộc bản, văn khắc...', 'Những câu chuyện kể truyền miệng qua các thế hệ', 'Dấu vết khảo cổ dưới lòng đất', 'Hình ảnh mô phỏng 3D hiện đại'], ans: 0, ex: 'Sử liệu thành văn là tư liệu được ghi chép thành văn bản qua các thời kì.' },
+          { q: 'Vì sao các nền văn minh phương Đông cổ đại thường ra đời bên lưu vực các dòng sông lớn?', opts: ['Đất phù sa màu mỡ, nguồn nước thuận lợi cho nông nghiệp trồng trọt', 'Vì không có núi rừng', 'Vì nằm ở vùng cực lạnh giá', 'Vì chỉ phát triển đánh bắt cá voi'], ans: 0, ex: 'Các lưu vực sông lớn tạo điều kiện tưới tiêu và bồi đắp phù sa thuận lợi cho kinh tế nông nghiệp sớm phát triển.' },
+          { q: 'Bộ luật Ham-mu-ra-bi gắn liền với nền văn minh cổ đại nào?', opts: ['Văn minh Lưỡng Hà', 'Văn minh Ai Cập', 'Văn minh Hy Lạp', 'Văn minh La Mã'], ans: 0, ex: 'Bộ luật Ham-mu-ra-bi là một trong những bộ luật thành văn cổ nổi tiếng nhất của Lưỡng Hà.' },
+          { q: 'Nền văn minh Hi Lạp và La Mã cổ đại phát triển mạnh ở khu vực nào?', opts: ['Vùng Địa Trung Hải', 'Lưu vực sông Hoàng Hà', 'Thảo nguyên Trung Á', 'Quần đảo Nhật Bản'], ans: 0, ex: 'Văn minh cổ đại Hi Lạp - La Mã hình thành và phát triển rực rỡ ở khu vực Địa Trung Hải.' },
+          { q: 'Thành tựu nào sau đây là đóng góp tiêu biểu của văn minh Hi Lạp cổ đại?', opts: ['Hệ thống chữ cái, triết học, sử học, khoa học tự nhiên và Thế vận hội Ô-lim-píc', 'Kim tự tháp lớn nhất thế giới', 'Giấy viết và kĩ thuật in chữ rời', 'Chữ tượng hình trên đá'], ans: 0, ex: 'Hi Lạp cổ đại để lại nhiều di sản về dân chủ, triết học, khoa học, văn học và nghệ thuật.' },
+          { q: 'Nguyên tắc quan trọng khi đối chiếu các nguồn sử liệu là gì?', opts: ['Kiểm chứng nguồn gốc, thời điểm ra đời và so sánh nhiều nguồn để đảm bảo khách quan', 'Chỉ tin vào một nguồn duy nhất không kiểm tra', 'Chọn nguồn phù hợp sở thích cá nhân rồi bỏ qua phần còn lại', 'Tự bịa thêm chi tiết cho hấp dẫn'], ans: 0, ex: 'Đối chiếu và đánh giá độ tin cậy của sử liệu giúp nhận thức lịch sử chính xác và khách quan hơn.' },
+          { q: 'Di sản thiên nhiên thế giới có đặc điểm gì?', opts: ['Có giá trị nổi bật toàn cầu về cảnh quan, địa chất, đa dạng sinh học', 'Chỉ do con người xây dựng hoàn toàn', 'Không cần được bảo vệ', 'Chỉ tồn tại trong vài tháng'], ans: 0, ex: 'Di sản thiên nhiên mang giá trị nổi bật toàn cầu về thẩm mĩ, địa chất hoặc hệ sinh thái.' },
+          { q: 'Gắn kết học tập Lịch sử với di tích và bảo tàng địa phương mang lại lợi ích gì?', opts: ['Giúp kiến thức trực quan, sinh động và bồi dưỡng tình yêu quê hương', 'Làm mất thời gian không có tác dụng', 'Chỉ phù hợp cho chuyên gia khảo cổ', 'Thay thế hoàn toàn sách giáo khoa'], ans: 0, ex: 'Trải nghiệm thực tế tại di tích, bảo tàng giúp học sinh hiểu sâu sắc hơn về quá khứ tại chính địa phương mình.' },
+          { q: 'Khái niệm "văn minh" khác gì với "văn hóa" trong cách tiếp cận phổ biến?', opts: ['Văn minh nhấn mạnh trình độ phát triển vật chất, tinh thần và tổ chức xã hội ở một giai đoạn nhất định, gắn với đô thị/chữ viết/nhà nước', 'Văn minh hoàn toàn đối lập và phủ nhận văn hóa', 'Hai khái niệm giống hệt nhau mọi lúc', 'Văn minh chỉ nói về máy móc'], ans: 0, ex: 'Văn hóa rộng và mang tính bền vững, bản sắc; văn minh thường chỉ trình độ phát triển đạt tới của xã hội loài người ở những giai đoạn/không gian nhất định.' },
+          { q: 'Người học lịch sử cần rèn luyện phẩm chất và năng lực nào?', opts: ['Tư duy phản biện, tôn trọng sự thật lịch sử và trách nhiệm công dân', 'Học vẹt ngày tháng rời rạc', 'Phán xét cảm tính không có căn cứ', 'Thờ ơ với lịch sử dân tộc và nhân loại'], ans: 0, ex: 'Học lịch sử giúp hình thành tư duy phân tích, thái độ khách quan và ý thức trân trọng giá trị lịch sử.' },
+          { q: 'Hoạt động nào góp phần quảng bá di sản lịch sử - văn hóa địa phương trong thời đại số?', opts: ['Xây dựng bài giới thiệu, video ngắn, bản đồ số hoặc triển lãm trực tuyến có nguồn tư liệu chính xác', 'Đăng thông tin sai lệch để câu tương tác', 'Xóa bỏ tư liệu địa phương', 'Sao chép không ghi nguồn'], ans: 0, ex: 'Ứng dụng công nghệ số đúng cách giúp lan tỏa giá trị di sản tới đông đảo bạn trẻ và cộng đồng.' }
+        ]
+      },
+      {
+        id: 'exam_dia_10',
+        subject: 'Địa lý',
+        title: 'Ôn kiểm tra Địa lý 10 - Bản đồ, Trái Đất & Lớp vỏ địa lí',
+        durationMinutes: 25,
+        curriculum: 'SGK Kết nối tri thức 10',
+        attemptRule: 'Không giới hạn lượt ôn',
+        questions: [
           { q: 'Trên bản đồ, "tỉ lệ bản đồ" cho biết điều gì?', opts: ['Mức độ thu nhỏ của khoảng cách trên bản đồ so với thực địa', 'Độ cao tuyệt đối của đỉnh núi', 'Hướng gió thổi trong năm', 'Nhiệt độ trung bình tháng'], ans: 0, ex: 'Tỉ lệ bản đồ cho biết 1 đơn vị đo trên bản đồ ứng với bao nhiêu đơn vị đo ngoài thực tế.' },
           { q: 'Tỉ lệ bản đồ 1 : 100.000 có nghĩa là gì?', opts: ['1 cm trên bản đồ ứng với 100.000 cm (1 km) trên thực địa', '1 cm trên bản đồ ứng với 100 m trên thực địa', '1 cm trên bản đồ ứng với 10 km trên thực địa', '1 m trên bản đồ ứng với 100 km trên thực địa'], ans: 0, ex: '100.000 cm = 1.000 m = 1 km, nên 1 cm trên bản đồ tương ứng 1 km ngoài thực tế.' },
           { q: 'Phương pháp kí hiệu trên bản đồ thường dùng để biểu hiện đối tượng nào?', opts: ['Các đối tượng phân bố theo điểm cụ thể như mỏ khoáng sản, cảng biển, nhà máy', 'Sự dịch chuyển dòng người di cư', 'Sự thay đổi màu sắc ngẫu nhiên', 'Tốc độ quay của Trái Đất'], ans: 0, ex: 'Phương pháp kí hiệu thể hiện chính xác vị trí và đặc điểm của các đối tượng phân bố theo điểm.' },
@@ -720,8 +747,15 @@
           { q: 'Nguyên nhân chính sinh ra các mùa Xuân, Hạ, Thu, Đông trên Trái Đất là gì?', opts: ['Trục Trái Đất nghiêng 23°27\' và không đổi hướng khi chuyển động quanh Mặt Trời', 'Mặt Trời ngừng chiếu sáng vào mùa đông', 'Khoảng cách Trái Đất - Mặt Trời thay đổi đột ngột mỗi tuần', 'Trái Đất ngừng tự quay'], ans: 0, ex: 'Trục nghiêng kết hợp với chuyển động tịnh tiến quanh Mặt Trời làm góc nhập xạ và thời gian chiếu sáng thay đổi theo mùa.' },
           { q: 'Khu vực Xích đạo có đặc điểm gì về độ dài ngày và đêm quanh năm?', opts: ['Ngày và đêm luôn dài bằng nhau (khoảng 12 giờ)', 'Ngày dài suốt 24 giờ quanh năm', 'Đêm dài suốt 24 giờ quanh năm', 'Không có ban ngày'], ans: 0, ex: 'Đường Xích đạo luôn được phân chia thành hai phần bằng nhau bởi đường sáng tối nên ngày đêm dài bằng nhau.' },
           { q: 'Lớp vỏ địa lí là nơi diễn ra hoạt động của đối tượng nào?', opts: ['Nơi các quyển (khí quyển, thạch quyển, thủy quyển, sinh quyển, thổ nhưỡng quyển) xâm nhập và tác động lẫn nhau', 'Chỉ có lớp đá nóng chảy sâu dưới tâm Trái Đất', 'Chỉ có tầng bình lưu', 'Không có sự sống'], ans: 0, ex: 'Lớp vỏ địa lí là lớp vỏ tự nhiên ở bề mặt Trái Đất, nơi các quyển tương tác mật thiết và có sự sống.' },
-          { q: 'Khi tìm hiểu lịch sử và địa lí địa phương (như quê hương, tỉnh/thành của mình), nguồn nào rất hữu ích?', opts: ['Bảo tàng địa phương, di tích lịch sử, tư liệu địa chí và thực tế địa phương', 'Chỉ đoán mò không kiểm chứng', 'Chỉ đọc một mẩu tin đồn', 'Bỏ qua thực tế tại địa phương'], ans: 0, ex: 'Kết hợp tư liệu địa chí, di tích, bảo tàng và quan sát thực tế giúp hiểu sâu sắc lịch sử - địa lí địa phương.' },
-          { q: 'Kĩ năng đọc lược đồ/bản đồ giúp ích gì trong học tập và đời sống?', opts: ['Định hướng không gian, nhận diện phân bố đối tượng và đọc hiểu thông tin trực quan', 'Thay thế việc ghi chép bài học', 'Làm bản đồ mất tính chính xác', 'Chỉ dùng khi đi du lịch nước ngoài'], ans: 0, ex: 'Đọc bản đồ là kĩ năng cốt lõi giúp nắm bắt nhanh không gian, vị trí và mối liên hệ địa lí.' }
+          { q: 'Kĩ năng đọc lược đồ/bản đồ giúp ích gì trong học tập và đời sống?', opts: ['Định hướng không gian, nhận diện phân bố đối tượng và đọc hiểu thông tin trực quan', 'Thay thế việc ghi chép bài học', 'Làm bản đồ mất tính chính xác', 'Chỉ dùng khi đi du lịch nước ngoài'], ans: 0, ex: 'Đọc bản đồ là kĩ năng cốt lõi giúp nắm bắt nhanh không gian, vị trí và mối liên hệ địa lí.' },
+          { q: 'Vĩ độ địa lí của một điểm được tính từ đường nào?', opts: ['Từ đường Xích đạo (0°) về phía Bắc hoặc phía Nam đến 90°', 'Từ kinh tuyến gốc 0° về phía Đông hoặc Tây', 'Từ cực Bắc xuống đáy đại dương', 'Từ mực nước biển lên đỉnh núi'], ans: 0, ex: 'Vĩ độ tính từ Xích đạo (0°) đến hai cực (90°B hoặc 90°N).' },
+          { q: 'Kinh tuyến gốc (0°) đi qua đài thiên văn nào?', opts: ['Đài thiên văn Grin-uých (Greenwich)', 'Đỉnh Ê-vơ-rét', 'Đảo Ha-oai', 'Thành phố Ô-xlô'], ans: 0, ex: 'Kinh tuyến 0° quy ước đi qua đài thiên văn Greenwich (Anh).' },
+          { q: 'Nếu ở múi giờ số 7 là 12 giờ trưa thì ở múi giờ số 8 cùng ngày là mấy giờ?', opts: ['13 giờ', '11 giờ', '12 giờ', '10 giờ'], ans: 0, ex: 'Đi về phía Đông (từ múi 7 sang múi 8) giờ tăng thêm 1 giờ, nên là 13 giờ.' },
+          { q: 'Lực Cô-ri-ô-lít làm vật chuyển động ở bán cầu Bắc lệch theo hướng nào (nhìn theo hướng chuyển động)?', opts: ['Lệch về bên phải', 'Lệch về bên trái', 'Thẳng đứng lên trời', 'Không bị lệch'], ans: 0, ex: 'Ở bán cầu Bắc, lực Cô-ri-ô-lít làm vật chuyển động lệch về bên phải so với hướng chuyển động.' },
+          { q: 'Vào ngày hạ chí ở bán cầu Bắc (khoảng 22/6), khu vực này có đặc điểm gì?', opts: ['Ngày dài hơn đêm, góc nhập xạ lớn', 'Đêm dài suốt 24 giờ', 'Ngày ngắn nhất trong năm', 'Không nhận được ánh sáng Mặt Trời'], ans: 0, ex: 'Ngày 22/6 bán cầu Bắc ngả về phía Mặt Trời nên ngày dài hơn đêm và nhận nhiều nhiệt hơn.' },
+          { q: 'Thạch quyển gồm những thành phần nào?', opts: ['Vỏ Trái Đất và phần trên của lớp Manti', 'Toàn bộ đại dương và sông hồ', 'Tầng ô-zôn và tầng điện li', 'Chỉ gồm lớp đất mặt'], ans: 0, ex: 'Thạch quyển bao gồm vỏ Trái Đất và phần trên cứng chắc của lớp Manti.' },
+          { q: 'Khí quyển có vai trò gì quan trọng đối với sự sống trên Trái Đất?', opts: ['Cung cấp không khí cho sinh vật hô hấp, điều hòa nhiệt độ và che chắn bức xạ có hại', 'Tạo ra thủy triều đại dương', 'Hình thành các mảng kiến tạo lục địa', 'Làm ngừng chuyển động tự quay'], ans: 0, ex: 'Khí quyển duy trì sự sống, thời tiết, khí hậu và bảo vệ bề mặt Trái Đất.' },
+          { q: 'Quy luật thống nhất và hoàn chỉnh của lớp vỏ địa lí thể hiện ở điều gì?', opts: ['Mọi thành phần trong lớp vỏ địa lí đều có mối quan hệ phụ thuộc, tác động lẫn nhau; khi một thành phần biến đổi sẽ kéo theo các thành phần khác', 'Các quyển tồn tại tách rời hoàn toàn', 'Thay đổi khí hậu không ảnh hưởng gì tới sinh vật và đất', 'Chỉ có địa hình thay đổi'], ans: 0, ex: 'Lớp vỏ địa lí là một thể thống nhất hoàn chỉnh nên biến đổi ở một bộ phận sẽ tác động dây chuyền.' }
         ]
       },
       {
