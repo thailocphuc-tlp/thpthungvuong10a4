@@ -152,11 +152,11 @@
     .exam-card:hover { border-color: var(--primary); }
     .exam-title { font-size: 15px; font-weight: 800; color: var(--text-main); margin: 8px 0 6px; }
     .exam-meta-list { font-size: 12.5px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
-    .exam-meta-list span { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-    .exam-meta-list strong { color: var(--text-main); font-weight: 600; }
+    .exam-meta-list span { display: flex; justify-content: space-between; gap: 8px; }
+    .exam-meta-list strong { color: var(--text-main); }
 
     .exam-runner-bar {
-      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
       background: var(--bg-input); border: 1px solid var(--border); padding: 12px 16px;
       border-radius: 12px; margin-bottom: 16px; position: sticky; top: 118px; z-index: 80;
     }
@@ -379,7 +379,6 @@
             <option value="Toán học">📐 Toán học</option>
             <option value="Ngữ Văn">📖 Ngữ Văn</option>
             <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-            <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
             <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
             <option value="Tin học">💻 Tin học</option>
             <option value="GDĐP">📚 Giáo dục địa phương</option>
@@ -414,7 +413,6 @@
           <option value="Toán học">📐 Toán học</option>
           <option value="Ngữ Văn">📖 Ngữ Văn</option>
           <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-          <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
           <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
           <option value="Tin học">💻 Tin học</option>
           <option value="GDĐP">📚 Giáo dục địa phương</option>
@@ -440,7 +438,6 @@
               <option value="Toán học">📐 Toán học</option>
               <option value="Ngữ Văn">📖 Ngữ Văn</option>
               <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-              <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
               <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
               <option value="Tin học">💻 Tin học</option>
               <option value="GDĐP">📚 Giáo dục địa phương</option>
@@ -459,7 +456,6 @@
             <option value="Toán học">📐 Toán học</option>
             <option value="Ngữ Văn">📖 Ngữ Văn</option>
             <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-            <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
             <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
             <option value="Tin học">💻 Tin học</option>
             <option value="GDĐP">📚 Giáo dục địa phương</option>
@@ -509,8 +505,8 @@
       <div id="exam-catalog-view" class="k12-card">
         <div class="card-header">
           <span>🎯 Danh Sách Bài Ôn Kiểm Tra Theo Môn (K12 Style)</span>
-          <select id="quiz-subject-filter" onchange="renderExamCatalog()" style="width: 210px; margin-bottom: 0; padding: 6px 10px; font-size: 12.5px;">
-            <option value="all">Tất cả môn học</option>
+          <select id="quiz-subject-filter" onchange="renderExamCatalog()" style="width: 215px; margin-bottom: 0; padding: 6px 10px; font-size: 12.5px;">
+            <option value="all">Tất cả môn ôn tập</option>
             <option value="Tin học">💻 Tin học 10 - KNTT</option>
             <option value="Toán học">📐 Toán học 10 - KNTT</option>
             <option value="Ngữ Văn">📖 Ngữ văn 10 - KNTT</option>
@@ -553,7 +549,6 @@
             <option value="Toán học">📐 Toán học</option>
             <option value="Ngữ Văn">📖 Ngữ Văn</option>
             <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-            <option value="KHTN">🧪 Lý - Hóa - Sinh</option>
             <option value="KHXH">🌍 Sử - Địa - GDKTPL</option>
             <option value="Tin học">💻 Tin học</option>
             <option value="GDĐP">📚 Giáo dục địa phương</option>
@@ -601,7 +596,7 @@
     const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Danh sách bài ôn tập theo từng môn (giữ đủ 20-22 câu cố định mỗi môn, không trộn lẫn)
+    // Danh sách bài ôn tập theo từng môn (đã bỏ Sinh học, Vật lí, Hóa học)
     const EXAM_MODULES = [
       {
         id: 'exam_tin_10',
@@ -609,7 +604,6 @@
         title: 'Ôn kiểm tra Tin học 10 - Chủ đề 1 & An toàn số',
         durationMinutes: 25,
         curriculum: 'SGK Kết nối tri thức 10',
-        examType: 'Trắc nghiệm 4 lựa chọn',
         attemptRule: 'Không giới hạn lượt ôn',
         questions: [
           { q: 'Đặc điểm nổi bật nhất của xã hội tri thức so với xã hội công nghiệp là gì?', opts: ['Tri thức là lực lượng sản xuất chủ yếu, CNTT gắn liền với mọi hoạt động', 'Chỉ dựa vào khai thác tài nguyên thô', 'Không còn sử dụng máy tính', 'Chỉ áp dụng cho ngành xuất bản giấy'], ans: 0, ex: 'Xã hội tri thức lấy tri thức và công nghệ thông tin - truyền thông làm động lực phát triển cốt lõi.' },
@@ -642,7 +636,6 @@
         title: 'Ôn kiểm tra Toán 10 - Mệnh đề, Tập hợp & BPT',
         durationMinutes: 35,
         curriculum: 'SGK Kết nối tri thức 10',
-        examType: 'Trắc nghiệm 4 lựa chọn',
         attemptRule: 'Không giới hạn lượt ôn',
         questions: [
           { q: 'Phát biểu nào sau đây là một mệnh đề?', opts: ['Hôm nay trời đẹp quá!', '3 + 5 = 8.', 'x là số chẵn phải không?', 'Hãy mở sách trang 10!'], ans: 1, ex: '"3 + 5 = 8" là câu khẳng định có tính đúng xác định nên là mệnh đề.' },
@@ -675,7 +668,6 @@
         title: 'Ôn kiểm tra Ngữ văn 10 - Thần thoại, Sử thi & Nghị luận',
         durationMinutes: 30,
         curriculum: 'SGK Kết nối tri thức 10',
-        examType: 'Trắc nghiệm 4 lựa chọn',
         attemptRule: 'Không giới hạn lượt ôn',
         questions: [
           { q: 'Đặc trưng nổi bật của nhân vật trong truyện thần thoại là gì?', opts: ['Thường là các vị thần hoặc nhân vật có sức mạnh siêu nhiên, kì ảo', 'Luôn là người nông dân bình thường không phép thuật', 'Chỉ nói về đời sống cung đình phong kiến', 'Nhân vật luôn có tâm lí giằng xé nội tâm hiện đại'], ans: 0, ex: 'Thần thoại giải thích nguồn gốc tự nhiên và đời sống thông qua các vị thần và kì tích siêu nhiên.' },
@@ -706,7 +698,6 @@
         title: 'Ôn kiểm tra Lịch sử & Địa lý 10 - Văn minh & Bản đồ',
         durationMinutes: 25,
         curriculum: 'SGK Kết nối tri thức 10',
-        examType: 'Trắc nghiệm 4 lựa chọn',
         attemptRule: 'Không giới hạn lượt ôn',
         questions: [
           { q: 'Khái niệm "Lịch sử" thường được hiểu theo những nghĩa cơ bản nào?', opts: ['Những gì đã diễn ra trong quá khứ và khoa học tìm hiểu quá khứ loài người', 'Chỉ là những câu chuyện tưởng tượng', 'Chỉ là các con số thống kê hiện tại', 'Chỉ là dự đoán tương lai'], ans: 0, ex: 'Lịch sử vừa là hiện thực khách quan đã diễn ra trong quá khứ, vừa là môn khoa học nghiên cứu quá khứ.' },
@@ -739,7 +730,6 @@
         title: 'Ôn kiểm tra Tiếng Anh 10 - Family Life & Environment',
         durationMinutes: 25,
         curriculum: 'Chương trình Tiếng Anh 10',
-        examType: 'Trắc nghiệm 4 lựa chọn',
         attemptRule: 'Không giới hạn lượt ôn',
         questions: [
           { q: 'Choose the best answer: My dad usually ______ the heavy lifting in our family.', opts: ['do', 'does', 'is doing', 'did'], ans: 1, ex: '"My dad" là ngôi thứ 3 số ít và có trạng từ tần suất "usually" -> dùng thì hiện tại đơn: does.' },
