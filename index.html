@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diễn Đàn Học Tập Trực Tuyến 10A4 - THPT Hùng Vương</title>
+  <title>Cổng Học Tập Trực Tuyến 10A4 - THPT Hùng Vương</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root[data-theme="light"] {
@@ -52,24 +52,24 @@
     .navbar {
       background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 24px;
       position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow); gap: 10px; flex-wrap: wrap;
     }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; border: 2px solid var(--primary); }
     .brand-text h1 { font-size: 17px; font-weight: 800; color: var(--primary); line-height: 1.2; }
     .brand-text span { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
 
-    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
     .k12-tabs-bar {
       background: var(--bg-card); border-bottom: 1px solid var(--border);
       position: sticky; top: 67px; z-index: 90; padding: 0 16px;
-      display: flex; justify-content: center; gap: 6px; overflow-x: auto;
+      display: flex; justify-content: center; gap: 4px; overflow-x: auto;
     }
     .k12-tab {
-      padding: 13px 18px; font-size: 13.5px; font-weight: 700; color: var(--text-muted);
+      padding: 13px 16px; font-size: 13.5px; font-weight: 700; color: var(--text-muted);
       background: transparent; border: none; border-bottom: 3px solid transparent; border-radius: 0;
-      cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 7px;
+      cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;
     }
     .k12-tab:hover { color: var(--primary); background: var(--primary-light); }
     .k12-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
@@ -143,6 +143,30 @@
     .deadline-add-row select { margin-bottom: 0; padding: 9px; font-size: 13px; width: 145px; }
     .deadline-add-row button { padding: 9px 14px; font-size: 13px; width: auto; }
 
+    /* Quiz / Ôn kiểm tra */
+    .quiz-score-box {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+      background: var(--primary-light); border: 1px solid var(--border); padding: 12px 16px; border-radius: 12px; margin-bottom: 16px;
+    }
+    .quiz-card {
+      background: var(--bg-input); border: 1px solid var(--border); border-radius: 14px;
+      padding: 16px; margin-bottom: 14px;
+    }
+    .quiz-question { font-weight: 700; font-size: 14.5px; margin-bottom: 10px; }
+    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media(max-width: 600px) { .quiz-options { grid-template-columns: 1fr; } }
+    .quiz-opt-btn {
+      justify-content: flex-start; text-align: left; padding: 9px 12px; border-radius: 10px;
+      background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); font-size: 13px;
+    }
+    .quiz-opt-btn:hover { border-color: var(--primary); background: var(--primary-light); }
+    .quiz-opt-btn.correct { background: rgba(5, 150, 105, 0.16); border-color: var(--success); color: var(--success); font-weight: 700; }
+    .quiz-opt-btn.wrong { background: rgba(220, 38, 38, 0.14); border-color: var(--danger); color: var(--danger); }
+    .quiz-explain {
+      margin-top: 10px; padding: 10px 12px; border-radius: 10px; font-size: 12.5px;
+      background: var(--bg-card); border-left: 3px solid var(--primary); color: var(--text-muted);
+    }
+
     input, select, textarea {
       width: 100%; padding: 11px 14px; margin-bottom: 12px; border-radius: 10px;
       border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main); font-size: 14px;
@@ -160,7 +184,7 @@
     .btn-pin.active { background: var(--warning); color: #fff; }
     .btn-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 5px 10px; font-size: 12px; border-radius: 8px; }
     .btn-danger { background: rgba(220, 38, 38, 0.15); color: var(--danger); padding: 5px 10px; font-size: 12px; border-radius: 8px; }
-    .btn-ghost { background: transparent; color: var(--text-muted); padding: 7px 12px; border: 1px solid var(--border); border-radius: 9px; }
+    .btn-ghost { background: transparent; color: var(--text-muted); padding: 7px 12px; border: 1px solid var(--border); border-radius: 9px; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
     .btn-ghost:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-light); }
 
     .auth-box {
@@ -241,11 +265,12 @@
     <div class="brand">
       <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/logo.png" alt="Logo" />
       <div class="brand-text">
-        <h1>Diễn Đàn • LỚP 10A4</h1>
+        <h1>K12 PORTAL • LỚP 10A4</h1>
         <span>THPT Hùng Vương • Năm học 2026 - 2027</span>
       </div>
     </div>
     <div class="nav-right">
+      <a href="https://k12online.vn" target="_blank" rel="noopener noreferrer" class="btn-ghost">🔗 Mở K12 Online</a>
       <button class="btn-ghost" onclick="toggleTheme()" id="theme-btn">🌓 Giao diện</button>
       <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 10px;">
         <span id="display-username" style="font-size: 13px; color: var(--text-main); font-weight: 700;"></span>
@@ -257,6 +282,7 @@
   <div id="k12-nav-tabs" class="k12-tabs-bar hidden">
     <button class="k12-tab active" id="tab-btn-home" onclick="switchTab('home')">🏠 Bảng tin & Thảo luận</button>
     <button class="k12-tab" id="tab-btn-study" onclick="switchTab('study')">📝 Bài tập & Thời khóa biểu</button>
+    <button class="k12-tab" id="tab-btn-quiz" onclick="switchTab('quiz')">🎯 Ôn kiểm tra</button>
     <button class="k12-tab" id="tab-btn-docs" onclick="switchTab('docs')">📚 Kho học liệu lớp</button>
     <button class="k12-tab" id="tab-btn-profile" onclick="switchTab('profile')">👤 Hồ sơ cá nhân</button>
   </div>
@@ -312,7 +338,7 @@
       <div class="grid-2-col">
         <div class="k12-card" style="margin-bottom: 0;">
           <div class="card-header">📌 Thông báo từ Ban cán sự lớp</div>
-          <p style="font-size: 13.5px; color: var(--text-main);">Chào mừng các thành viên 10A4! Các bạn kiểm tra mục <b>Bài tập & Thời khóa biểu</b> thường xuyên để không bị trễ hạn nộp bài nhé. Các tài liệu ôn tập được tổng hợp gọn ở tab <b>Kho học liệu</b>. 🚀</p>
+          <p style="font-size: 13.5px; color: var(--text-main);">Chào mừng các thành viên 10A4! Các bạn kiểm tra mục <b>Bài tập & Thời khóa biểu</b> thường xuyên và ghé <b>Ôn kiểm tra</b> luyện câu hỏi theo sách <i>Kết nối tri thức</i> trước giờ kiểm tra nhé. 🚀</p>
         </div>
         <div class="k12-card" style="margin-bottom: 0;">
           <div class="card-header">
@@ -457,7 +483,36 @@
       </div>
     </div>
 
-    <!-- TAB 3: KHO HỌC LIỆU LỚP -->
+    <!-- TAB 3: ÔN KIỂM TRA (KẾT NỐI TRI THỨC LỚP 10) -->
+    <div id="view-tab-quiz" class="hidden">
+      <div class="k12-card">
+        <div class="card-header">
+          <span>🎯 Luyện Trắc Nghiệm Ôn Kiểm Tra (SGK Kết nối tri thức 10)</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <select id="quiz-subject-filter" onchange="renderQuizList()" style="width: 170px; margin-bottom: 0; padding: 6px 10px; font-size: 12.5px;">
+              <option value="all">Tất cả môn ôn tập</option>
+              <option value="Tin học">💻 Tin học 10</option>
+              <option value="Toán học">📐 Toán học 10</option>
+              <option value="Ngữ Văn">📖 Ngữ Văn 10</option>
+              <option value="KHXH">🌍 Lịch sử & Địa lý 10</option>
+              <option value="Tiếng Anh">🇬🇧 Tiếng Anh 10</option>
+            </select>
+            <button class="btn-ghost" onclick="resetQuizAttempt()">🔄 Làm lại lượt này</button>
+          </div>
+        </div>
+
+        <div class="quiz-score-box">
+          <div style="font-size: 13.5px; font-weight: 700;">
+            📊 Kết quả lượt làm: <span id="quiz-score-text" style="color: var(--primary);">0 / 0 câu đúng</span>
+          </div>
+          <span style="font-size: 12px; color: var(--text-muted);">Bấm chọn 1 đáp án để xem giải thích chi tiết ngay</span>
+        </div>
+
+        <div id="quiz-list-container"></div>
+      </div>
+    </div>
+
+    <!-- TAB 4: KHO HỌC LIỆU LỚP -->
     <div id="view-tab-docs" class="hidden">
       <div class="k12-card">
         <div class="card-header">
@@ -478,7 +533,7 @@
       </div>
     </div>
 
-    <!-- TAB 4: HỒ SƠ CÁ NHÂN -->
+    <!-- TAB 5: HỒ SƠ CÁ NHÂN -->
     <div id="view-tab-profile" class="hidden">
       <div class="k12-card">
         <div class="card-header">👤 Thông tin hồ sơ học sinh 10A4</div>
@@ -515,11 +570,94 @@
     const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // Bộ câu hỏi trắc nghiệm mẫu bám sát chương trình SGK Kết nối tri thức lớp 10
+    const KNTT_QUIZ_BANK = [
+      {
+        id: 'tin_1',
+        subject: 'Tin học',
+        question: '[Tin học 10 - KNTT] Đặc điểm nổi bật nhất của xã hội tri thức so với xã hội công nghiệp là gì?',
+        options: [
+          'Tri thức trở thành lực lượng sản xuất trực tiếp, công nghệ thông tin gắn liền với mọi hoạt động',
+          'Chỉ dựa vào khai thác tài nguyên khoáng sản và sức lao động cơ bắp',
+          'Không còn sử dụng máy tính trong sản xuất và đời sống',
+          'Chỉ áp dụng cho ngành in ấn sách báo truyền thống'
+        ],
+        answerIndex: 0,
+        explain: 'Trong chương trình Tin học 10 Kết nối tri thức (Chủ đề 1), xã hội tri thức phát triển dựa trên tri thức và công nghệ thông tin - truyền thông (ICT).'
+      },
+      {
+        id: 'tin_2',
+        subject: 'Tin học',
+        question: '[Tin học 10 - KNTT] Khi chia sẻ thông tin trên mạng xã hội, hành vi nào thể hiện tính nhân văn và tuân thủ pháp luật?',
+        options: [
+          'Đăng tải hình ảnh cá nhân của người khác khi chưa được phép',
+          'Kiểm chứng nguồn tin trước khi chia sẻ, tôn trọng bản quyền và quyền riêng tư',
+          'Bình luận ác ý, xúc phạm bạn học để câu tương tác',
+          'Phát tán đường link lạ không rõ nguồn gốc'
+        ],
+        answerIndex: 1,
+        explain: 'Ứng xử có văn hóa, tôn trọng pháp luật và bảo vệ thông tin cá nhân là nội dung trọng tâm về an toàn và đạo đức số trong Tin học 10.'
+      },
+      {
+        id: 'toan_1',
+        subject: 'Toán học',
+        question: '[Toán 10 - KNTT] Phát biểu nào sau đây là một mệnh đề toán học?',
+        options: [
+          'Hôm nay trời đẹp quá!',
+          'x + 2 = 5 có phải là phương trình không?',
+          'Tổng các góc trong một tam giác bằng 180°.',
+          'Hãy làm bài tập về nhà đi!'
+        ],
+        answerIndex: 2,
+        explain: 'Mệnh đề là câu khẳng định có tính đúng hoặc sai xác định; câu cảm thán, câu hỏi, câu mệnh lệnh không phải là mệnh đề.'
+      },
+      {
+        id: 'toan_2',
+        subject: 'Toán học',
+        question: '[Toán 10 - KNTT] Mệnh đề phủ định của mệnh đề P: "∀x ∈ ℝ, x² ≥ 0" là mệnh đề nào?',
+        options: [
+          '∀x ∈ ℝ, x² < 0',
+          '∃x ∈ ℝ, x² < 0',
+          '∃x ∈ ℝ, x² ≤ 0',
+          '∀x ∈ ℝ, x² > 0'
+        ],
+        answerIndex: 1,
+        explain: 'Phủ định của "∀x" là "∃x", và phủ định của "≥" là "<", nên phủ định của P là "∃x ∈ ℝ, x² < 0".'
+      },
+      {
+        id: 'van_1',
+        subject: 'Ngữ Văn',
+        question: '[Ngữ văn 10 - KNTT] Trong văn bản truyện thần thoại, yếu tố "thời gian phiếm chỉ" thường được nhận diện qua các cụm từ nào?',
+        options: [
+          'Vào lúc 8 giờ sáng ngày 19/8/1945',
+          'Ngày xửa ngày xưa, thuở ấy, khi trời đất mới tạo lập',
+          'Trong vòng 30 phút cuối trận đấu',
+          'Theo báo cáo thống kê quý III'
+        ],
+        answerIndex: 1,
+        explain: 'Thần thoại thường mở đầu bằng thời gian phiếm chỉ (không xác định cụ thể) và không gian vũ trụ rộng lớn, kỳ ảo.'
+      },
+      {
+        id: 'su_1',
+        subject: 'KHXH',
+        question: '[Lịch sử 10 - KNTT] Sử học có vai trò cốt lõi nào đối với đời sống và sự phát triển của xã hội hiện đại?',
+        options: [
+          'Giúp con người hiểu cội nguồn, rút ra bài học kinh nghiệm và dự báo xu hướng',
+          'Chỉ ghi chép lại mọi sự kiện mà không cần đối chiếu tư liệu',
+          'Thay thế hoàn toàn các môn khoa học tự nhiên',
+          'Chỉ phục vụ cho việc lưu trữ hồ sơ hành chính'
+        ],
+        answerIndex: 0,
+        explain: 'Bài mở đầu Lịch sử 10 Kết nối tri thức nhấn mạnh mối quan hệ giữa quá khứ, hiện tại và tương lai cùng giá trị giáo dục, nhận thức của sử học.'
+      }
+    ];
+
     let currentUser = null;
     let allPosts = [];
     let allComments = [];
     let allDeadlines = [];
     let userProfiles = {};
+    let quizAnswers = {};
     let deadlineSubjects = JSON.parse(localStorage.getItem('class_deadline_subjects') || '{}');
     let editedItems = JSON.parse(localStorage.getItem('class_edited_items') || '{}');
     let localPinnedPosts = JSON.parse(localStorage.getItem('class_pinned_posts') || '[]');
@@ -545,13 +683,14 @@
     }
 
     function switchTab(tabName) {
-      ['home', 'study', 'docs', 'profile'].forEach(t => {
+      ['home', 'study', 'quiz', 'docs', 'profile'].forEach(t => {
         document.getElementById(`view-tab-${t}`).classList.add('hidden');
         document.getElementById(`tab-btn-${t}`).classList.remove('active');
       });
       document.getElementById(`view-tab-${tabName}`).classList.remove('hidden');
       document.getElementById(`tab-btn-${tabName}`).classList.add('active');
       if (tabName === 'docs') renderDocsLibrary();
+      if (tabName === 'quiz') renderQuizList();
     }
 
     function toggleTheme() {
@@ -578,6 +717,75 @@
       const { data: { session } } = await sb.auth.getSession();
       if (session) initApp(session.user);
     });
+
+    /* TÍNH NĂNG ÔN KIỂM TRA */
+    function selectQuizOption(questionId, optIndex) {
+      quizAnswers[questionId] = optIndex;
+      renderQuizList();
+    }
+
+    function resetQuizAttempt() {
+      const subjectFilter = document.getElementById('quiz-subject-filter')?.value || 'all';
+      KNTT_QUIZ_BANK.forEach(q => {
+        if (subjectFilter === 'all' || q.subject === subjectFilter) {
+          delete quizAnswers[q.id];
+        }
+      });
+      renderQuizList();
+    }
+
+    function renderQuizList() {
+      const container = document.getElementById('quiz-list-container');
+      const subjectFilter = document.getElementById('quiz-subject-filter')?.value || 'all';
+      if (!container) return;
+
+      const list = KNTT_QUIZ_BANK.filter(q => subjectFilter === 'all' || q.subject === subjectFilter);
+      let correctCount = 0;
+
+      container.innerHTML = list.map((q, idx) => {
+        const chosen = quizAnswers[q.id];
+        const hasAnswered = chosen !== undefined;
+        if (hasAnswered && chosen === q.answerIndex) correctCount += 1;
+
+        const labels = ['A', 'B', 'C', 'D'];
+        const optionsHTML = q.options.map((opt, optIdx) => {
+          let extraClass = '';
+          if (hasAnswered) {
+            if (optIdx === q.answerIndex) extraClass = 'correct';
+            else if (optIdx === chosen) extraClass = 'wrong';
+          }
+          return `
+            <button type="button" class="quiz-opt-btn ${extraClass}" onclick="selectQuizOption('${q.id}', ${optIdx})">
+              <b>${labels[optIdx]}.</b> ${escapeHTML(opt)}
+            </button>
+          `;
+        }).join('');
+
+        const explainHTML = hasAnswered
+          ? `<div class="quiz-explain">
+               <b>${chosen === q.answerIndex ? '✅ Chính xác!' : `❌ Chưa đúng (Đáp án đúng: ${labels[q.answerIndex]}).`}</b>
+               ${escapeHTML(q.explain)}
+             </div>`
+          : '';
+
+        return `
+          <div class="quiz-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span class="badge">${escapeHTML(q.subject)}</span>
+              <span style="font-size: 11.5px; color: var(--text-muted);">Câu ${idx + 1}/${list.length}</span>
+            </div>
+            <div class="quiz-question">${escapeHTML(q.question)}</div>
+            <div class="quiz-options">${optionsHTML}</div>
+            ${explainHTML}
+          </div>
+        `;
+      }).join('');
+
+      const scoreEl = document.getElementById('quiz-score-text');
+      if (scoreEl) {
+        scoreEl.innerText = `${correctCount} / ${list.length} câu đúng`;
+      }
+    }
 
     async function handleForgotPassword() {
       const email = normalizeEmail(document.getElementById('auth-email').value);
@@ -816,6 +1024,7 @@
       }
 
       updateProfileUI();
+      renderQuizList();
       fetchData();
       fetchDeadlines();
     }
