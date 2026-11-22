@@ -1870,6 +1870,7 @@
         <select id="bg-effect-select" onchange="setBgEffect(this.value)" aria-label="Hiệu ứng nền">
           <option value="meteor">☄️ Sao băng</option>
           <option value="rain">🌧️ Mưa rơi</option>
+          <option value="trees">🌳 Cây đung đưa</option>
           <option value="off">⏸️ Tắt nền</option>
         </select>
       </div>
@@ -3737,7 +3738,7 @@
        ===================================================================== */
     (function initDynamicBgEngine() {
       const BG_STORAGE_KEY = 'k12_10a4_bg_effect_v1';
-      const VALID_BG_MODES = ['meteor', 'rain', 'off'];
+      const VALID_BG_MODES = ['meteor', 'rain', 'trees', 'off'];
       const canvas = document.getElementById('k12-animated-bg');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
@@ -3752,78 +3753,116 @@
       let meteors = [];
       let raindrops = [];
       let ripples = [];
+      let trees = [];
+      let fallingLeaves = [];
       let lastMeteorSpawn = 0;
 
-      function getPaletteColors() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const palette = document.documentElement.getAttribute('data-palette') || 'ocean';
-
-        const accents = {
-          ocean: isDark ? ['#60a5fa', '#93c5fd', '#e0f2fe'] : ['#1e3a8a', '#2563eb', '#3b82f6'],
-          emerald: isDark ? ['#34d399', '#6ee7b7', '#d1fae5'] : ['#065f46', '#059669', '#10b981'],
-          rose: isDark ? ['#fb7185', '#fda4af', '#ffe4e6'] : ['#9f1239', '#e11d48', '#f43f5e'],
-          amber: isDark ? ['#e4e4e7', '#a1a1aa', '#ffffff'] : ['#18181b', '#3f3f46', '#52525b']
-        };
-
-        return {
-          isDark,
-          colors: accents[palette] || accents.ocean
-        };
-      }
+      const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       function resizeCanvas() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
         width = window.innerWidth;
         height = window.innerHeight;
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = Math.floor(width * dpr);
         canvas.height = Math.floor(height * dpr);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
 
       function createStar() {
         return {
           x: Math.random() * width,
-          y: Math.random() * height,
-          r: Math.random() * 1.4 + 0.4,
-          alpha: Math.random() * 0.65 + 0.15,
-          twinkleSpeed: (Math.random() * 0.015 + 0.005) * (Math.random() > 0.5 ? 1 : -1)
+          y: Math.random() * height * 0.85,
+          r: 0.6 + Math.random() * 1.4,
+          alpha: 0.25 + Math.random() * 0.7,
+          twinkleSpeed: 0.008 + Math.random() * 0.02,
+          phase: Math.random() * Math.PI * 2
         };
       }
 
-      function createMeteor(initialRandomPos = false) {
-        const angle = Math.PI / 4 + (Math.random() * 0.14 - 0.07);
-        const speed = Math.random() * 7 + 7.5;
-        const startX = initialRandomPos
-          ? Math.random() * width
-          : Math.random() * (width * 1.15) - width * 0.1;
-        const startY = initialRandomPos
-          ? Math.random() * (height * 0.6)
-          : -30 - Math.random() * 120;
-
+      function createMeteor(forceOffscreenTop = false) {
+        const angle = (28 + Math.random() * 16) * (Math.PI / 180);
+        const speed = 7 + Math.random() * 6.5;
+        const startX = forceOffscreenTop
+          ? Math.random() * (width * 1.15) - width * 0.1
+          : Math.random() * width;
+        const startY = forceOffscreenTop
+          ? -20 - Math.random() * 120
+          : Math.random() * (height * 0.45);
         return {
           x: startX,
           y: startY,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
-          len: Math.random() * 85 + 65,
-          width: Math.random() * 1.8 + 1.1,
+          len: 70 + Math.random() * 85,
           life: 1,
-          decay: Math.random() * 0.008 + 0.006,
-          colorIndex: Math.floor(Math.random() * 3)
+          decay: 0.008 + Math.random() * 0.008
         };
       }
 
-      function createRaindrop(randomY = true) {
-        const depth = Math.random() * 0.65 + 0.35;
+      function createRaindrop() {
+        const wind = -1.2 + Math.random() * 0.6;
+        const speed = 10 + Math.random() * 8;
         return {
-          x: Math.random() * (width + 180) - 90,
-          y: randomY ? Math.random() * height : -20 - Math.random() * 120,
-          vx: -1.6 * depth,
-          vy: (11 + Math.random() * 7) * depth,
-          len: (14 + Math.random() * 14) * depth,
-          alpha: (document.documentElement.getAttribute('data-theme') === 'dark' ? 0.34 : 0.22) * depth,
-          width: Math.max(1, 1.5 * depth)
+          x: Math.random() * (width + 120),
+          y: Math.random() * height,
+          vx: wind,
+          vy: speed,
+          len: 14 + Math.random() * 16,
+          width: 0.9 + Math.random() * 0.8,
+          alpha: 0.18 + Math.random() * 0.28
         };
+      }
+
+      function createTreeLayer(count, scaleMin, scaleMax, layerIndex) {
+        const arr = [];
+        const spacing = width / Math.max(1, count);
+        for (let i = 0; i < count; i++) {
+          const scale = scaleMin + Math.random() * (scaleMax - scaleMin);
+          const baseX = spacing * (i + 0.5) + (Math.random() - 0.5) * spacing * 0.48;
+          const baseY = height - (layerIndex === 0 ? 16 : 4);
+          const trunkHeight = (105 + Math.random() * 82) * scale;
+          const trunkWidth = (9.5 + Math.random() * 5.5) * scale;
+          arr.push({
+            x: baseX,
+            y: baseY,
+            height: trunkHeight,
+            width: trunkWidth,
+            scale,
+            layer: layerIndex,
+            phase: Math.random() * Math.PI * 2,
+            swayAmp: (0.024 + Math.random() * 0.018) / Math.sqrt(scale),
+            canopyClusters: [
+              { dx: 0, dy: -trunkHeight * 0.94, r: 42 * scale },
+              { dx: -28 * scale, dy: -trunkHeight * 0.78, r: 33 * scale },
+              { dx: 28 * scale, dy: -trunkHeight * 0.8, r: 34 * scale },
+              { dx: -15 * scale, dy: -trunkHeight * 1.08, r: 29 * scale },
+              { dx: 16 * scale, dy: -trunkHeight * 1.05, r: 28 * scale }
+            ]
+          });
+        }
+        return arr;
+      }
+
+      function initTreesEffect() {
+        const backCount = Math.max(4, Math.floor(width / 250));
+        const frontCount = Math.max(3, Math.floor(width / 330));
+        trees = [
+          ...createTreeLayer(backCount, 0.72, 1.02, 0),
+          ...createTreeLayer(frontCount, 0.96, 1.34, 1)
+        ];
+        fallingLeaves = Array.from({ length: 20 }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height * 0.85,
+          size: 4 + Math.random() * 4.5,
+          vy: 0.45 + Math.random() * 0.65,
+          vxBase: 0.35 + Math.random() * 0.6,
+          rot: Math.random() * Math.PI * 2,
+          vRot: (Math.random() - 0.5) * 0.04,
+          phase: Math.random() * Math.PI * 2,
+          alpha: 0.32 + Math.random() * 0.35
+        }));
       }
 
       function initParticlesForMode(mode) {
@@ -3831,103 +3870,103 @@
         meteors = [];
         raindrops = [];
         ripples = [];
+        trees = [];
+        fallingLeaves = [];
 
         if (mode === 'meteor') {
-          const starCount = Math.min(95, Math.floor((width * height) / 18000));
-          for (let i = 0; i < starCount; i++) stars.push(createStar());
-          for (let i = 0; i < 3; i++) meteors.push(createMeteor(true));
+          const starCount = Math.min(130, Math.floor((width * height) / 14000));
+          stars = Array.from({ length: starCount }, createStar);
+          meteors = Array.from({ length: 3 }, () => createMeteor(false));
         } else if (mode === 'rain') {
-          const dropCount = Math.min(130, Math.floor((width * height) / 12000));
-          for (let i = 0; i < dropCount; i++) raindrops.push(createRaindrop(true));
+          const dropCount = Math.min(180, Math.floor(width / 7));
+          raindrops = Array.from({ length: dropCount }, createRaindrop);
+        } else if (mode === 'trees') {
+          initTreesEffect();
         }
       }
 
       function drawMeteorFrame(now) {
-        const { isDark, colors } = getPaletteColors();
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         ctx.clearRect(0, 0, width, height);
 
-        for (let i = 0; i < stars.length; i++) {
-          const s = stars[i];
-          s.alpha += s.twinkleSpeed;
-          if (s.alpha <= 0.12 || s.alpha >= 0.85) s.twinkleSpeed *= -1;
-
+        for (const s of stars) {
+          s.phase += s.twinkleSpeed;
+          const twinkle = 0.55 + 0.45 * Math.sin(s.phase);
+          const alpha = s.alpha * twinkle * (isDark ? 0.9 : 0.45);
           ctx.beginPath();
           ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
           ctx.fillStyle = isDark
-            ? `rgba(244, 244, 245, ${s.alpha.toFixed(3)})`
-            : `${colors[0]}`;
-          ctx.globalAlpha = isDark ? 1 : Math.min(0.45, s.alpha * 0.55);
+            ? `rgba(248, 250, 252, ${alpha.toFixed(3)})`
+            : `rgba(30, 41, 59, ${alpha.toFixed(3)})`;
           ctx.fill();
         }
-        ctx.globalAlpha = 1;
 
-        if (now - lastMeteorSpawn > 950 && meteors.length < 7) {
-          meteors.push(createMeteor(false));
+        if (!prefersReducedMotion && now - lastMeteorSpawn > 1350 && meteors.length < 6) {
+          meteors.push(createMeteor(true));
           lastMeteorSpawn = now;
         }
 
         for (let i = meteors.length - 1; i >= 0; i--) {
           const m = meteors[i];
-          m.x += m.vx;
-          m.y += m.vy;
-          m.life -= m.decay;
-
-          if (m.life <= 0 || m.x > width + 160 || m.y > height + 160) {
-            meteors.splice(i, 1);
-            continue;
+          if (!prefersReducedMotion) {
+            m.x += m.vx;
+            m.y += m.vy;
+            m.life -= m.decay;
           }
 
-          const mag = Math.hypot(m.vx, m.vy) || 1;
-          const tailX = m.x - (m.vx / mag) * m.len;
-          const tailY = m.y - (m.vy / mag) * m.len;
-          const headColor = colors[m.colorIndex] || colors[0];
+          const norm = Math.hypot(m.vx, m.vy) || 1;
+          const tailX = m.x - (m.vx / norm) * m.len;
+          const tailY = m.y - (m.vy / norm) * m.len;
 
-          const grad = ctx.createLinearGradient(tailX, tailY, m.x, m.y);
-          grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-          grad.addColorStop(0.75, headColor);
-          grad.addColorStop(1, isDark ? '#ffffff' : headColor);
+          const grad = ctx.createLinearGradient(m.x, m.y, tailX, tailY);
+          if (isDark) {
+            grad.addColorStop(0, `rgba(255, 255, 255, ${(0.92 * Math.max(0, m.life)).toFixed(3)})`);
+            grad.addColorStop(0.35, `rgba(125, 211, 252, ${(0.55 * Math.max(0, m.life)).toFixed(3)})`);
+            grad.addColorStop(1, 'rgba(125, 211, 252, 0)');
+          } else {
+            grad.addColorStop(0, `rgba(37, 99, 235, ${(0.55 * Math.max(0, m.life)).toFixed(3)})`);
+            grad.addColorStop(0.4, `rgba(99, 102, 241, ${(0.28 * Math.max(0, m.life)).toFixed(3)})`);
+            grad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+          }
 
-          ctx.save();
-          ctx.globalAlpha = Math.max(0, Math.min(1, m.life * (isDark ? 0.92 : 0.65)));
           ctx.beginPath();
-          ctx.moveTo(tailX, tailY);
-          ctx.lineTo(m.x, m.y);
+          ctx.moveTo(m.x, m.y);
+          ctx.lineTo(tailX, tailY);
           ctx.strokeStyle = grad;
-          ctx.lineWidth = m.width;
+          ctx.lineWidth = 2;
           ctx.lineCap = 'round';
           ctx.stroke();
 
-          ctx.beginPath();
-          ctx.arc(m.x, m.y, m.width * 1.45, 0, Math.PI * 2);
-          ctx.fillStyle = isDark ? '#ffffff' : headColor;
-          ctx.fill();
-          ctx.restore();
+          if (m.life <= 0 || m.x > width + 200 || m.y > height + 200) {
+            meteors.splice(i, 1);
+          }
         }
       }
 
       function drawRainFrame() {
-        const { isDark, colors } = getPaletteColors();
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         ctx.clearRect(0, 0, width, height);
 
-        const strokeBase = isDark ? '186, 230, 253' : '30, 58, 138';
+        const strokeBase = isDark ? '186, 230, 253' : '37, 99, 235';
 
-        for (let i = 0; i < raindrops.length; i++) {
-          const d = raindrops[i];
-          d.x += d.vx;
-          d.y += d.vy;
+        for (const d of raindrops) {
+          if (!prefersReducedMotion) {
+            d.x += d.vx;
+            d.y += d.vy;
+          }
 
-          if (d.y >= height - 6) {
-            if (ripples.length < 28 && Math.random() < 0.25) {
+          if (d.y > height - 8) {
+            if (ripples.length < 35 && Math.random() < 0.35) {
               ripples.push({
                 x: d.x,
-                y: height - 4,
+                y: height - 6 - Math.random() * 14,
                 rx: 2,
                 ry: 0.8,
-                alpha: Math.min(0.45, d.alpha * 1.3),
-                color: colors[0]
+                alpha: isDark ? 0.35 : 0.25
               });
             }
-            Object.assign(d, createRaindrop(false));
+            d.x = Math.random() * (width + 120);
+            d.y = -20;
           }
 
           const endX = d.x + d.vx * (d.len / Math.max(1, d.vy));
@@ -3936,9 +3975,7 @@
           ctx.beginPath();
           ctx.moveTo(d.x, d.y);
           ctx.lineTo(endX, endY);
-          ctx.strokeStyle = isDark
-            ? `rgba(${strokeBase}, ${d.alpha.toFixed(3)})`
-            : `rgba(${strokeBase}, ${d.alpha.toFixed(3)})`;
+          ctx.strokeStyle = `rgba(${strokeBase}, ${d.alpha.toFixed(3)})`;
           ctx.lineWidth = d.width;
           ctx.lineCap = 'round';
           ctx.stroke();
@@ -3965,11 +4002,102 @@
         }
       }
 
+      function drawTreesFrame(now) {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const t = prefersReducedMotion ? 0 : (now || performance.now()) * 0.0014;
+        const gust = prefersReducedMotion ? 0 : (Math.sin(t * 0.7) * 0.55 + Math.cos(t * 1.35) * 0.45);
+
+        ctx.clearRect(0, 0, width, height);
+
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, height);
+        if (isDark) {
+          skyGrad.addColorStop(0, 'rgba(9, 9, 11, 0.04)');
+          skyGrad.addColorStop(1, 'rgba(24, 24, 27, 0.26)');
+        } else {
+          skyGrad.addColorStop(0, 'rgba(255, 255, 255, 0.03)');
+          skyGrad.addColorStop(1, 'rgba(212, 212, 216, 0.22)');
+        }
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, width, height);
+
+        for (const tree of trees) {
+          const sway = (Math.sin(t + tree.phase) + gust * 0.45) * tree.swayAmp;
+          const isFront = tree.layer === 1;
+          const baseAlpha = isFront ? (isDark ? 0.34 : 0.28) : (isDark ? 0.2 : 0.16);
+
+          ctx.save();
+          ctx.translate(tree.x, tree.y);
+
+          const tipX = Math.sin(sway) * tree.height;
+          const tipY = -Math.cos(sway) * tree.height;
+          const ctrlX = Math.sin(sway * 0.55) * (tree.height * 0.52);
+          const ctrlY = -tree.height * 0.5;
+
+          ctx.beginPath();
+          ctx.moveTo(-tree.width * 0.55, 0);
+          ctx.quadraticCurveTo(ctrlX, ctrlY, tipX, tipY);
+          ctx.quadraticCurveTo(ctrlX + tree.width * 0.5, ctrlY, tree.width * 0.55, 0);
+          ctx.closePath();
+          ctx.fillStyle = isDark
+            ? `rgba(63, 63, 70, ${(baseAlpha * 1.15).toFixed(3)})`
+            : `rgba(87, 67, 53, ${(baseAlpha * 1.25).toFixed(3)})`;
+          ctx.fill();
+
+          ctx.save();
+          ctx.translate(tipX, tipY + tree.height * 0.88);
+          ctx.rotate(sway * 1.35);
+
+          for (const c of tree.canopyClusters) {
+            ctx.beginPath();
+            ctx.arc(c.dx, c.dy + tree.height * 0.88, c.r, 0, Math.PI * 2);
+            if (isDark) {
+              ctx.fillStyle = isFront
+                ? `rgba(52, 211, 153, ${(baseAlpha * 0.72).toFixed(3)})`
+                : `rgba(16, 185, 129, ${(baseAlpha * 0.65).toFixed(3)})`;
+            } else {
+              ctx.fillStyle = isFront
+                ? `rgba(21, 128, 61, ${(baseAlpha * 0.85).toFixed(3)})`
+                : `rgba(22, 101, 52, ${(baseAlpha * 0.75).toFixed(3)})`;
+            }
+            ctx.fill();
+          }
+
+          ctx.restore();
+          ctx.restore();
+        }
+
+        for (const leaf of fallingLeaves) {
+          if (!prefersReducedMotion) {
+            leaf.x += leaf.vxBase + gust * 0.7 + Math.sin(t * 1.6 + leaf.phase) * 0.35;
+            leaf.y += leaf.vy;
+            leaf.rot += leaf.vRot;
+          }
+
+          if (leaf.y > height + 16 || leaf.x > width + 24 || leaf.x < -24) {
+            leaf.x = Math.random() * width;
+            leaf.y = -12;
+          }
+
+          ctx.save();
+          ctx.translate(leaf.x, leaf.y);
+          ctx.rotate(leaf.rot);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, leaf.size, leaf.size * 0.52, 0, 0, Math.PI * 2);
+          ctx.fillStyle = isDark
+            ? `rgba(110, 231, 183, ${leaf.alpha.toFixed(3)})`
+            : `rgba(22, 163, 74, ${leaf.alpha.toFixed(3)})`;
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
       function loop(now) {
         if (currentMode === 'meteor') {
           drawMeteorFrame(now);
         } else if (currentMode === 'rain') {
           drawRainFrame();
+        } else if (currentMode === 'trees') {
+          drawTreesFrame(now);
         }
         if (currentMode !== 'off') {
           rafId = requestAnimationFrame(loop);
