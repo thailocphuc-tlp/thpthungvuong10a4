@@ -608,6 +608,166 @@
       }
     }
 
+  
+    /* ===== iOS 27 LIQUID GLASS UPGRADE ===== */
+    :root[data-theme="light"] {
+      --bg-main: #e6eef8;
+      --bg-mesh:
+        radial-gradient(circle at 12% 10%, rgba(56, 189, 248, 0.28), transparent 45%),
+        radial-gradient(circle at 88% 14%, rgba(37, 99, 235, 0.20), transparent 46%),
+        radial-gradient(circle at 52% 95%, rgba(14, 165, 233, 0.18), transparent 52%),
+        linear-gradient(180deg, #f6faff 0%, #e6eef8 100%);
+      --bg-card: rgba(255, 255, 255, 0.66);
+      --bg-card-elevated: rgba(255, 255, 255, 0.82);
+      --bg-input: rgba(255, 255, 255, 0.56);
+      --glass-blur: blur(22px) saturate(185%);
+      --glass-blur-heavy: blur(28px) saturate(195%);
+      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.88), inset 0 -1px 0 rgba(15, 23, 42, 0.05);
+      --glass-refraction: radial-gradient(360px circle at var(--lg-x, 50%) var(--lg-y, 20%), rgba(255, 255, 255, 0.58), transparent 65%);
+      --border: rgba(255, 255, 255, 0.72);
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(2, 132, 199, 0.05);
+    }
+
+    :root[data-theme="dark"] {
+      --bg-main: #050a14;
+      --bg-mesh:
+        radial-gradient(circle at 14% 12%, rgba(56, 189, 248, 0.22), transparent 45%),
+        radial-gradient(circle at 86% 16%, rgba(79, 70, 229, 0.22), transparent 48%),
+        radial-gradient(circle at 50% 92%, rgba(14, 165, 233, 0.14), transparent 52%),
+        linear-gradient(180deg, #070e1d 0%, #050a14 100%);
+      --bg-card: rgba(15, 23, 42, 0.60);
+      --bg-card-elevated: rgba(20, 31, 56, 0.76);
+      --bg-input: rgba(30, 41, 59, 0.54);
+      --glass-blur: blur(24px) saturate(185%);
+      --glass-blur-heavy: blur(30px) saturate(200%);
+      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+      --glass-refraction: radial-gradient(360px circle at var(--lg-x, 50%) var(--lg-y, 20%), rgba(125, 211, 252, 0.15), transparent 65%);
+      --border: rgba(255, 255, 255, 0.14);
+      --shadow: 0 14px 36px rgba(0, 0, 0, 0.48), 0 4px 12px rgba(2, 132, 199, 0.08);
+    }
+
+    body {
+      background: var(--bg-mesh);
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+
+    .navbar,
+    .k12-tabs-bar,
+    .k12-card,
+    .k12-stat-card,
+    .post-card,
+    .auth-box,
+    .filter-bar,
+    .resource-card,
+    .exam-card,
+    .quiz-card,
+    .profile-modal-card,
+    .grades-modal-card {
+      position: relative;
+      background: var(--bg-card);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow), var(--glass-highlight);
+      overflow: hidden;
+    }
+
+    .navbar,
+    .k12-tabs-bar {
+      backdrop-filter: var(--glass-blur-heavy);
+      -webkit-backdrop-filter: var(--glass-blur-heavy);
+      overflow: visible;
+    }
+
+    .k12-card::before,
+    .k12-stat-card::before,
+    .post-card::before,
+    .auth-box::before,
+    .filter-bar::before,
+    .resource-card::before,
+    .exam-card::before,
+    .profile-modal-card::before,
+    .grades-modal-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: var(--glass-refraction);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .k12-card > *,
+    .k12-stat-card > *,
+    .post-card > *,
+    .auth-box > *,
+    .filter-bar > *,
+    .resource-card > *,
+    .exam-card > *,
+    .profile-modal-card > *,
+    .grades-modal-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .k12-tabs-bar {
+      border-radius: 999px;
+      max-width: fit-content;
+      margin: 10px auto 0;
+      padding: 4px 6px;
+    }
+
+    .k12-tab {
+      border-radius: 999px;
+    }
+
+    .k12-tab::after {
+      display: none;
+    }
+
+    .k12-tab.active {
+      background: var(--bg-card-elevated);
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+
+    input,
+    select,
+    textarea {
+      background: var(--bg-input);
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    .btn-primary {
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    .btn-ghost {
+      background: var(--bg-input);
+      backdrop-filter: blur(12px) saturate(160%);
+      -webkit-backdrop-filter: blur(12px) saturate(160%);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tab-panel-enter,
+      .profile-modal-card,
+      .grades-modal-card {
+        animation: none !important;
+      }
+      .k12-card::before,
+      .k12-stat-card::before,
+      .post-card::before,
+      .auth-box::before,
+      .filter-bar::before,
+      .resource-card::before,
+      .exam-card::before,
+      .profile-modal-card::before,
+      .grades-modal-card::before {
+        display: none;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2420,6 +2580,28 @@
         '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
       }[tag]));
     }
-  </script>
+  
+    (function initLiquidGlassPointer() {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      let rafId = null;
+      const targets = '.k12-card, .k12-stat-card, .post-card, .auth-box, .filter-bar, .resource-card, .exam-card, .profile-modal-card, .grades-modal-card';
+
+      function updateLight(e) {
+        if (rafId) return;
+        const clientX = e.clientX;
+        const clientY = e.clientY;
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          const el = document.elementFromPoint(clientX, clientY)?.closest(targets);
+          if (!el) return;
+          const rect = el.getBoundingClientRect();
+          el.style.setProperty('--lg-x', `${((clientX - rect.left) / rect.width) * 100}%`);
+          el.style.setProperty('--lg-y', `${((clientY - rect.top) / rect.height) * 100}%`);
+        });
+      }
+
+      document.addEventListener('pointermove', updateLight, { passive: true });
+    })();
+</script>
 </body>
 </html>
