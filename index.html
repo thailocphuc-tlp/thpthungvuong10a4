@@ -324,6 +324,70 @@
       padding: 10px 12px; margin-bottom: 8px; cursor: pointer;
     }
     .profile-recent-post:hover { border-color: var(--primary); }
+
+    /* Banner Bảng Điểm Cả Lớp 10A4 */
+    .grades-banner-cta {
+      width: 100%; margin-bottom: 20px; padding: 18px 22px; border-radius: 18px;
+      background: var(--accent-gradient); color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: var(--shadow);
+      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; flex-wrap: wrap; text-align: left;
+    }
+    .grades-banner-cta:hover {
+      transform: translateY(-2px); filter: brightness(1.04);
+      box-shadow: 0 10px 26px rgba(2, 132, 199, 0.28);
+    }
+    .grades-banner-left { display: flex; align-items: center; gap: 14px; }
+    .grades-banner-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: rgba(255, 255, 255, 0.18); display: flex; align-items: center;
+      justify-content: center; font-size: 24px; flex-shrink: 0;
+    }
+    .grades-banner-title { font-size: 16.5px; font-weight: 800; line-height: 1.25; color: #ffffff; }
+    .grades-banner-sub { font-size: 12.5px; color: rgba(255, 255, 255, 0.9); margin-top: 2px; }
+    .grades-banner-btn {
+      background: #ffffff; color: #0056b3; font-weight: 800; font-size: 13px;
+      padding: 9px 16px; border-radius: 11px; white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Modal Bảng Điểm Cả Lớp 10A4 */
+    .grades-modal-card {
+      width: 100%; max-width: 1160px; max-height: 90vh; overflow-y: auto;
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 22px; box-shadow: var(--shadow);
+    }
+    .grades-toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; align-items: center;
+    }
+    .grades-toolbar input { flex: 2; min-width: 220px; margin-bottom: 0; padding: 9px 12px; font-size: 13px; }
+    .grades-toolbar select { flex: 1; min-width: 180px; margin-bottom: 0; padding: 9px 12px; font-size: 13px; }
+    .grades-table-wrap {
+      overflow-x: auto; max-height: 60vh; border: 1px solid var(--border); border-radius: 12px;
+    }
+    .grades-table {
+      width: 100%; border-collapse: collapse; font-size: 12px; text-align: center;
+    }
+    .grades-table th, .grades-table td {
+      border: 1px solid var(--border); padding: 7px 6px; white-space: nowrap;
+    }
+    .grades-table thead th {
+      position: sticky; top: 0; z-index: 5;
+      background: var(--primary-light); color: var(--primary); font-weight: 800;
+    }
+    .grades-table td.name-col, .grades-table th.name-col {
+      text-align: left; position: sticky; left: 0; z-index: 4;
+      background: var(--bg-card); font-weight: 700;
+    }
+    .grades-table thead th.name-col { z-index: 6; background: var(--primary-light); }
+    .grades-table tbody tr:hover td { background: var(--primary-light); }
+    .grades-table tbody tr:hover td.name-col { background: var(--primary-light); }
+    .score-highlight {
+      background: rgba(245, 158, 11, 0.22) !important;
+      color: var(--warning) !important; font-weight: 800 !important;
+    }
+    .score-low { color: var(--danger); font-weight: 700; }
+
   </style>
 </head>
 <body>
@@ -380,6 +444,19 @@
         <p>GVCN: Cô Nguyễn Như Ngọc • Cập nhật bài tập, thời khóa biểu, tài liệu ôn tập và góc sinh hoạt chung của lớp.</p>
       </div>
     </div>
+
+    <!-- BANNER BẤM VÀO ĐỂ MỞ BẢNG ĐIỂM CẢ LỚP 10A4 -->
+    <div class="grades-banner-cta" role="button" tabindex="0" onclick="openClassGradesModal()" onkeypress="if(event.key==='Enter'||event.key===' ') openClassGradesModal();" title="Bấm để mở bảng điểm đợt 2 (Giữa kì) cả lớp 10A4">
+      <div class="grades-banner-left">
+        <div class="grades-banner-icon">📊</div>
+        <div>
+          <div class="grades-banner-title">Bảng Điểm Giữa Kì (Đợt 2) Cả Lớp 10A4 • 50 Học Sinh</div>
+          <div class="grades-banner-sub">Bấm vào banner để xem toàn bộ điểm các môn (16/11/2026 • GVCN: Nguyễn Như Ngọc), tìm kiếm học sinh & tô sáng môn học.</div>
+        </div>
+      </div>
+      <div class="grades-banner-btn">📋 Xem bảng điểm cả lớp →</div>
+    </div>
+
 
     <div class="k12-stats-row">
       <div class="k12-stat-card">
@@ -683,6 +760,64 @@
     </div>
   </div>
 
+
+  <!-- MODAL BẢNG ĐIỂM CẢ LỚP 10A4 -->
+  <div id="class-grades-modal" class="profile-modal-backdrop hidden" onclick="if(event.target === this) closeClassGradesModal()">
+    <div class="grades-modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap;">
+        <div>
+          <h3 style="font-size: 18px; font-weight: 800; color: var(--primary);">📊 Tổng Hợp Kết Quả Đợt 2 - Năm Học: 2026–2027 • Lớp 10A4</h3>
+          <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;">Trường THPT Hùng Vương • GVCN: Nguyễn Như Ngọc • Cập nhật: 16/11/2026 • Sĩ số: 50</div>
+          <div id="class-grades-count" style="font-size: 12px; color: var(--primary); font-weight: 700; margin-top: 4px;"></div>
+        </div>
+        <button type="button" class="btn-ghost" onclick="closeClassGradesModal()">✕ Đóng</button>
+      </div>
+
+      <div class="grades-toolbar">
+        <input type="text" id="grade-search-input" placeholder="🔍 Tìm theo STT hoặc họ tên học sinh..." oninput="renderClassGradesTable()" />
+        <select id="grade-highlight-select" onchange="renderClassGradesTable()">
+          <option value="all">Tô sáng cột môn: Không chọn</option>
+          <option value="van">Ngữ văn</option>
+          <option value="toan">Toán</option>
+          <option value="anh">Tiếng Anh</option>
+          <option value="qpan">GD QP-AN</option>
+          <option value="su">Lịch Sử</option>
+          <option value="dia">Địa Lý</option>
+          <option value="gdktpl">GDKT-PL</option>
+          <option value="tin">Tin học</option>
+        </select>
+        <button type="button" class="btn-ghost" onclick="document.getElementById('grade-search-input').value=''; document.getElementById('grade-highlight-select').value='all'; renderClassGradesTable();">Đặt lại</button>
+      </div>
+
+      <div class="grades-table-wrap">
+        <table class="grades-table">
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th class="name-col" colspan="2">Họ và tên</th>
+              <th>Nữ</th>
+              <th>Ngữ văn</th>
+              <th>Toán</th>
+              <th>Tiếng Anh</th>
+              <th>GD TC</th>
+              <th>GD QP-AN</th>
+              <th>HĐTN-HN</th>
+              <th>ND GDDP</th>
+              <th>Lịch Sử</th>
+              <th>Địa Lý</th>
+              <th>GDKT-PL</th>
+              <th>Tin học</th>
+              <th>Mỹ thuật</th>
+              <th>CP</th>
+              <th>KP</th>
+            </tr>
+          </thead>
+          <tbody id="class-grades-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = 'https://kafwlqcqqtvodzjgqdsw.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
@@ -874,6 +1009,124 @@
         ]
       }
     ];
+
+
+    const CLASS_10A4_GRADES = [
+      { stt: 1, ho: 'Phạm Nguyễn Khánh', ten: 'An', nu: 'x', van: '6.7', toan: '7.7', anh: '10', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '7.0', dia: '5.0', gdktpl: '9.5', tin: '9.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 2, ho: 'Cáp Ngọc Hồng', ten: 'Anh', nu: 'x', van: '7.0', toan: '6.3', anh: '8.7', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '7.8', dia: '8.3', gdktpl: '8.8', tin: '9.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 3, ho: 'Đỗ Lê Xuân', ten: 'Anh', nu: 'x', van: '8.3', toan: '5.9', anh: '7.3', gdtc: 'Đ', qpan: '8.0', hdtn: 'Đ', gddp: 'Đ', su: '9.3', dia: '7.0', gdktpl: '8.5', tin: '9.3', mt: 'Đ', cp: '1', kp: '0' },
+      { stt: 4, ho: 'Nguyễn Phương', ten: 'Anh', nu: 'x', van: '7.7', toan: '7.0', anh: '9.3', gdtc: 'Đ', qpan: '9.0', hdtn: 'Đ', gddp: 'Đ', su: '8.5', dia: '7.8', gdktpl: '9.3', tin: '9.0', mt: 'Đ', cp: '', kp: '' },
+      { stt: 5, ho: 'Trà Trúc', ten: 'Anh', nu: 'x', van: '7.7', toan: '7.0', anh: '6.5', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '6.8', dia: '7.0', gdktpl: '7.8', tin: '7.0', mt: 'Đ', cp: '', kp: '' },
+      { stt: 6, ho: 'Võ Chữ Minh', ten: 'Anh', nu: 'x', van: '6.3', toan: '6.2', anh: '9.3', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.0', dia: '7.3', gdktpl: '8.3', tin: '8.0', mt: 'Đ', cp: '', kp: '' },
+      { stt: 7, ho: 'La Kim', ten: 'Ánh', nu: 'x', van: '6.9', toan: '5.7', anh: '9.0', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.5', dia: '8.0', gdktpl: '6.8', tin: '8.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 8, ho: 'Văn Mỹ', ten: 'Bình', nu: 'x', van: '6.2', toan: '4.7', anh: '10', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.0', dia: '6.3', gdktpl: '8.3', tin: '8.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 9, ho: 'Nguyễn Sơn', ten: 'Ca', nu: 'x', van: '7.8', toan: '7.0', anh: '9.7', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.0', dia: '8.0', gdktpl: '8.8', tin: '9.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 10, ho: 'Bùi Lê Bảo', ten: 'Châu', nu: 'x', van: '7.5', toan: '7.7', anh: '8.7', gdtc: 'Đ', qpan: '9.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '7.8', gdktpl: '8.8', tin: '7.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 11, ho: 'Châu Chí', ten: 'Cường', nu: '', van: '6.5', toan: '7.0', anh: '7.7', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '8.0', gdktpl: '9.0', tin: '9.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 12, ho: 'Huỳnh Vương Hân', ten: 'Di', nu: 'x', van: '6.5', toan: '5.0', anh: '10', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '6.8', dia: '5.0', gdktpl: '8.0', tin: '8.0', mt: 'Đ', cp: '', kp: '' },
+      { stt: 13, ho: 'Hồng Yến', ten: 'Doanh', nu: 'x', van: '8.5', toan: '6.3', anh: '8.7', gdtc: 'Đ', qpan: '8.0', hdtn: 'Đ', gddp: 'Đ', su: '7.0', dia: '6.5', gdktpl: '8.3', tin: '9.0', mt: 'Đ', cp: '', kp: '' },
+      { stt: 14, ho: 'Đào Hương', ten: 'Giang', nu: 'x', van: '7.2', toan: '6.0', anh: '9.7', gdtc: 'Đ', qpan: '9.0', hdtn: 'Đ', gddp: 'Đ', su: '9.5', dia: '6.5', gdktpl: '8.5', tin: '8.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 15, ho: 'Huỳnh Ngọc Vân', ten: 'Hà', nu: 'x', van: '7.7', toan: '7.7', anh: '9.2', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '7.8', dia: '7.3', gdktpl: '8.3', tin: '9.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 16, ho: 'Nguyễn Ngọc Thanh', ten: 'Hà', nu: 'x', van: '7.2', toan: '5.9', anh: '9.2', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '7.5', dia: '6.0', gdktpl: '9.8', tin: '9.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 17, ho: 'Từ Thúy', ten: 'Hà', nu: 'x', van: '7.7', toan: '9.0', anh: '10', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '8.3', gdktpl: '8.5', tin: '9.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 18, ho: 'Huỳnh Vĩnh', ten: 'Hào', nu: '', van: '6.0', toan: '7.0', anh: '9.3', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '9.3', dia: '7.0', gdktpl: '8.5', tin: '9.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 19, ho: 'Dương Gia', ten: 'Hân', nu: 'x', van: '8.3', toan: '5.9', anh: '8.5', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.5', dia: '8.3', gdktpl: '9.3', tin: '9.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 20, ho: 'Nguyễn Anh', ten: 'Khôi', nu: '', van: '7.0', toan: '6.3', anh: '8.3', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.5', dia: '8.3', gdktpl: '8.0', tin: '8.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 21, ho: 'Mai Trúc', ten: 'Linh', nu: 'x', van: '7.5', toan: '8.3', anh: '8.9', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '9.8', dia: '9.0', gdktpl: '10', tin: '9.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 22, ho: 'Nguyễn Phương', ten: 'Linh', nu: 'x', van: '7.9', toan: '6.3', anh: '8.9', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.8', dia: '8.0', gdktpl: '8.3', tin: '8.0', mt: 'Đ', cp: '', kp: '' },
+      { stt: 23, ho: 'Nguyễn Quang', ten: 'Minh', nu: '', van: '7.9', toan: '5.3', anh: '9.5', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '9.0', gdktpl: '7.5', tin: '9.0', mt: 'Đ', cp: '1', kp: '0' },
+      { stt: 24, ho: 'Trần Tuệ', ten: 'Minh', nu: 'x', van: '8.0', toan: '6.7', anh: '10', gdtc: 'Đ', qpan: '8.0', hdtn: 'Đ', gddp: 'Đ', su: '9.0', dia: '8.8', gdktpl: '8.8', tin: '8.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 25, ho: 'Huỳnh Lý Bảo', ten: 'Ngân', nu: 'x', van: '7.7', toan: '9.0', anh: '9.7', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.8', dia: '7.5', gdktpl: '8.5', tin: '8.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 26, ho: 'Trương Thị Kim', ten: 'Ngân', nu: 'x', van: '7.5', toan: '7.0', anh: '9.0', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '8.5', gdktpl: '9.0', tin: '7.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 27, ho: 'Lưu Khánh', ten: 'Nghi', nu: 'x', van: '6.7', toan: '6.7', anh: '9.3', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '9.3', dia: '6.3', gdktpl: '7.0', tin: '7.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 28, ho: 'Nguyễn Lê Thành', ten: 'Nhân', nu: '', van: '5.7', toan: '9.0', anh: '9.0', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '7.3', gdktpl: '9.5', tin: '9.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 29, ho: 'Nguyễn Trần Hạnh', ten: 'Nhi', nu: 'x', van: '9.2', toan: '7.3', anh: '8.7', gdtc: 'Đ', qpan: '9.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '8.3', gdktpl: '8.3', tin: '10', mt: 'Đ', cp: '', kp: '' },
+      { stt: 30, ho: 'Trần Ái', ten: 'Như', nu: 'x', van: '8.9', toan: '7.7', anh: '9.5', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.5', dia: '8.0', gdktpl: '9.0', tin: '9.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 31, ho: 'Trần Tố', ten: 'Như', nu: 'x', van: '6.2', toan: '6.7', anh: '7.3', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '6.5', dia: '6.0', gdktpl: '7.8', tin: '7.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 32, ho: 'Vũ Tâm', ten: 'Như', nu: 'x', van: '8.7', toan: '7.0', anh: '9.9', gdtc: 'Đ', qpan: '9.0', hdtn: 'Đ', gddp: 'Đ', su: '8.8', dia: '9.0', gdktpl: '8.5', tin: '9.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 33, ho: 'Nguyễn Đỗ Thái', ten: 'Ny', nu: 'x', van: '7.0', toan: '8.0', anh: '10', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.0', dia: '7.0', gdktpl: '9.5', tin: '9.8', mt: 'Đ', cp: '1', kp: '0' },
+      { stt: 34, ho: 'Nguyễn Hoàng', ten: 'Phú', nu: '', van: '6.7', toan: '6.0', anh: '8.5', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '6.5', gdktpl: '7.5', tin: '9.0', mt: 'Đ', cp: '', kp: '' },
+      { stt: 35, ho: 'Thái Lộc', ten: 'Phúc', nu: '', van: '6.7', toan: '4.7', anh: '9.7', gdtc: 'Đ', qpan: '8.0', hdtn: 'Đ', gddp: 'Đ', su: '7.0', dia: '7.3', gdktpl: '5.8', tin: '7.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 36, ho: 'Huỳnh Đình', ten: 'Quý', nu: '', van: '5.2', toan: '4.9', anh: '7.7', gdtc: 'Đ', qpan: '8.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '7.8', gdktpl: '6.8', tin: '7.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 37, ho: 'Lưu Nguyễn Minh', ten: 'Tâm', nu: '', van: '8.2', toan: '7.7', anh: '10', gdtc: 'Đ', qpan: '8.0', hdtn: 'Đ', gddp: 'Đ', su: '9.0', dia: '9.5', gdktpl: '9.5', tin: '9.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 38, ho: 'Huỳnh Chí', ten: 'Thành', nu: '', van: '7.9', toan: '5.7', anh: '9.0', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '7.5', dia: '7.0', gdktpl: '9.0', tin: '8.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 39, ho: 'Lê Ngọc Phương', ten: 'Thảo', nu: 'x', van: '8.3', toan: '7.7', anh: '9.2', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.0', dia: '8.3', gdktpl: '8.8', tin: '9.0', mt: 'Đ', cp: '', kp: '' },
+      { stt: 40, ho: 'Nguyễn Thanh', ten: 'Thảo', nu: 'x', van: '6.7', toan: '6.3', anh: '8.7', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '7.3', dia: '8.8', gdktpl: '8.8', tin: '9.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 41, ho: 'Bùi Phạm Song', ten: 'Thư', nu: 'x', van: '7.0', toan: '5.2', anh: '8.2', gdtc: 'Đ', qpan: '9.0', hdtn: 'Đ', gddp: 'Đ', su: '8.5', dia: '6.0', gdktpl: '9.0', tin: '9.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 42, ho: 'Trần Phúc Tuệ', ten: 'Thư', nu: 'x', van: '7.5', toan: '9.3', anh: '8.9', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '9.0', dia: '8.8', gdktpl: '8.5', tin: '9.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 43, ho: 'Sử Minh', ten: 'Thy', nu: 'x', van: '5.8', toan: '4.7', anh: '9.5', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.0', dia: '5.0', gdktpl: '8.3', tin: '9.0', mt: 'Đ', cp: '', kp: '' },
+      { stt: 44, ho: 'Nguyễn Phú', ten: 'Trọng', nu: '', van: '7.0', toan: '7.2', anh: '9.5', gdtc: 'Đ', qpan: '8.0', hdtn: 'Đ', gddp: 'Đ', su: '8.5', dia: '8.8', gdktpl: '9.0', tin: '9.8', mt: 'Đ', cp: '', kp: '' },
+      { stt: 45, ho: 'NGUYỄN LÊ UYÊN', ten: 'TÚ', nu: 'x', van: '7.5', toan: '7.0', anh: '9.2', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '9.0', gdktpl: '9.8', tin: '9.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 46, ho: 'Trịnh Hoàng Khánh', ten: 'Uyên', nu: 'x', van: '6.9', toan: '6.3', anh: '6.0', gdtc: 'Đ', qpan: '9.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '7.5', gdktpl: '8.5', tin: '9.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 47, ho: 'Nguyễn Kiều', ten: 'Vy', nu: 'x', van: '8.0', toan: '5.3', anh: '9.0', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '7.0', dia: '6.5', gdktpl: '8.8', tin: '7.5', mt: 'Đ', cp: '', kp: '' },
+      { stt: 48, ho: 'Nguyễn Trần Khánh', ten: 'Vy', nu: 'x', van: '7.5', toan: '6.7', anh: '9.0', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.8', dia: '6.8', gdktpl: '9.5', tin: '9.3', mt: 'Đ', cp: '1', kp: '0' },
+      { stt: 49, ho: 'Trần Tăng Tâm', ten: 'Ý', nu: 'x', van: '7.2', toan: '5.5', anh: '9.9', gdtc: 'Đ', qpan: '7.0', hdtn: 'Đ', gddp: 'Đ', su: '8.3', dia: '8.0', gdktpl: '9.0', tin: '9.3', mt: 'Đ', cp: '', kp: '' },
+      { stt: 50, ho: 'Ngô Thanh', ten: 'Yến', nu: 'x', van: '7.9', toan: '6.5', anh: '8.5', gdtc: 'Đ', qpan: '9.0', hdtn: 'Đ', gddp: 'Đ', su: '8.5', dia: '8.0', gdktpl: '8.3', tin: '9.3', mt: 'Đ', cp: '', kp: '' }
+    ];
+
+    function openClassGradesModal() {
+      document.getElementById('class-grades-modal').classList.remove('hidden');
+      renderClassGradesTable();
+    }
+
+    function closeClassGradesModal() {
+      document.getElementById('class-grades-modal').classList.add('hidden');
+    }
+
+    function renderClassGradesTable() {
+      const tbody = document.getElementById('class-grades-tbody');
+      const countEl = document.getElementById('class-grades-count');
+      if (!tbody) return;
+
+      const q = (document.getElementById('grade-search-input')?.value || '').trim().toLowerCase();
+      const hlKey = document.getElementById('grade-highlight-select')?.value || 'all';
+
+      const filtered = CLASS_10A4_GRADES.filter(item => {
+        if (!q) return true;
+        const fullName = `${item.ho} ${item.ten}`.toLowerCase();
+        return String(item.stt).includes(q) || fullName.includes(q);
+      });
+
+      if (countEl) {
+        countEl.innerText = `Đang hiển thị ${filtered.length} / ${CLASS_10A4_GRADES.length} học sinh lớp 10A4`;
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="18" style="padding: 18px; color: var(--text-muted);">Không tìm thấy học sinh phù hợp.</td></tr>`;
+        return;
+      }
+
+      const cellClass = (key, val) => {
+        const classes = [];
+        if (hlKey === key) classes.push('score-highlight');
+        const num = parseFloat(val);
+        if (!Number.isNaN(num) && num < 5.0) classes.push('score-low');
+        return classes.length ? ` class="${classes.join(' ')}"` : '';
+      };
+
+      tbody.innerHTML = filtered.map(r => `
+        <tr>
+          <td>${r.stt}</td>
+          <td class="name-col" style="text-align:left;">${escapeHTML(r.ho)}</td>
+          <td style="text-align:left; font-weight:700;">${escapeHTML(r.ten)}</td>
+          <td>${escapeHTML(r.nu)}</td>
+          <td${cellClass('van', r.van)}>${escapeHTML(r.van)}</td>
+          <td${cellClass('toan', r.toan)}>${escapeHTML(r.toan)}</td>
+          <td${cellClass('anh', r.anh)}>${escapeHTML(r.anh)}</td>
+          <td>${escapeHTML(r.gdtc)}</td>
+          <td${cellClass('qpan', r.qpan)}>${escapeHTML(r.qpan)}</td>
+          <td>${escapeHTML(r.hdtn)}</td>
+          <td>${escapeHTML(r.gddp)}</td>
+          <td${cellClass('su', r.su)}>${escapeHTML(r.su)}</td>
+          <td${cellClass('dia', r.dia)}>${escapeHTML(r.dia)}</td>
+          <td${cellClass('gdktpl', r.gdktpl)}>${escapeHTML(r.gdktpl)}</td>
+          <td${cellClass('tin', r.tin)}>${escapeHTML(r.tin)}</td>
+          <td>${escapeHTML(r.mt)}</td>
+          <td>${escapeHTML(r.cp)}</td>
+          <td>${escapeHTML(r.kp)}</td>
+        </tr>
+      `).join('');
+    }
 
     let currentUser = null;
     let allPosts = [];
