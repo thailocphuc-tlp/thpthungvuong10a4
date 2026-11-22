@@ -1849,6 +1849,7 @@
 
         <div class="hero-slide-item">
           <div class="grades-banner-cta in-carousel" role="button" tabindex="0" onclick="openClassGradesModal()" onkeypress="if(event.key==='Enter'||event.key===' ') openClassGradesModal();" title="Bấm để mở bảng điểm đợt 2 (Giữa kì) cả lớp 10A4">
+            <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/banner.jpg" alt="Bảng điểm 10A4" class="grades-banner-bg-img" onerror="this.style.display='none'" />
             <div class="grades-banner-scrim"></div>
             <div class="grades-banner-content">
               <div class="grades-banner-left">
@@ -1870,6 +1871,7 @@
           <button type="button" class="carousel-dot" onclick="goToHeroSlide(1)" aria-label="Banner 2"></button>
         </div>
         <div class="carousel-quick-actions">
+          <button type="button" class="btn-ghost carousel-arrow-btn" onclick="openClassGradesModal()">📊 Bảng điểm GK</button>
           <button type="button" class="btn-ghost carousel-arrow-btn" onclick="prevHeroSlide()" aria-label="Banner trước">←</button>
           <button type="button" class="btn-ghost carousel-arrow-btn" onclick="nextHeroSlide()" aria-label="Banner tiếp">→</button>
         </div>
@@ -2472,12 +2474,28 @@
       return ADMIN_EMAILS.includes(email.toLowerCase().trim());
     }
 
-    function getUserDisplayName(email) {
-      if (!email) return 'Học sinh 10A4';
-      const prof = profilesCache[email.toLowerCase()];
-      if (prof && prof.full_name) return prof.full_name;
-      const base = email.split('@')[0];
+    function formatEmailHandle(email) {
+      if (!email) return '';
+      const base = String(email).split('@')[0].trim();
+      if (!base) return String(email).trim();
       return base.charAt(0).toUpperCase() + base.slice(1);
+    }
+
+    function getUserDisplayName(email, fallbackName = '') {
+      const normalized = (email || '').toLowerCase().trim();
+      if (normalized) {
+        const prof = profilesCache[normalized];
+        if (prof && prof.full_name && prof.full_name.trim()) {
+          return prof.full_name.trim();
+        }
+        if (currentUser && currentUser.email && currentUser.email.toLowerCase().trim() === normalized) {
+          const metaName = currentUser.user_metadata?.full_name || currentUser.user_metadata?.name;
+          if (metaName && String(metaName).trim()) return String(metaName).trim();
+        }
+        return formatEmailHandle(normalized);
+      }
+      if (fallbackName && String(fallbackName).trim()) return String(fallbackName).trim();
+      return 'Thành viên lớp';
     }
 
     function getUserAvatar(email) {
@@ -3162,11 +3180,29 @@
 
     async function loadAllProfiles() {
       const { data, error } = await sbClient.from('profiles').select('*');
-      if (!error && data) {
-        profilesCache = {};
+      if (!error && Array.isArray(data)) {
+        const nextCache = {};
         data.forEach(p => {
-          if (p.email) profilesCache[p.email.toLowerCase()] = p;
+          if (p && p.email) {
+            nextCache[p.email.toLowerCase().trim()] = {
+              ...(nextCache[p.email.toLowerCase().trim()] || {}),
+              ...p,
+              email: p.email.toLowerCase().trim()
+            };
+          }
         });
+        profilesCache = nextCache;
+      }
+      if (currentUser && currentUser.email) {
+        const myEmail = currentUser.email.toLowerCase().trim();
+        if (!profilesCache[myEmail]) {
+          profilesCache[myEmail] = {
+            email: myEmail,
+            full_name: currentUser.user_metadata?.full_name || currentUser.user_metadata?.name || formatEmailHandle(myEmail),
+            avatar_url: currentUser.user_metadata?.avatar_url || null,
+            bio: currentUser.user_metadata?.bio || null
+          };
+        }
       }
     }
 
@@ -3269,6 +3305,21 @@
       }
 
       postsCache = posts || [];
+      postsCache.forEach(p => {
+        if (p && p.author_email) {
+          const em = p.author_email.toLowerCase().trim();
+          if (!profilesCache[em]) {
+            profilesCache[em] = {
+              email: em,
+              full_name: p.author_name || formatEmailHandle(em),
+              avatar_url: p.author_avatar || null,
+              bio: null
+            };
+          } else if (!profilesCache[em].full_name && p.author_name) {
+            profilesCache[em].full_name = p.author_name;
+          }
+        }
+      });
       updateStatsRow();
 
       const { data: comments, error: cmtErr } = await sbClient
@@ -3281,6 +3332,17 @@
         comments.forEach(c => {
           if (!commentsCache[c.post_id]) commentsCache[c.post_id] = [];
           commentsCache[c.post_id].push(c);
+          if (c && c.author_email) {
+            const em = c.author_email.toLowerCase().trim();
+            if (!profilesCache[em]) {
+              profilesCache[em] = {
+                email: em,
+                full_name: c.author_name || formatEmailHandle(em),
+                avatar_url: null,
+                bio: null
+              };
+            }
+          }
         });
       }
 
