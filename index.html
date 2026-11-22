@@ -1771,9 +1771,78 @@
         animation: none !important;
       }
     }
+  
+/* =====================================================================
+   DYNAMIC BACKGROUND LAYER — SAO BĂNG & MƯA RƠI PHÍA SAU WEBSITE
+   ===================================================================== */
+#k12-animated-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+#k12-animated-bg.is-active {
+  opacity: 1;
+}
+
+.navbar,
+.k12-tabs-bar,
+.container,
+.profile-modal-backdrop {
+  position: relative;
+}
+
+.navbar {
+  z-index: 120;
+}
+
+.k12-tabs-bar {
+  z-index: 100;
+}
+
+.container {
+  z-index: 1;
+}
+
+.bg-effect-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-strong);
+}
+
+.bg-effect-switcher select {
+  width: auto;
+  margin-bottom: 0;
+  padding: 4px 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-radius: 7px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #k12-animated-bg {
+    display: none !important;
+  }
+}
+
   </style>
 </head>
 <body>
+  <canvas id="k12-animated-bg" aria-hidden="true"></canvas>
+
 
   <nav class="navbar">
     <div class="brand">
@@ -3646,6 +3715,290 @@
       const savedPalette = localStorage.getItem(PALETTE_STORAGE_KEY) || 'ocean';
       applyTheme(savedTheme);
       setPalette(savedPalette);
+    })();
+
+
+    /* =====================================================================
+       DYNAMIC BACKGROUND ENGINE — METEOR SHOWER & RAIN
+       ===================================================================== */
+    (function initDynamicBgEngine() {
+      const BG_STORAGE_KEY = 'k12_10a4_bg_effect_v1';
+      const VALID_BG_MODES = ['meteor', 'rain', 'off'];
+      const canvas = document.getElementById('k12-animated-bg');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      let currentMode = 'meteor';
+      let rafId = null;
+      let width = 0;
+      let height = 0;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      let stars = [];
+      let meteors = [];
+      let raindrops = [];
+      let ripples = [];
+      let lastMeteorSpawn = 0;
+
+      function getPaletteColors() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const palette = document.documentElement.getAttribute('data-palette') || 'ocean';
+
+        const accents = {
+          ocean: isDark ? ['#60a5fa', '#93c5fd', '#e0f2fe'] : ['#1e3a8a', '#2563eb', '#3b82f6'],
+          emerald: isDark ? ['#34d399', '#6ee7b7', '#d1fae5'] : ['#065f46', '#059669', '#10b981'],
+          rose: isDark ? ['#fb7185', '#fda4af', '#ffe4e6'] : ['#9f1239', '#e11d48', '#f43f5e'],
+          amber: isDark ? ['#e4e4e7', '#a1a1aa', '#ffffff'] : ['#18181b', '#3f3f46', '#52525b']
+        };
+
+        return {
+          isDark,
+          colors: accents[palette] || accents.ocean
+        };
+      }
+
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function createStar() {
+        return {
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: Math.random() * 1.4 + 0.4,
+          alpha: Math.random() * 0.65 + 0.15,
+          twinkleSpeed: (Math.random() * 0.015 + 0.005) * (Math.random() > 0.5 ? 1 : -1)
+        };
+      }
+
+      function createMeteor(initialRandomPos = false) {
+        const angle = Math.PI / 4 + (Math.random() * 0.14 - 0.07);
+        const speed = Math.random() * 7 + 7.5;
+        const startX = initialRandomPos
+          ? Math.random() * width
+          : Math.random() * (width * 1.15) - width * 0.1;
+        const startY = initialRandomPos
+          ? Math.random() * (height * 0.6)
+          : -30 - Math.random() * 120;
+
+        return {
+          x: startX,
+          y: startY,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          len: Math.random() * 85 + 65,
+          width: Math.random() * 1.8 + 1.1,
+          life: 1,
+          decay: Math.random() * 0.008 + 0.006,
+          colorIndex: Math.floor(Math.random() * 3)
+        };
+      }
+
+      function createRaindrop(randomY = true) {
+        const depth = Math.random() * 0.65 + 0.35;
+        return {
+          x: Math.random() * (width + 180) - 90,
+          y: randomY ? Math.random() * height : -20 - Math.random() * 120,
+          vx: -1.6 * depth,
+          vy: (11 + Math.random() * 7) * depth,
+          len: (14 + Math.random() * 14) * depth,
+          alpha: (document.documentElement.getAttribute('data-theme') === 'dark' ? 0.34 : 0.22) * depth,
+          width: Math.max(1, 1.5 * depth)
+        };
+      }
+
+      function initParticlesForMode(mode) {
+        stars = [];
+        meteors = [];
+        raindrops = [];
+        ripples = [];
+
+        if (mode === 'meteor') {
+          const starCount = Math.min(95, Math.floor((width * height) / 18000));
+          for (let i = 0; i < starCount; i++) stars.push(createStar());
+          for (let i = 0; i < 3; i++) meteors.push(createMeteor(true));
+        } else if (mode === 'rain') {
+          const dropCount = Math.min(130, Math.floor((width * height) / 12000));
+          for (let i = 0; i < dropCount; i++) raindrops.push(createRaindrop(true));
+        }
+      }
+
+      function drawMeteorFrame(now) {
+        const { isDark, colors } = getPaletteColors();
+        ctx.clearRect(0, 0, width, height);
+
+        for (let i = 0; i < stars.length; i++) {
+          const s = stars[i];
+          s.alpha += s.twinkleSpeed;
+          if (s.alpha <= 0.12 || s.alpha >= 0.85) s.twinkleSpeed *= -1;
+
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fillStyle = isDark
+            ? `rgba(244, 244, 245, ${s.alpha.toFixed(3)})`
+            : `${colors[0]}`;
+          ctx.globalAlpha = isDark ? 1 : Math.min(0.45, s.alpha * 0.55);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        if (now - lastMeteorSpawn > 950 && meteors.length < 7) {
+          meteors.push(createMeteor(false));
+          lastMeteorSpawn = now;
+        }
+
+        for (let i = meteors.length - 1; i >= 0; i--) {
+          const m = meteors[i];
+          m.x += m.vx;
+          m.y += m.vy;
+          m.life -= m.decay;
+
+          if (m.life <= 0 || m.x > width + 160 || m.y > height + 160) {
+            meteors.splice(i, 1);
+            continue;
+          }
+
+          const mag = Math.hypot(m.vx, m.vy) || 1;
+          const tailX = m.x - (m.vx / mag) * m.len;
+          const tailY = m.y - (m.vy / mag) * m.len;
+          const headColor = colors[m.colorIndex] || colors[0];
+
+          const grad = ctx.createLinearGradient(tailX, tailY, m.x, m.y);
+          grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+          grad.addColorStop(0.75, headColor);
+          grad.addColorStop(1, isDark ? '#ffffff' : headColor);
+
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, Math.min(1, m.life * (isDark ? 0.92 : 0.65)));
+          ctx.beginPath();
+          ctx.moveTo(tailX, tailY);
+          ctx.lineTo(m.x, m.y);
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = m.width;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, m.width * 1.45, 0, Math.PI * 2);
+          ctx.fillStyle = isDark ? '#ffffff' : headColor;
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function drawRainFrame() {
+        const { isDark, colors } = getPaletteColors();
+        ctx.clearRect(0, 0, width, height);
+
+        const strokeBase = isDark ? '186, 230, 253' : '30, 58, 138';
+
+        for (let i = 0; i < raindrops.length; i++) {
+          const d = raindrops[i];
+          d.x += d.vx;
+          d.y += d.vy;
+
+          if (d.y >= height - 6) {
+            if (ripples.length < 28 && Math.random() < 0.25) {
+              ripples.push({
+                x: d.x,
+                y: height - 4,
+                rx: 2,
+                ry: 0.8,
+                alpha: Math.min(0.45, d.alpha * 1.3),
+                color: colors[0]
+              });
+            }
+            Object.assign(d, createRaindrop(false));
+          }
+
+          const endX = d.x + d.vx * (d.len / Math.max(1, d.vy));
+          const endY = d.y + d.len;
+
+          ctx.beginPath();
+          ctx.moveTo(d.x, d.y);
+          ctx.lineTo(endX, endY);
+          ctx.strokeStyle = isDark
+            ? `rgba(${strokeBase}, ${d.alpha.toFixed(3)})`
+            : `rgba(${strokeBase}, ${d.alpha.toFixed(3)})`;
+          ctx.lineWidth = d.width;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+        }
+
+        for (let i = ripples.length - 1; i >= 0; i--) {
+          const rp = ripples[i];
+          rp.rx += 0.55;
+          rp.ry += 0.22;
+          rp.alpha -= 0.015;
+
+          if (rp.alpha <= 0) {
+            ripples.splice(i, 1);
+            continue;
+          }
+
+          ctx.beginPath();
+          ctx.ellipse(rp.x, rp.y, rp.rx, rp.ry, 0, 0, Math.PI * 2);
+          ctx.strokeStyle = isDark
+            ? `rgba(147, 197, 253, ${rp.alpha.toFixed(3)})`
+            : `rgba(30, 58, 138, ${rp.alpha.toFixed(3)})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+
+      function loop(now) {
+        if (currentMode === 'meteor') {
+          drawMeteorFrame(now);
+        } else if (currentMode === 'rain') {
+          drawRainFrame();
+        }
+        if (currentMode !== 'off') {
+          rafId = requestAnimationFrame(loop);
+        }
+      }
+
+      function applyBgEffect(mode) {
+        const nextMode = VALID_BG_MODES.includes(mode) ? mode : 'meteor';
+        currentMode = nextMode;
+        localStorage.setItem(BG_STORAGE_KEY, nextMode);
+
+        const selectEl = document.getElementById('bg-effect-select');
+        if (selectEl && selectEl.value !== nextMode) {
+          selectEl.value = nextMode;
+        }
+
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+
+        if (nextMode === 'off') {
+          canvas.classList.remove('is-active');
+          ctx.clearRect(0, 0, width, height);
+          return;
+        }
+
+        resizeCanvas();
+        initParticlesForMode(nextMode);
+        canvas.classList.add('is-active');
+        rafId = requestAnimationFrame(loop);
+      }
+
+      window.setBgEffect = applyBgEffect;
+
+      window.addEventListener('resize', () => {
+        if (currentMode === 'off') return;
+        resizeCanvas();
+        initParticlesForMode(currentMode);
+      });
+
+      const savedBg = localStorage.getItem(BG_STORAGE_KEY) || 'meteor';
+      applyBgEffect(savedBg);
     })();
 
 </script>
