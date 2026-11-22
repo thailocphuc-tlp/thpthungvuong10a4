@@ -1,881 +1,930 @@
 <!DOCTYPE html>
 <html lang="vi" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cổng Học Tập Trực Tuyến 10A4 - THPT Hùng Vương</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cổng Học Tập & Diễn Đàn Lớp 10A4 - THPT Hùng Vương</title>
   <style>
-    :root[data-theme="light"] {
-      --bg-main: #f0f4f8;
+    :root {
+      --bg-body: #f4f7fb;
       --bg-card: #ffffff;
-      --bg-input: #f8fafc;
-      --primary: #0056b3;
-      --primary-light: #e6f0fa;
-      --accent: #0284c7;
-      --accent-gradient: linear-gradient(135deg, #0056b3 0%, #0284c7 100%);
-      --text-main: #1e293b;
+      --bg-subtle: #f8fafc;
+      --text-main: #0f172a;
       --text-muted: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
       --border: #e2e8f0;
-      --border-glow: rgba(2, 132, 199, 0.2);
-      --danger: #dc2626;
-      --success: #059669;
+      --success: #16a34a;
       --warning: #d97706;
-      --pin-bg: #fffbeb;
-      --pin-border: #f59e0b;
-      --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+      --danger: #dc2626;
+      --shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+      --radius: 16px;
     }
 
-    :root[data-theme="dark"] {
-      --bg-main: #060b16;
-      --bg-card: #0f172a;
-      --bg-input: #1e293b;
-      --primary: #38bdf8;
-      --primary-light: rgba(56, 189, 248, 0.12);
-      --accent: #38bdf8;
-      --accent-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
-      --text-main: #f1f5f9;
+    [data-theme="dark"] {
+      --bg-body: #0b1120;
+      --bg-card: #111827;
+      --bg-subtle: #1e293b;
+      --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --border: rgba(255, 255, 255, 0.1);
-      --border-glow: rgba(56, 189, 248, 0.25);
-      --danger: #ef4444;
-      --success: #10b981;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --primary-soft: rgba(59, 130, 246, 0.15);
+      --border: #1e293b;
+      --success: #22c55e;
       --warning: #f59e0b;
-      --pin-bg: rgba(245, 158, 11, 0.08);
-      --pin-border: rgba(245, 158, 11, 0.45);
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      --danger: #ef4444;
+      --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; transition: background-color 0.25s, color 0.25s, border-color 0.25s; }
-    body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 70px; }
-
-    .navbar {
-      background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 24px;
-      position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center;
-      box-shadow: var(--shadow); gap: 10px; flex-wrap: wrap;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand img { width: 42px; height: 42px; object-fit: contain; border-radius: 50%; background: #fff; padding: 2px; border: 2px solid var(--primary); }
-    .brand-text h1 { font-size: 17px; font-weight: 800; color: var(--primary); line-height: 1.2; }
-    .brand-text span { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
-
-    .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-
-    .k12-tabs-bar {
-      background: var(--bg-card); border-bottom: 1px solid var(--border);
-      position: sticky; top: 67px; z-index: 90; padding: 0 16px;
-      display: flex; justify-content: center; gap: 4px; overflow-x: auto;
-    }
-    .k12-tab {
-      padding: 13px 16px; font-size: 13.5px; font-weight: 700; color: var(--text-muted);
-      background: transparent; border: none; border-bottom: 3px solid transparent; border-radius: 0;
-      cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;
-    }
-    .k12-tab:hover { color: var(--primary); background: var(--primary-light); }
-    .k12-tab.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--primary-light); }
-
-    .container { max-width: 1020px; margin: 22px auto; padding: 0 16px; }
-
-    .school-banner {
-      width: 100%; height: 210px; border-radius: 18px; overflow: hidden; margin-bottom: 20px;
-      border: 1px solid var(--border); box-shadow: var(--shadow); position: relative;
-    }
-    .school-banner img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.88); }
-    .banner-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to right, rgba(6, 11, 22, 0.85) 20%, rgba(6, 11, 22, 0.25) 100%);
-      padding: 26px; display: flex; flex-direction: column; justify-content: center; color: #fff;
-    }
-    .banner-tag { display: inline-block; width: fit-content; background: #0284c7; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; margin-bottom: 8px; }
-    .banner-overlay h3 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-    .banner-overlay p { font-size: 13px; color: #e2e8f0; max-width: 540px; }
-
-    .k12-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
-    @media(max-width: 768px) { .k12-stats-row { grid-template-columns: repeat(2, 1fr); } }
-    .k12-stat-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 16px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 12px;
-    }
-    .stat-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-    .stat-info span { display: block; font-size: 12px; color: var(--text-muted); font-weight: 600; }
-    .stat-info strong { font-size: 20px; font-weight: 800; color: var(--text-main); }
-
-    .grid-2-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
-    @media(max-width: 768px) { .grid-2-col { grid-template-columns: 1fr; } }
-
-    .k12-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 20px; box-shadow: var(--shadow); margin-bottom: 20px;
-    }
-    .card-header {
-      font-weight: 800; font-size: 15.5px; color: var(--primary); margin-bottom: 14px;
-      padding-bottom: 10px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.55;
+      transition: background 0.2s, color 0.2s;
     }
 
-    .schedule-table-wrapper { overflow-x: auto; }
-    .schedule-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; }
-    .schedule-table th, .schedule-table td { border: 1px solid var(--border); padding: 7px 5px; }
-    .schedule-table th { background: var(--primary-light); color: var(--primary); font-weight: 700; }
-    .schedule-table td.session-col { font-weight: 700; background: var(--bg-input); color: var(--text-muted); }
-
-    .leaderboard-list { display: flex; flex-direction: column; gap: 10px; }
-    .leader-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border); }
-    .leader-left { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-    .leader-left:hover .leader-name { color: var(--primary); text-decoration: underline; }
-    .rank-medal { font-size: 18px; width: 24px; text-align: center; font-weight: 800; }
-    .leader-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--primary); }
-    .leader-name { font-size: 13.5px; font-weight: 700; color: var(--text-main); }
-    .leader-stats { font-size: 11px; color: var(--text-muted); }
-    .leader-score { font-size: 12px; font-weight: 800; color: var(--warning); background: rgba(245, 158, 11, 0.12); padding: 4px 10px; border-radius: 99px; }
-
-    .deadline-list { display: flex; flex-direction: column; gap: 8px; max-height: 290px; overflow-y: auto; }
-    .deadline-item {
-      display: flex; align-items: center; justify-content: space-between; background: var(--bg-input);
-      padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border); font-size: 13px; gap: 10px;
-    }
-    .deadline-item.done { opacity: 0.6; text-decoration: line-through; background: transparent; }
-    .deadline-tag { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 700; margin-right: 6px; white-space: nowrap; }
-    .tag-urgent { background: rgba(220, 38, 38, 0.12); color: var(--danger); border: 1px solid rgba(220, 38, 38, 0.25); }
-    .tag-normal { background: var(--primary-light); color: var(--primary); border: 1px solid rgba(2, 132, 199, 0.25); }
-    .subject-chip { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 700; background: rgba(5, 150, 105, 0.12); color: var(--success); border: 1px solid rgba(5, 150, 105, 0.25); margin-right: 6px; white-space: nowrap; }
-    .deadline-add-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-    .deadline-add-row input { margin-bottom: 0; padding: 9px 12px; font-size: 13px; flex: 2; min-width: 180px; }
-    .deadline-add-row select { margin-bottom: 0; padding: 9px; font-size: 13px; width: 145px; }
-    .deadline-add-row button { padding: 9px 14px; font-size: 13px; width: auto; }
-
-    .exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
-    .exam-card {
-      background: var(--bg-input); border: 1px solid var(--border); border-radius: 14px;
-      padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
-    }
-    .exam-card:hover { border-color: var(--primary); }
-    .exam-title { font-size: 15px; font-weight: 800; color: var(--text-main); margin: 8px 0 6px; }
-    .exam-meta-list { font-size: 12.5px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
-    .exam-meta-list span { display: flex; justify-content: space-between; gap: 8px; }
-    .exam-meta-list strong { color: var(--text-main); }
-
-    .exam-runner-bar {
-      display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
-      background: var(--bg-input); border: 1px solid var(--border); padding: 12px 16px;
-      border-radius: 12px; margin-bottom: 16px; position: sticky; top: 118px; z-index: 80;
-    }
-    .timer-pill {
-      font-size: 13.5px; font-weight: 800; padding: 6px 12px; border-radius: 99px;
-      background: rgba(2, 132, 199, 0.14); color: var(--primary); border: 1px solid var(--border);
-    }
-    .timer-pill.warning-time {
-      background: rgba(220, 38, 38, 0.15); color: var(--danger); border-color: rgba(220, 38, 38, 0.35);
-    }
-
-    .quiz-card {
-      background: var(--bg-input); border: 1px solid var(--border); border-radius: 14px;
-      padding: 16px; margin-bottom: 14px;
-    }
-    .quiz-question { font-weight: 700; font-size: 14.5px; margin-bottom: 10px; }
-    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    @media(max-width: 600px) { .quiz-options { grid-template-columns: 1fr; } }
-    .quiz-opt-btn {
-      justify-content: flex-start; text-align: left; padding: 9px 12px; border-radius: 10px;
-      background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); font-size: 13px;
-    }
-    .quiz-opt-btn:hover { border-color: var(--primary); background: var(--primary-light); }
-    .quiz-opt-btn.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 700; }
-    .quiz-opt-btn.correct { background: rgba(5, 150, 105, 0.16); border-color: var(--success); color: var(--success); font-weight: 700; }
-    .quiz-opt-btn.wrong { background: rgba(220, 38, 38, 0.14); border-color: var(--danger); color: var(--danger); }
-    .quiz-explain {
-      margin-top: 10px; padding: 10px 12px; border-radius: 10px; font-size: 12.5px;
-      background: var(--bg-card); border-left: 3px solid var(--primary); color: var(--text-muted);
-    }
-
-    input, select, textarea {
-      width: 100%; padding: 11px 14px; margin-bottom: 12px; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--bg-input); color: var(--text-main); font-size: 14px;
-    }
-    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--border-glow); }
-
-    button {
-      padding: 10px 16px; border-radius: 10px; border: none; font-weight: 600; font-size: 13.5px;
-      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .btn-primary { background: var(--accent-gradient); color: #fff; width: 100%; }
-    .btn-primary:hover { opacity: 0.92; }
-    .btn-success { background: var(--success); color: white; width: 100%; }
-    .btn-pin { background: rgba(245, 158, 11, 0.12); color: var(--warning); padding: 5px 10px; font-size: 12px; border-radius: 8px; }
-    .btn-pin.active { background: var(--warning); color: #fff; }
-    .btn-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 5px 10px; font-size: 12px; border-radius: 8px; }
-    .btn-danger { background: rgba(220, 38, 38, 0.15); color: var(--danger); padding: 5px 10px; font-size: 12px; border-radius: 8px; }
-    .btn-ghost { background: transparent; color: var(--text-muted); padding: 7px 12px; border: 1px solid var(--border); border-radius: 9px; text-decoration: none; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
-    .btn-ghost:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-light); }
-
-    .auth-box {
-      max-width: 420px; margin: 70px auto; background: var(--bg-card);
-      padding: 32px; border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow);
-    }
-    .auth-box h2 { text-align: center; margin-bottom: 6px; font-weight: 800; color: var(--primary); }
-    .auth-box p { text-align: center; color: var(--text-muted); font-size: 13px; margin-bottom: 22px; }
-
-    .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .editor-toolbar { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-    .toolbar-btn { background: var(--bg-input); border: 1px solid var(--border); padding: 4px 10px; border-radius: 7px; font-size: 12px; color: var(--text-muted); }
-    .toolbar-btn:hover { color: var(--primary); border-color: var(--primary); }
-
-    .file-upload-box { border: 1.5px dashed var(--border); padding: 14px; border-radius: 12px; margin-bottom: 14px; background: var(--bg-input); text-align: center; }
-    .file-upload-box input[type="file"] { display: none; }
-    .custom-file-upload { display: inline-block; padding: 7px 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; color: var(--primary); font-weight: 600; cursor: pointer; margin-top: 6px; font-size: 13px; }
-
-    .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: var(--bg-card); padding: 14px; border-radius: 14px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-    .filter-bar input { flex: 2; min-width: 180px; margin-bottom: 0; }
-    .filter-bar select { flex: 1; min-width: 140px; margin-bottom: 0; }
-
-    .post-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 22px; margin-bottom: 18px; box-shadow: var(--shadow);
-    }
-    .post-card.pinned-post { background: var(--pin-bg); border: 1.5px solid var(--pin-border); }
-    .pin-banner { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--warning); background: rgba(245, 158, 11, 0.15); padding: 3px 10px; border-radius: 99px; margin-bottom: 10px; }
-
-    .post-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
-    .author-info { display: flex; align-items: center; gap: 12px; }
-    .profile-trigger { display: flex; align-items: center; gap: 12px; cursor: pointer; border-radius: 12px; padding: 2px 6px 2px 2px; }
-    .profile-trigger:hover { background: var(--primary-light); }
-    .profile-trigger:hover .author-name-text { color: var(--primary); text-decoration: underline; }
-    .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--primary); }
-    .author-name { font-weight: 700; font-size: 14.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .post-meta { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-    .edited-tag { font-size: 11px; color: var(--text-muted); font-style: italic; }
-    .badge { padding: 2px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; background: var(--primary-light); color: var(--primary); }
-    .admin-badge { font-size: 10px; background: rgba(5, 150, 105, 0.15); color: var(--success); padding: 2px 6px; border-radius: 5px; font-weight: 700; }
-
-    .post-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
-    .post-body { font-size: 14.5px; white-space: pre-wrap; word-break: break-word; margin-bottom: 14px; }
-
-    .attachment-box { margin-bottom: 14px; }
-    .attachment-box img { max-width: 100%; max-height: 400px; border-radius: 12px; border: 1px solid var(--border); }
-    .file-pill { display: inline-flex; align-items: center; gap: 8px; background: var(--primary-light); border: 1px solid var(--border); padding: 10px 14px; border-radius: 10px; color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 600; }
-
-    .post-actions { display: flex; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border); }
-    .action-btn { background: transparent; color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 13px; }
-    .action-btn:hover { background: var(--primary-light); color: var(--primary); }
-    .action-btn.liked { color: #e11d48; background: rgba(225, 29, 72, 0.1); }
-
-    .comments-area { margin-top: 14px; padding: 14px; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border); }
-    .comment-item { font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-    .comment-item:last-child { border-bottom: none; }
-    .comment-author { font-weight: 700; color: var(--primary); margin-right: 4px; cursor: pointer; }
-    .comment-author:hover { text-decoration: underline; }
-    .comment-img { max-width: 150px; max-height: 150px; border-radius: 8px; margin-top: 6px; display: block; }
-    .comment-actions { display: flex; gap: 4px; flex-shrink: 0; }
-    .comment-btn { background: none; border: none; color: var(--text-muted); font-size: 11px; padding: 2px 6px; border-radius: 6px; }
-    .comment-btn:hover { color: var(--primary); background: var(--bg-card); }
-    .comment-btn.liked { color: #e11d48; }
-
-    .comment-form { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
-    .comment-form input { margin-bottom: 0; padding: 8px 12px; font-size: 13px; flex: 1; }
-    .comment-form button { padding: 8px 14px; width: auto; }
-
-    .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-    .resource-card {
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px;
-      box-shadow: var(--shadow); display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
-    }
-
-    .user-avatar-lg { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
     .hidden { display: none !important; }
 
-    /* Modal xem profile riêng & Bio */
-    .profile-modal-backdrop {
-      position: fixed; inset: 0; background: rgba(6, 11, 22, 0.65);
-      backdrop-filter: blur(4px); z-index: 300; display: flex;
-      align-items: center; justify-content: center; padding: 16px;
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
     }
-    .profile-modal-card {
-      width: 100%; max-width: 470px; max-height: 88vh; overflow-y: auto;
-      background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
-      padding: 22px; box-shadow: var(--shadow);
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--primary);
     }
-    .profile-modal-top {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+
+    .nav-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .nav-tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 7px 13px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .nav-tab-btn:hover { background: var(--bg-subtle); color: var(--text-main); }
+    .nav-tab-btn.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-color: rgba(37, 99, 235, 0.25);
+    }
+
+    .nav-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    button { font-family: inherit; cursor: pointer; }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13.5px;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-ghost {
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .btn-ghost:hover { background: var(--border); }
+
+    .btn-warning {
+      background: rgba(217, 119, 6, 0.12);
+      color: var(--warning);
+      border: 1px solid rgba(217, 119, 6, 0.25);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .btn-danger {
+      background: rgba(220, 38, 38, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(220, 38, 38, 0.25);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .btn-pin {
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .btn-pin.active { background: #fef3c7; color: #92400e; border-color: #f59e0b; }
+
+    input[type="text"], input[type="email"], input[type="password"], textarea, select {
+      font-family: inherit;
+      background: var(--bg-subtle);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 13.5px;
+      width: 100%;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); }
+
+    .container { max-width: 1160px; margin: 22px auto; padding: 0 16px 48px; }
+
+    .auth-box {
+      max-width: 420px;
+      margin: 60px auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    /* Banner Split Row (Banner chính + Banner Bảng điểm kế bên) */
+    .banner-split-row {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 820px) {
+      .banner-split-row { grid-template-columns: 1fr; }
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #0ea5e9 100%);
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .hero-banner h1 { margin: 0 0 6px; font-size: 20px; font-weight: 800; }
+    .hero-banner p { margin: 0; font-size: 13.5px; opacity: 0.92; }
+
+    .grades-side-banner {
+      background: linear-gradient(135deg, #0f766e 0%, #0d9488 55%, #16a34a 100%);
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      border: 2px solid rgba(255, 255, 255, 0.22);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+    }
+    .grades-side-banner:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+      box-shadow: 0 10px 26px rgba(13, 148, 136, 0.28);
+    }
+    .grades-side-banner .banner-pill {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .grades-side-banner h2 { margin: 6px 0 4px; font-size: 18px; font-weight: 800; }
+    .grades-side-banner p { margin: 0; font-size: 13px; opacity: 0.95; }
+    .grades-banner-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.18);
+      padding: 7px 12px;
+      border-radius: 10px;
+      align-self: flex-start;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.85fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .quick-toolbar { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; }
+    .quick-chip {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .filter-bar {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 10px;
       margin-bottom: 14px;
     }
-    .profile-modal-hero { display: flex; align-items: center; gap: 14px; }
-    .profile-modal-avatar {
-      width: 62px; height: 62px; border-radius: 50%; object-fit: cover;
-      border: 2px solid var(--primary); flex-shrink: 0;
+    @media (max-width: 640px) { .filter-bar { grid-template-columns: 1fr; } }
+
+    .post-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
     }
-    .profile-bio-box {
-      background: var(--bg-input); border: 1px solid var(--border);
-      border-left: 3px solid var(--primary); border-radius: 12px;
-      padding: 12px 14px; font-size: 13.5px; color: var(--text-main);
-      margin-bottom: 14px; white-space: pre-wrap;
+    .post-card.pinned-post {
+      border-color: #f59e0b;
+      background: linear-gradient(to bottom, rgba(245, 158, 11, 0.05), var(--bg-card) 90px);
     }
-    .profile-mini-stats {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;
+    .pin-banner {
+      font-size: 12px;
+      font-weight: 700;
+      color: #b45309;
+      background: #fef3c7;
+      padding: 5px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: inline-block;
     }
-    .profile-mini-stat {
-      background: var(--bg-input); border: 1px solid var(--border); border-radius: 12px;
-      padding: 10px; text-align: center;
+    .post-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+    .author-info { display: flex; align-items: center; gap: 10px; }
+    .profile-trigger { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .profile-trigger:hover .author-name-text { text-decoration: underline; color: var(--primary); }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
     }
-    .profile-mini-stat strong { display: block; font-size: 16px; color: var(--primary); font-weight: 800; }
-    .profile-mini-stat span { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
-    .profile-recent-post {
-      background: var(--bg-input); border: 1px solid var(--border); border-radius: 11px;
-      padding: 10px 12px; margin-bottom: 8px; cursor: pointer;
+    .author-name { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .badge { background: var(--primary-soft); color: var(--primary); padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .admin-badge { background: #fee2e2; color: #b91c1c; padding: 2px 7px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .post-meta { font-size: 12px; color: var(--text-muted); }
+    .edited-tag { font-style: italic; color: var(--text-muted); font-size: 11.5px; }
+    .post-title { font-size: 16.5px; font-weight: 800; margin: 12px 0 6px; }
+    .post-body { white-space: pre-line; font-size: 14px; color: var(--text-main); }
+    .attachment-box { margin-top: 10px; }
+    .attachment-box img { max-width: 100%; max-height: 380px; border-radius: 12px; border: 1px solid var(--border); }
+    .file-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
     }
-    .profile-recent-post:hover { border-color: var(--primary); }
+
+    .post-actions { display: flex; gap: 10px; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .action-btn {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .action-btn.liked { background: #ffe4e6; color: #e11d48; border-color: #fda4af; }
+
+    .comments-area { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
+    .comment-item { background: var(--bg-subtle); border-radius: 10px; padding: 8px 12px; margin-bottom: 8px; font-size: 13px; }
+    .comment-author { font-weight: 700; color: var(--primary); cursor: pointer; margin-right: 6px; }
+    .comment-author:hover { text-decoration: underline; }
+    .comment-actions { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+    .comment-btn { background: none; border: none; color: var(--text-muted); font-size: 11.5px; padding: 0; font-weight: 600; }
+    .comment-btn.liked { color: #e11d48; }
+    .comment-img { max-width: 180px; border-radius: 8px; margin-top: 6px; }
+    .comment-form { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .stat-box { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; }
+    .stat-num { font-size: 20px; font-weight: 800; color: var(--primary); }
+    .stat-lbl { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+    .deadline-item {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 11px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .deadline-item.done { opacity: 0.6; text-decoration: line-through; }
+    .deadline-tag { padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-right: 4px; }
+    .tag-urgent { background: #fee2e2; color: #b91c1c; }
+    .tag-normal { background: #dbeafe; color: #1d4ed8; }
+    .subject-chip { background: var(--primary-soft); color: var(--primary); padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-right: 6px; }
+
+    .leader-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .leader-left { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .leader-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+    .leader-name { font-weight: 700; font-size: 13px; }
+    .leader-stats { font-size: 11px; color: var(--text-muted); }
+    .leader-score { font-weight: 800; color: var(--primary); font-size: 13px; }
+
+    .timetable-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .timetable-table th, .timetable-table td { border: 1px solid var(--border); padding: 9px 10px; text-align: center; }
+    .timetable-table th { background: var(--bg-subtle); font-weight: 700; }
+
+    .resource-grid, .exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 14px; }
+    .resource-card, .exam-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .exam-title { font-size: 15px; font-weight: 800; margin: 8px 0; }
+    .exam-meta-list { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--text-muted); }
+    .exam-meta-list > span { display: flex; justify-content: space-between; gap: 8px; }
+    .exam-meta-list strong { color: var(--text-main); }
+
+    .exam-runner-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      position: sticky;
+      top: 62px;
+      z-index: 20;
+    }
+    .timer-pill { background: var(--primary-soft); color: var(--primary); padding: 7px 14px; border-radius: 999px; font-weight: 800; font-size: 14px; }
+    .timer-pill.warning-time { background: #fee2e2; color: #dc2626; }
+
+    .quiz-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+    .quiz-question { font-weight: 700; font-size: 14.5px; margin-bottom: 10px; }
+    .quiz-options { display: grid; gap: 8px; }
+    .quiz-opt-btn {
+      text-align: left;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 13.5px;
+    }
+    .quiz-opt-btn.selected { border-color: var(--primary); background: var(--primary-soft); font-weight: 600; }
+    .quiz-opt-btn.correct { border-color: #16a34a; background: #dcfce7; color: #14532d; font-weight: 700; }
+    .quiz-opt-btn.wrong { border-color: #dc2626; background: #fee2e2; color: #7f1d1d; }
+    .quiz-explain { margin-top: 10px; background: var(--bg-subtle); border-left: 3px solid var(--primary); padding: 8px 12px; border-radius: 8px; font-size: 12.5px; }
+    .result-banner { background: var(--primary-soft); border: 1px solid rgba(37, 99, 235, 0.3); color: var(--text-main); padding: 14px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 14px; }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.58);
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-width: 520px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+    .grades-modal-card { max-width: 1080px; width: 100%; }
+
+    .grades-toolbar {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr auto;
+      gap: 10px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+    @media (max-width: 720px) { .grades-toolbar { grid-template-columns: 1fr; } }
+
+    .grades-table-wrap { overflow-x: auto; max-height: 60vh; border: 1px solid var(--border); border-radius: 12px; }
+    .grades-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 820px; }
+    .grades-table th, .grades-table td { border: 1px solid var(--border); padding: 7px 8px; text-align: center; white-space: nowrap; }
+    .grades-table thead th { position: sticky; top: 0; background: var(--bg-subtle); z-index: 5; font-weight: 700; }
+    .grades-table td.name-col, .grades-table th.name-col { text-align: left; position: sticky; left: 0; background: var(--bg-card); z-index: 2; font-weight: 600; }
+    .grades-table thead th.name-col { background: var(--bg-subtle); z-index: 6; }
+    .score-highlight { background: #fef08a !important; color: #854d0e !important; font-weight: 800; }
+
+    .profile-recent-post { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; }
   </style>
 </head>
 <body>
-
+  <!-- Navbar -->
   <nav class="navbar">
-    <div class="brand">
-      <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/logo.png" alt="Logo" />
-      <div class="brand-text">
-        <h1>K12 PORTAL • LỚP 10A4</h1>
-        <span>THPT Hùng Vương • Năm học 2026 - 2027</span>
-      </div>
+    <div class="brand"><span>🎓 10A4 - THPT Hùng Vương</span></div>
+    <div id="k12-nav-tabs" class="nav-tabs hidden">
+      <button type="button" id="tab-btn-home" class="nav-tab-btn active" onclick="switchTab('home')">📰 Bảng tin</button>
+      <button type="button" id="tab-btn-study" class="nav-tab-btn" onclick="switchTab('study')">📅 Thời khóa biểu</button>
+      <button type="button" id="tab-btn-quiz" class="nav-tab-btn" onclick="switchTab('quiz')">📝 Ôn kiểm tra</button>
+      <button type="button" id="tab-btn-docs" class="nav-tab-btn" onclick="switchTab('docs')">📚 Tài liệu</button>
+      <button type="button" id="tab-btn-profile" class="nav-tab-btn" onclick="switchTab('profile')">👤 Hồ sơ</button>
     </div>
     <div class="nav-right">
-      <a href="https://k12online.vn" target="_blank" rel="noopener noreferrer" class="btn-ghost">🔗 Mở K12 Online</a>
-      <button class="btn-ghost" onclick="toggleTheme()" id="theme-btn">🌓 Giao diện</button>
-      <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 10px;">
-        <span id="display-username" onclick="openUserProfileModal(currentUser?.email)" style="font-size: 13px; color: var(--text-main); font-weight: 700; cursor: pointer;" title="Xem hồ sơ cá nhân của bạn"></span>
-        <button class="btn-danger" onclick="handleLogout()">Đăng xuất</button>
+      <button type="button" class="btn-ghost" onclick="toggleTheme()" title="Đổi giao diện Sáng / Tối">🌓 Giao diện</button>
+      <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 8px;">
+        <span id="display-username" style="font-size: 13px; font-weight: 700;"></span>
+        <button type="button" class="btn-ghost" onclick="handleLogout()">Đăng xuất</button>
       </div>
     </div>
   </nav>
 
-  <div id="k12-nav-tabs" class="k12-tabs-bar hidden">
-    <button class="k12-tab active" id="tab-btn-home" onclick="switchTab('home')">🏠 Bảng tin & Thảo luận</button>
-    <button class="k12-tab" id="tab-btn-study" onclick="switchTab('study')">📝 Bài tập & Thời khóa biểu</button>
-    <button class="k12-tab" id="tab-btn-quiz" onclick="switchTab('quiz')">🎯 Ôn kiểm tra</button>
-    <button class="k12-tab" id="tab-btn-docs" onclick="switchTab('docs')">📚 Kho học liệu lớp</button>
-    <button class="k12-tab" id="tab-btn-profile" onclick="switchTab('profile')">👤 Hồ sơ cá nhân</button>
-  </div>
-
-  <div id="auth-view" class="container">
-    <div class="auth-box">
-      <h2>Cổng Học Tập 10A4</h2>
-      <p>Đăng nhập để xem thời khóa biểu, nộp bài tập và trao đổi tài liệu cùng lớp</p>
-      <input type="email" id="auth-email" placeholder="Email học sinh (VD: tenban@gmail.com)" />
-      <input type="password" id="auth-password" placeholder="Mật khẩu (tối thiểu 6 ký tự)" />
-      <div style="display: flex; gap: 10px; margin-top: 6px;">
-        <button class="btn-primary" onclick="handleLogin()">Đăng nhập</button>
-        <button class="btn-success" onclick="handleSignUp()">Đăng ký</button>
-      </div>
-      <div style="text-align: right; margin-top: 10px;">
-        <a href="#" onclick="handleForgotPassword(); return false;" style="font-size: 12.5px; color: var(--primary); text-decoration: none; font-weight: 600;">Quên mật khẩu?</a>
-      </div>
-      <p id="auth-msg" style="color: var(--danger); margin-top: 12px; text-align: center; font-size: 13px; font-weight: 600;"></p>
+  <!-- Auth View -->
+  <div id="auth-view" class="auth-box">
+    <h2 style="margin: 0 0 6px; font-size: 20px;">Đăng nhập Cổng Lớp 10A4</h2>
+    <p style="margin: 0 0 18px; font-size: 13px; color: var(--text-muted);">Dùng tài khoản học sinh để trao đổi bài tập, tài liệu và xem bảng điểm lớp.</p>
+    <div style="display: grid; gap: 10px;">
+      <input type="email" id="auth-email" placeholder="Email của bạn..." />
+      <input type="password" id="auth-password" placeholder="Mật khẩu (ít nhất 6 ký tự)..." onkeypress="if(event.key==='Enter') handleLogin()" />
+      <button type="button" class="btn-primary" onclick="handleLogin()">Đăng nhập</button>
+      <button type="button" class="btn-ghost" onclick="handleSignUp()">Đăng ký tài khoản mới</button>
+      <button type="button" class="comment-btn" style="text-align: center; margin-top: 4px;" onclick="handleForgotPassword()">Quên mật khẩu?</button>
     </div>
+    <div id="auth-msg" style="margin-top: 12px; font-size: 13px; font-weight: 600;"></div>
   </div>
 
+  <!-- Main App View -->
   <div id="forum-view" class="container hidden">
-    <div class="school-banner">
-      <img src="https://raw.githubusercontent.com/thailocphuc-tlp/thpthungvuong10a4/main/banner.jpg" alt="THPT Hùng Vương" />
-      <div class="banner-overlay">
-        <span class="banner-tag">HỆ THỐNG QUẢN LÝ HỌC TẬP NỘI BỘ</span>
-        <h3>Tập thể Lớp 10A4 - THPT Hùng Vương</h3>
-        <p>GVCN: Cô Nguyễn Như Ngọc • Cập nhật bài tập, thời khóa biểu, tài liệu ôn tập và góc sinh hoạt chung của lớp.</p>
-      </div>
-    </div>
-
-    <div class="k12-stats-row">
-      <div class="k12-stat-card">
-        <div class="stat-icon">💬</div>
-        <div class="stat-info"><span>Bài thảo luận</span><strong id="stat-posts">0</strong></div>
-      </div>
-      <div class="k12-stat-card">
-        <div class="stat-icon">📁</div>
-        <div class="stat-info"><span>Học liệu & Đề cương</span><strong id="stat-files">0</strong></div>
-      </div>
-      <div class="k12-stat-card">
-        <div class="stat-icon">⏰</div>
-        <div class="stat-info"><span>Bài tập đang mở</span><strong id="stat-tasks">0</strong></div>
-      </div>
-      <div class="k12-stat-card">
-        <div class="stat-icon">✅</div>
-        <div class="stat-info"><span>Đã hoàn thành</span><strong id="stat-tasks-done">0</strong></div>
-      </div>
-    </div>
-
-    <!-- TAB 1: BẢNG TIN & THẢO LUẬN -->
+    <!-- TAB 1: HOME -->
     <div id="view-tab-home">
-      <div class="grid-2-col">
-        <div class="k12-card" style="margin-bottom: 0;">
-          <div class="card-header">📌 Thông báo từ Ban cán sự lớp</div>
-          <p style="font-size: 13.5px; color: var(--text-main);">Chào mừng các thành viên 10A4! Các bạn kiểm tra mục <b>Bài tập & Thời khóa biểu</b> thường xuyên và ghé <b>Ôn kiểm tra</b> luyện câu hỏi theo sách <i>Kết nối tri thức</i> trước giờ kiểm tra nhé. 🚀</p>
-        </div>
-        <div class="k12-card" style="margin-bottom: 0;">
-          <div class="card-header">
-            <span>🏆 Bảng vàng tích cực</span>
-            <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Top 3 đóng góp</span>
+      <!-- Banner Split Row: Main Banner + Side Grades Banner -->
+      <div class="banner-split-row">
+        <div class="hero-banner">
+          <div>
+            <h1>Chào mừng đến với Cổng Học Tập 10A4</h1>
+            <p>Nơi chia sẻ bài giảng, nhắc nhở hạn bài tập, luyện trắc nghiệm theo SGK Kết nối tri thức và kết nối cả lớp.</p>
           </div>
-          <div id="leaderboard-container" class="leaderboard-list"></div>
+          <div style="font-size: 12px; opacity: 0.9;">THPT Hùng Vương • Năm học 2026 - 2027</div>
+        </div>
+
+        <div class="grades-side-banner" onclick="openClassGradesModal()" role="button" tabindex="0" onkeypress="if(event.key==='Enter') openClassGradesModal()" title="Bấm để xem bảng điểm giữa kì cả lớp 10A4">
+          <div>
+            <span class="banner-pill">📊 BẢNG ĐIỂM GIỮA KÌ</span>
+            <h2>Điểm Giữa Kì Lớp 10A4</h2>
+            <p>Tra cứu nhanh điểm từng môn của cả 50 học sinh và tô sáng môn học nổi bật.</p>
+          </div>
+          <div class="grades-banner-cta">
+            <span>Xem bảng điểm ngay</span>
+            <span>→</span>
+          </div>
         </div>
       </div>
 
-      <div class="k12-card">
-        <div class="card-header">✍️ Đăng bài thảo luận / Chia sẻ tài liệu mới</div>
-        <div class="form-row">
-          <input type="text" id="post-title" placeholder="Tiêu đề bài viết (VD: Đề cương Toán giữa kỳ...)" style="flex: 2;" />
-          <select id="post-category" style="flex: 1;">
-            <option value="Thảo luận">💬 Thảo luận chung</option>
-            <option value="Toán học">📐 Toán học</option>
-            <option value="Ngữ Văn">📖 Ngữ Văn</option>
-            <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-            <option value="Lịch sử">🏛️ Lịch sử</option>
-            <option value="Địa lý">🗺️ Địa lý</option>
-            <option value="Tin học">💻 Tin học</option>
-            <option value="GDĐP">📚 Giáo dục địa phương</option>
-            <option value="Giải trí">📸 Góc giải trí & Meme</option>
-          </select>
+      <div class="main-grid">
+        <!-- Feed Column -->
+        <div>
+          <div class="card">
+            <div class="card-title">✍️ Đăng bài / Chia sẻ tài liệu mới</div>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; margin-bottom: 8px;">
+              <input type="text" id="post-title" placeholder="Tiêu đề bài viết (ví dụ: Đề cương Toán giữa kì)..." />
+              <select id="post-category">
+                <option value="Thảo luận">Thảo luận</option>
+                <option value="Toán học">Toán học</option>
+                <option value="Ngữ Văn">Ngữ Văn</option>
+                <option value="Tiếng Anh">Tiếng Anh</option>
+                <option value="Lịch sử">Lịch sử</option>
+                <option value="Địa lý">Địa lý</option>
+                <option value="Tin học">Tin học</option>
+                <option value="GDKT & PL">GDKT & PL</option>
+              </select>
+            </div>
+            <textarea id="post-content" rows="3" placeholder="Nội dung trao đổi, câu hỏi hoặc ghi chú bài học..."></textarea>
+            <div class="quick-toolbar">
+              <button type="button" class="quick-chip" onclick="insertContent('\n📌 Lưu ý quan trọng: ')">+ Lưu ý</button>
+              <button type="button" class="quick-chip" onclick="insertContent('\n❓ Câu hỏi cần giải đáp: ')">+ Câu hỏi</button>
+              <button type="button" class="quick-chip" onclick="insertContent('\n📎 Tài liệu tham khảo: ')">+ Tài liệu</button>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="post-file" class="btn-ghost">📎 Đính kèm ảnh / tệp</label>
+                <input type="file" id="post-file" style="display: none;" onchange="document.getElementById('post-file-chosen').innerText = this.files[0] ? this.files[0].name : ''" />
+                <span id="post-file-chosen" style="font-size: 12px; color: var(--text-muted);"></span>
+              </div>
+              <button type="button" id="btn-submit-post" class="btn-primary" onclick="createPost()">🚀 Đăng lên cổng học tập</button>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <input type="text" id="search-input" placeholder="🔍 Tìm theo tiêu đề, nội dung, email..." oninput="applyFilters()" />
+            <select id="filter-category" onchange="applyFilters()">
+              <option value="all">Tất cả chủ đề / môn</option>
+              <option value="Thảo luận">Thảo luận</option>
+              <option value="Toán học">Toán học</option>
+              <option value="Ngữ Văn">Ngữ Văn</option>
+              <option value="Tiếng Anh">Tiếng Anh</option>
+              <option value="Lịch sử">Lịch sử</option>
+              <option value="Địa lý">Địa lý</option>
+              <option value="Tin học">Tin học</option>
+              <option value="GDKT & PL">GDKT & PL</option>
+            </select>
+            <select id="sort-order" onchange="applyFilters()">
+              <option value="newest">Mới nhất trước</option>
+              <option value="popular">Nhiều lượt thích nhất</option>
+            </select>
+          </div>
+
+          <div id="posts-list"></div>
         </div>
 
-        <div class="editor-toolbar">
-          <button type="button" class="toolbar-btn" onclick="insertContent(' 😊 ')">😊 Emoji</button>
-          <button type="button" class="toolbar-btn" onclick="insertContent(' 📚 #TaiLieu ')"># Tài liệu</button>
-          <button type="button" class="toolbar-btn" onclick="insertContent(' ❓ #HoiBai ')"># Hỏi bài</button>
-          <button type="button" class="toolbar-btn" onclick="insertContent(' 📸 #GiaiTri ')"># Giải trí</button>
-        </div>
+        <!-- Sidebar Column -->
+        <div>
+          <div class="card">
+            <div class="card-title">📊 Thống kê lớp 10A4</div>
+            <div class="stats-grid">
+              <div class="stat-box"><div id="stat-posts" class="stat-num">0</div><div class="stat-lbl">Bài viết</div></div>
+              <div class="stat-box"><div id="stat-files" class="stat-num">0</div><div class="stat-lbl">Tài liệu đính kèm</div></div>
+              <div class="stat-box"><div id="stat-tasks" class="stat-num">0</div><div class="stat-lbl">Việc cần làm</div></div>
+              <div class="stat-box"><div id="stat-tasks-done" class="stat-num">0</div><div class="stat-lbl">Đã hoàn thành</div></div>
+            </div>
+          </div>
 
-        <textarea id="post-content" rows="3" placeholder="Nhập nội dung câu hỏi, bài giảng hoặc chia sẻ của bạn..."></textarea>
-        
-        <div class="file-upload-box">
-          <span style="font-size: 12.5px; color: var(--text-muted); display: block;">📎 Đính kèm ảnh, PDF, Word, PowerPoint, ZIP...</span>
-          <label for="post-file" class="custom-file-upload">Chọn tệp từ máy</label>
-          <input type="file" id="post-file" accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar" onchange="document.getElementById('post-file-chosen').innerText = this.files[0] ? this.files[0].name : '';" />
-          <div id="post-file-chosen" style="font-size: 12px; color: var(--primary); margin-top: 6px; font-weight: 600;"></div>
-        </div>
+          <div class="card">
+            <div class="card-title">📌 Nhiệm vụ & Hạn bài tập</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+              <select id="new-deadline-subject">
+                <option value="Toán học">Toán học</option>
+                <option value="Ngữ Văn">Ngữ Văn</option>
+                <option value="Tiếng Anh">Tiếng Anh</option>
+                <option value="Lịch sử">Lịch sử</option>
+                <option value="Địa lý">Địa lý</option>
+                <option value="Tin học">Tin học</option>
+                <option value="GDKT & PL">GDKT & PL</option>
+                <option value="Thảo luận">Thảo luận</option>
+              </select>
+              <select id="new-deadline-type">
+                <option value="normal">📘 Bài tập</option>
+                <option value="urgent">🔥 Hạn gấp</option>
+              </select>
+            </div>
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+              <input type="text" id="new-deadline-text" placeholder="Nhập nội dung nhiệm vụ..." onkeypress="if(event.key==='Enter') addDeadline()" />
+              <button type="button" id="btn-add-deadline" class="btn-primary" style="white-space: nowrap;" onclick="addDeadline()">+ Giao việc</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+              <select id="deadline-filter" onchange="renderDeadlines()">
+                <option value="all">Tất cả trạng thái</option>
+                <option value="pending">Chưa xong</option>
+                <option value="done">Đã hoàn thành</option>
+              </select>
+              <select id="deadline-subject-filter" onchange="renderDeadlines()">
+                <option value="all">Tất cả môn</option>
+                <option value="Toán học">Toán học</option>
+                <option value="Ngữ Văn">Ngữ Văn</option>
+                <option value="Tiếng Anh">Tiếng Anh</option>
+                <option value="Lịch sử">Lịch sử</option>
+                <option value="Địa lý">Địa lý</option>
+                <option value="Tin học">Tin học</option>
+                <option value="GDKT & PL">GDKT & PL</option>
+                <option value="Thảo luận">Thảo luận</option>
+              </select>
+            </div>
+            <div id="deadline-list"></div>
+          </div>
 
-        <button id="btn-submit-post" class="btn-primary" onclick="createPost()">🚀 Đăng lên cổng học tập</button>
+          <div class="card">
+            <div class="card-title">🏆 Bảng xếp hạng tích cực</div>
+            <div id="leaderboard-container"></div>
+          </div>
+        </div>
       </div>
-
-      <div class="filter-bar">
-        <input type="text" id="search-input" onkeyup="applyFilters()" placeholder="🔍 Tìm kiếm tiêu đề, nội dung hoặc tác giả..." />
-        <select id="filter-category" onchange="applyFilters()">
-          <option value="all">Tất cả môn & chuyên mục</option>
-          <option value="Thảo luận">💬 Thảo luận chung</option>
-          <option value="Toán học">📐 Toán học</option>
-          <option value="Ngữ Văn">📖 Ngữ Văn</option>
-          <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-          <option value="Lịch sử">🏛️ Lịch sử</option>
-          <option value="Địa lý">🗺️ Địa lý</option>
-          <option value="Tin học">💻 Tin học</option>
-          <option value="GDĐP">📚 Giáo dục địa phương</option>
-          <option value="Giải trí">📸 Góc giải trí & Meme</option>
-        </select>
-        <select id="sort-order" onchange="applyFilters()">
-          <option value="newest">🕒 Mới nhất</option>
-          <option value="popular">❤️ Nhiều thích nhất</option>
-        </select>
-      </div>
-
-      <div id="posts-list"></div>
     </div>
 
-    <!-- TAB 2: BÀI TẬP & THỜI KHÓA BIỂU -->
+    <!-- TAB 2: TIMETABLE -->
     <div id="view-tab-study" class="hidden">
-      <div class="k12-card">
-        <div class="card-header">
-          <span>📝 Nhiệm vụ học tập & Hạn nộp bài theo môn</span>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <select id="deadline-subject-filter" onchange="renderDeadlines()" style="width: 155px; margin-bottom: 0; padding: 5px 10px; font-size: 12px;">
-              <option value="all">Tất cả môn học</option>
-              <option value="Toán học">📐 Toán học</option>
-              <option value="Ngữ Văn">📖 Ngữ Văn</option>
-              <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-              <option value="Lịch sử">🏛️ Lịch sử</option>
-              <option value="Địa lý">🗺️ Địa lý</option>
-              <option value="Tin học">💻 Tin học</option>
-              <option value="GDĐP">📚 Giáo dục địa phương</option>
-              <option value="Thảo luận">💬 Chung</option>
-            </select>
-            <select id="deadline-filter" onchange="renderDeadlines()" style="width: 140px; margin-bottom: 0; padding: 5px 10px; font-size: 12px;">
-              <option value="all">Mọi trạng thái</option>
-              <option value="pending">⏳ Chưa xong</option>
-              <option value="done">✅ Đã xong</option>
-            </select>
-          </div>
-        </div>
-        <div id="deadline-list" class="deadline-list"></div>
-        <div class="deadline-add-row">
-          <select id="new-deadline-subject" style="width: 150px;">
-            <option value="Toán học">📐 Toán học</option>
-            <option value="Ngữ Văn">📖 Ngữ Văn</option>
-            <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-            <option value="Lịch sử">🏛️ Lịch sử</option>
-            <option value="Địa lý">🗺️ Địa lý</option>
-            <option value="Tin học">💻 Tin học</option>
-            <option value="GDĐP">📚 Giáo dục địa phương</option>
-            <option value="Thảo luận">💬 Chung</option>
-          </select>
-          <input type="text" id="new-deadline-text" placeholder="VD: Làm bài tập trang 45 trước thứ 6..." onkeypress="if(event.key==='Enter') addDeadline()" />
-          <select id="new-deadline-type">
-            <option value="urgent">🔥 Hạn gấp</option>
-            <option value="normal">📘 Bài tập</option>
-          </select>
-          <button id="btn-add-deadline" class="btn-primary" onclick="addDeadline()">+ Giao việc</button>
-        </div>
-      </div>
-
-      <div class="k12-card">
-        <div class="card-header">📅 Thời Khóa Biểu Chính Thức Lớp 10A4 (Học kỳ I)</div>
-        <div class="schedule-table-wrapper">
-          <table class="schedule-table">
+      <div class="card">
+        <div class="card-title">📅 Thời khóa biểu lớp 10A4 (Tham khảo)</div>
+        <div style="overflow-x: auto;">
+          <table class="timetable-table">
             <thead>
-              <tr>
-                <th>Tiết</th>
-                <th>Thứ 2</th>
-                <th>Thứ 3</th>
-                <th>Thứ 4</th>
-                <th>Thứ 5</th>
-                <th>Thứ 6</th>
-                <th>Thứ 7</th>
-              </tr>
+              <tr><th>Tiết</th><th>Thứ 2</th><th>Thứ 3</th><th>Thứ 4</th><th>Thứ 5</th><th>Thứ 6</th><th>Thứ 7</th></tr>
             </thead>
             <tbody>
-              <tr><td class="session-col">Sáng 1</td><td>Chào cờ</td><td>Địa lý</td><td>Anh NN</td><td>Ngữ văn</td><td>Mỹ thuật</td><td>HĐTN-LMS</td></tr>
-              <tr><td class="session-col">Sáng 2</td><td>SHL</td><td>Tin học</td><td>Anh NN</td><td>Ngữ văn</td><td>Mỹ thuật</td><td>-</td></tr>
-              <tr><td class="session-col">Sáng 3</td><td>Ngữ văn</td><td>Ngữ văn</td><td>GDKT-PL</td><td>Toán</td><td>Tin học</td><td>-</td></tr>
-              <tr><td class="session-col">Sáng 4</td><td>Tiếng Anh</td><td>Toán</td><td>GDKT-PL</td><td>Địa lý</td><td>-</td><td>-</td></tr>
-              <tr><td class="session-col">Chiều 1</td><td>-</td><td>GDĐP</td><td>Toán</td><td>Lịch sử</td><td>-</td><td>-</td></tr>
-              <tr><td class="session-col">Chiều 2</td><td>-</td><td>GDKT-PL</td><td>Toán</td><td>GD QP-AN</td><td>-</td><td>-</td></tr>
-              <tr><td class="session-col">Chiều 3</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
-              <tr><td class="session-col">Chiều 4</td><td>GDTC</td><td>Tiếng Anh</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>
+              <tr><td>1</td><td>Chào cờ</td><td>Toán</td><td>Văn</td><td>Anh</td><td>Lịch sử</td><td>Địa lý</td></tr>
+              <tr><td>2</td><td>Văn</td><td>Toán</td><td>Văn</td><td>Anh</td><td>Tin học</td><td>GDKT & PL</td></tr>
+              <tr><td>3</td><td>Toán</td><td>Lịch sử</td><td>Tin học</td><td>Toán</td><td>GDĐP</td><td>SHCN</td></tr>
+              <tr><td>4</td><td>Anh</td><td>Địa lý</td><td>GDKT & PL</td><td>GDTC</td><td>QPAN</td><td>HĐTN</td></tr>
+              <tr><td>5</td><td>GDTC</td><td>QPAN</td><td>HĐTN</td><td>Tin học</td><td>Toán</td><td>Văn</td></tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- TAB 3: ÔN KIỂM TRA (BỐ CỤC LƯỚI THẺ & THỜI GIAN QUY ĐỊNH KIỂU K12 ONLINE) -->
+    <!-- TAB 3: QUIZ / EXAM -->
     <div id="view-tab-quiz" class="hidden">
-      <div id="exam-catalog-view" class="k12-card">
-        <div class="card-header">
-          <span>🎯 Danh Sách Bài Ôn Kiểm Tra Theo Môn (K12 Style)</span>
-          <select id="quiz-subject-filter" onchange="renderExamCatalog()" style="width: 215px; margin-bottom: 0; padding: 6px 10px; font-size: 12.5px;">
-            <option value="all">Tất cả môn ôn tập</option>
-            <option value="Tin học">💻 Tin học 10 - KNTT</option>
-            <option value="Toán học">📐 Toán học 10 - KNTT</option>
-            <option value="Ngữ Văn">📖 Ngữ văn 10 - KNTT</option>
-            <option value="Lịch sử">🏛️ Lịch sử 10 - KNTT</option>
-            <option value="Địa lý">🗺️ Địa lý 10 - KNTT</option>
-            <option value="Tiếng Anh">🇬🇧 Tiếng Anh 10</option>
-          </select>
+      <div id="exam-catalog-view">
+        <div class="card">
+          <div class="card-title">
+            <span>📝 Ngân hàng ôn kiểm tra 10A4</span>
+            <select id="quiz-subject-filter" style="max-width: 210px;" onchange="renderExamCatalog()">
+              <option value="all">Tất cả môn học</option>
+              <option value="Tin học">Tin học</option>
+              <option value="Toán học">Toán học</option>
+              <option value="Ngữ Văn">Ngữ Văn</option>
+              <option value="Lịch sử">Lịch sử</option>
+              <option value="Địa lý">Địa lý</option>
+              <option value="Tiếng Anh">Tiếng Anh</option>
+            </select>
+          </div>
+          <p style="margin: 0; font-size: 13px; color: var(--text-muted);">Chọn đề ôn bên dưới để làm bài có tính giờ và xem giải thích chi tiết ngay sau khi nộp.</p>
         </div>
         <div id="exam-catalog-grid" class="exam-grid"></div>
       </div>
 
-      <div id="exam-runner-view" class="k12-card hidden">
-        <div class="card-header">
-          <span id="runner-exam-title">Bài ôn kiểm tra</span>
-          <button class="btn-ghost" onclick="exitExamRunner()">← Danh sách đề ôn</button>
-        </div>
-
-        <div class="exam-runner-bar">
+      <div id="exam-runner-view" class="hidden">
+        <div class="exam-runner-header">
+          <div>
+            <div id="runner-exam-title" style="font-weight: 800; font-size: 16px;"></div>
+            <div id="runner-progress-text" style="font-size: 12.5px; color: var(--text-muted);"></div>
+          </div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <span class="timer-pill" id="exam-timer-display">⏱️ 25:00</span>
-            <span id="runner-progress-text" style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Đã chọn: 0 / 0 câu</span>
-          </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn-ghost" onclick="restartCurrentExam()">🔄 Làm lại</button>
-            <button class="btn-success" id="btn-submit-exam" onclick="submitExam()" style="width: auto; padding: 8px 16px;">✅ Nộp bài ôn</button>
+            <span id="exam-timer-display" class="timer-pill">⏱️ 00:00</span>
+            <button type="button" id="btn-submit-exam" class="btn-primary" onclick="submitExam(false)">✅ Nộp bài</button>
+            <button type="button" class="btn-ghost" onclick="restartCurrentExam()">🔄 Làm lại</button>
+            <button type="button" class="btn-ghost" onclick="exitExamRunner()">← Danh sách đề</button>
           </div>
         </div>
-
-        <div id="exam-result-summary" class="quiz-explain hidden" style="margin-bottom: 16px; font-size: 13.5px;"></div>
+        <div id="exam-result-summary" class="result-banner hidden"></div>
         <div id="exam-questions-container"></div>
       </div>
     </div>
 
-    <!-- TAB 4: KHO HỌC LIỆU LỚP -->
+    <!-- TAB 4: DOCS -->
     <div id="view-tab-docs" class="hidden">
-      <div class="k12-card">
-        <div class="card-header">
-          <span>📚 Kho Tài Liệu, Đề Cương & Bài Giảng 10A4</span>
-          <select id="docs-subject-filter" onchange="renderDocsLibrary()" style="width: 180px; margin-bottom: 0; padding: 6px 10px; font-size: 12.5px;">
-            <option value="all">Tất cả môn học</option>
-            <option value="Toán học">📐 Toán học</option>
-            <option value="Ngữ Văn">📖 Ngữ Văn</option>
-            <option value="Tiếng Anh">🇬🇧 Tiếng Anh</option>
-            <option value="Lịch sử">🏛️ Lịch sử</option>
-            <option value="Địa lý">🗺️ Địa lý</option>
-            <option value="Tin học">💻 Tin học</option>
-            <option value="GDĐP">📚 Giáo dục địa phương</option>
-            <option value="Thảo luận">💬 Chung</option>
+      <div class="card">
+        <div class="card-title">
+          <span>📚 Kho tài liệu lớp 10A4</span>
+          <select id="docs-subject-filter" style="max-width: 210px;" onchange="renderDocsLibrary()">
+            <option value="all">Tất cả môn</option>
+            <option value="Thảo luận">Thảo luận</option>
+            <option value="Toán học">Toán học</option>
+            <option value="Ngữ Văn">Ngữ Văn</option>
+            <option value="Tiếng Anh">Tiếng Anh</option>
+            <option value="Lịch sử">Lịch sử</option>
+            <option value="Địa lý">Địa lý</option>
+            <option value="Tin học">Tin học</option>
+            <option value="GDKT & PL">GDKT & PL</option>
           </select>
         </div>
         <div id="docs-library-grid" class="resource-grid"></div>
       </div>
     </div>
 
-    <!-- TAB 5: HỒ SƠ CÁ NHÂN -->
+    <!-- TAB 5: PROFILE -->
     <div id="view-tab-profile" class="hidden">
-      <div class="k12-card">
-        <div class="card-header">👤 Thông tin hồ sơ học sinh 10A4</div>
-        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
-          <img id="profile-avatar-preview" src="" alt="Avatar" class="user-avatar-lg" />
+      <div class="card" style="max-width: 620px; margin: 0 auto;">
+        <div class="card-title">👤 Hồ sơ cá nhân</div>
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+          <img id="profile-avatar-preview" src="" alt="Avatar" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);" />
           <div>
-            <strong id="profile-display-name" style="font-size: 18px; display: block;">Học sinh 10A4</strong>
-            <span id="profile-email-txt" style="font-size: 13px; color: var(--text-muted); display: block;"></span>
-            <p id="profile-bio-txt" style="font-size: 13.5px; color: var(--primary); font-style: italic; margin-top: 6px;"></p>
+            <div id="profile-display-name" style="font-size: 18px; font-weight: 800;"></div>
+            <div id="profile-email-txt" style="font-size: 13px; color: var(--text-muted);"></div>
+            <div id="profile-bio-txt" style="font-size: 13px; margin-top: 4px; font-style: italic;"></div>
           </div>
         </div>
-        <div style="max-width: 480px;">
-          <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Tên hiển thị trên cổng học tập</label>
-          <input type="text" id="input-new-name" placeholder="Nhập họ tên hoặc biệt danh..." />
-          
-          <label style="font-size: 12.5px; font-weight: 700; color: var(--text-muted);">Tiểu sử / Giới thiệu ngắn (Bio)</label>
-          <input type="text" id="input-new-bio" placeholder="VD: Thành viên 10A4 • Đam mê Toán & Tin học..." />
-          
-          <div style="margin-bottom: 14px;">
-            <label for="input-avatar-file" class="custom-file-upload">📁 Tải ảnh đại diện mới</label>
-            <input type="file" id="input-avatar-file" accept="image/*" style="display:none;" onchange="document.getElementById('file-chosen-txt').innerText = this.files[0] ? this.files[0].name : '';" />
-            <span id="file-chosen-txt" style="font-size: 12px; color: var(--text-muted); margin-left: 8px;"></span>
-          </div>
-          
-          <button class="btn-success" onclick="saveProfile()" style="width: auto; padding: 10px 22px;">💾 Lưu thay đổi hồ sơ</button>
+        <div style="display: grid; gap: 10px;">
+          <div><label style="font-size: 12.5px; font-weight: 600;">Tên hiển thị</label><input type="text" id="input-new-name" /></div>
+          <div><label style="font-size: 12.5px; font-weight: 600;">Tiểu sử (Bio)</label><textarea id="input-new-bio" rows="2" placeholder="Giới thiệu ngắn về bản thân..."></textarea></div>
+          <div><label style="font-size: 12.5px; font-weight: 600;">Ảnh đại diện mới</label><input type="file" id="input-avatar-file" accept="image/*" /></div>
+          <button type="button" class="btn-primary" onclick="saveProfile()">💾 Lưu hồ sơ</button>
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- MODAL XEM PROFILE RIÊNG & BIO KHI BẤM VÀO TÁC GIẢ -->
-  <div id="user-profile-modal" class="profile-modal-backdrop hidden" onclick="if(event.target === this) closeUserProfileModal()">
-    <div class="profile-modal-card">
-      <div class="profile-modal-top">
-        <div class="profile-modal-hero">
-          <img id="modal-user-avatar" src="" alt="Avatar" class="profile-modal-avatar" />
+  <!-- Class Mid-Term Grades Modal -->
+  <div id="class-grades-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeClassGradesModal()">
+    <div class="modal-card grades-modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 800;">📊 Tổng Hợp Kết Quả Đợt 2 (Giữa Kì) - Lớp 10A4</h3>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Trường THPT Hùng Vương • Năm học 2026-2027 • GVCN: Nguyễn Như Ngọc</div>
+          <div id="grade-count-info" style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;"></div>
+        </div>
+        <button type="button" class="btn-ghost" onclick="closeClassGradesModal()">✕ Đóng</button>
+      </div>
+
+      <div class="grades-toolbar">
+        <input type="text" id="grade-search-input" placeholder="🔍 Tìm theo STT hoặc họ tên học sinh..." oninput="renderClassGradesTable()" />
+        <select id="grade-highlight-subject" onchange="renderClassGradesTable()">
+          <option value="all">Tô sáng môn: Không chọn</option>
+          <option value="van">Ngữ Văn</option>
+          <option value="toan">Toán học</option>
+          <option value="anh">Tiếng Anh</option>
+          <option value="qpan">GDQP-AN</option>
+          <option value="su">Lịch sử</option>
+          <option value="dia">Địa lý</option>
+          <option value="gdktpl">GDKT & PL</option>
+          <option value="tin">Tin học</option>
+        </select>
+        <button type="button" class="btn-ghost" onclick="document.getElementById('grade-search-input').value=''; document.getElementById('grade-highlight-subject').value='all'; renderClassGradesTable();">Đặt lại</button>
+      </div>
+
+      <div class="grades-table-wrap">
+        <table class="grades-table">
+          <thead>
+            <tr>
+              <th>STT</th><th class="name-col">Họ và tên</th><th>Nữ</th><th>Văn</th><th>Toán</th><th>Anh</th>
+              <th>GDTC</th><th>QPAN</th><th>HĐTN</th><th>GDĐP</th><th>Sử</th><th>Địa</th><th>KTPL</th><th>Tin</th><th>MT</th><th>CP</th><th>KP</th>
+            </tr>
+          </thead>
+          <tbody id="class-grades-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Profile Modal -->
+  <div id="user-profile-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeUserProfileModal()">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img id="modal-user-avatar" src="" alt="Avatar" style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);" />
           <div>
-            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-              <strong id="modal-user-name" style="font-size: 18px; color: var(--text-main);"></strong>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <strong id="modal-user-name" style="font-size: 16px;"></strong>
               <span id="modal-user-role-badge"></span>
             </div>
-            <div id="modal-user-email" style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;"></div>
+            <div id="modal-user-email" style="font-size: 12.5px; color: var(--text-muted);"></div>
           </div>
         </div>
-        <button type="button" class="btn-ghost" onclick="closeUserProfileModal()">✕ Đóng</button>
+        <button type="button" class="btn-ghost" onclick="closeUserProfileModal()">✕</button>
       </div>
 
-      <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">📝 TIỂU SỬ (BIO)</div>
-      <div id="modal-user-bio" class="profile-bio-box"></div>
+      <p id="modal-user-bio" style="background: var(--bg-subtle); padding: 10px 12px; border-radius: 10px; font-size: 13px; margin: 14px 0;"></p>
 
-      <div class="profile-mini-stats">
-        <div class="profile-mini-stat">
-          <strong id="modal-stat-posts">0</strong>
-          <span>Bài đăng</span>
-        </div>
-        <div class="profile-mini-stat">
-          <strong id="modal-stat-comments">0</strong>
-          <span>Bình luận</span>
-        </div>
-        <div class="profile-mini-stat">
-          <strong id="modal-stat-likes">0</strong>
-          <span>Lượt thích</span>
-        </div>
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 14px;">
+        <div class="stat-box"><div id="modal-stat-posts" class="stat-num">0</div><div class="stat-lbl">Bài đăng</div></div>
+        <div class="stat-box"><div id="modal-stat-comments" class="stat-num">0</div><div class="stat-lbl">Bình luận</div></div>
+        <div class="stat-box"><div id="modal-stat-likes" class="stat-num">0</div><div class="stat-lbl">Lượt thích nhận</div></div>
       </div>
 
-      <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">📌 BÀI VIẾT GẦN ĐÂY</div>
+      <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Bài viết gần đây</div>
       <div id="modal-user-posts"></div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://kafwlqcqqtvodzjgqdsw.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
+    // ⚠️ THAY 2 DÒNG DƯỚI ĐÂY BẰNG URL VÀ ANON KEY SUPABASE CỦA LỚP BẠN:
+    const SUPABASE_URL = window.SUPABASE_URL || 'https://https://kafwlqcqqtvodzjgqdsw.supabase.co';
+    const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'sb_publishable__kbhfIcsvg0LldYLgYEGcw_LWHEyOvq';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const EXAM_MODULES = [
-      {
-        id: 'exam_tin_10',
-        subject: 'Tin học',
-        title: 'Ôn kiểm tra Tin học 10 - Chủ đề 1 & An toàn số',
-        durationMinutes: 25,
-        curriculum: 'SGK Kết nối tri thức 10',
-        attemptRule: 'Không giới hạn lượt ôn',
-        questions: [
-          { q: 'Đặc điểm nổi bật nhất của xã hội tri thức so với xã hội công nghiệp là gì?', opts: ['Tri thức là lực lượng sản xuất chủ yếu, CNTT gắn liền với mọi hoạt động', 'Chỉ dựa vào khai thác tài nguyên thô', 'Không còn sử dụng máy tính', 'Chỉ áp dụng cho ngành xuất bản giấy'], ans: 0, ex: 'Xã hội tri thức lấy tri thức và công nghệ thông tin - truyền thông làm động lực phát triển cốt lõi.' },
-          { q: 'Khái niệm nào sau đây phản ánh đúng nhất "dữ liệu"?', opts: ['Ý nghĩa con người rút ra để ra quyết định', 'Thông tin thô, số liệu, kí hiệu, hình ảnh chưa được xử lí', 'Kinh nghiệm sống lâu năm', 'Phần mềm ứng dụng trên điện thoại'], ans: 1, ex: 'Dữ liệu là sự thể hiện thông tin dưới dạng số, chữ, kí hiệu, âm thanh, hình ảnh... để máy tính tiếp nhận và xử lí.' },
-          { q: 'Khi tiếp nhận và xử lí dữ liệu, con người thu được điều gì?', opts: ['Thông tin có ý nghĩa', 'Tăng dung lượng ổ cứng', 'Thay đổi cấu trúc phần cứng', 'Xóa toàn bộ dữ liệu gốc'], ans: 0, ex: 'Xử lí dữ liệu giúp biến dữ liệu thô thành thông tin mang lại hiểu biết và ý nghĩa cho con người.' },
-          { q: 'Tri thức hình thành như thế nào từ thông tin?', opts: ['Khi thông tin được con người hiểu, tích hợp và vận dụng vào thực tiễn', 'Khi sao chép file sang USB khác', 'Khi tắt nguồn máy tính', 'Khi tăng độ sáng màn hình'], ans: 0, ex: 'Tri thức là những hiểu biết của con người về một lĩnh vực hoặc vấn đề cụ thể, rút ra từ thông tin và kinh nghiệm.' },
-          { q: 'Đơn vị đo lượng thông tin cơ bản nhỏ nhất trong tin học là gì?', opts: ['Byte', 'Bit', 'Kilobyte', 'Megabyte'], ans: 1, ex: 'Bit (viết tắt của binary digit) là đơn vị nhỏ nhất của thông tin, nhận giá trị 0 hoặc 1.' },
-          { q: '1 Byte thông thường gồm bao nhiêu bit?', opts: ['4 bit', '8 bit', '16 bit', '32 bit'], ans: 1, ex: 'Theo chuẩn phổ biến trong tin học, 1 Byte = 8 bit.' },
-          { q: 'Thiết bị nào sau đây là thiết bị vào (nhập dữ liệu)?', opts: ['Màn hình', 'Máy in', 'Bàn phím', 'Loa ngoài'], ans: 2, ex: 'Bàn phím dùng để nhập kí tự, lệnh vào máy tính; màn hình, máy in, loa là thiết bị ra.' },
-          { q: 'Thiết bị nào sau đây là thiết bị ra (xuất thông tin)?', opts: ['Chuột máy tính', 'Máy quét (Scanner)', 'Màn hình', 'Microphone'], ans: 2, ex: 'Màn hình hiển thị kết quả xử lí và giao diện làm việc cho người dùng.' },
-          { q: 'Thành phần nào được ví như "bộ não" xử lí tính toán và điều khiển của máy tính?', opts: ['RAM', 'CPU', 'Ổ cứng SSD', 'Card mạng'], ans: 1, ex: 'CPU (Central Processing Unit) thực hiện các phép tính và điều khiển hoạt động của hệ thống.' },
-          { q: 'Bộ nhớ nào sau đây có tốc độ truy xuất nhanh nhưng dữ liệu thường mất khi tắt điện?', opts: ['RAM', 'HDD', 'SSD', 'Thẻ nhớ SD'], ans: 0, ex: 'RAM là bộ nhớ truy cập ngẫu nhiên, lưu dữ liệu tạm thời khi máy đang hoạt động.' },
-          { q: 'Phần mềm nào thuộc nhóm phần mềm hệ thống?', opts: ['Microsoft Word', 'Windows 11', 'CapCut', 'Trình duyệt Chrome'], ans: 1, ex: 'Hệ điều hành (như Windows, Linux, Android) là phần mềm hệ thống quản lí phần cứng và phần mềm khác.' },
-          { q: 'Phần mềm nào sau đây là phần mềm ứng dụng?', opts: ['BIOS', 'Hệ điều hành macOS', 'Trình soạn thảo văn bản', 'Trình điều khiển card đồ họa'], ans: 2, ex: 'Phần mềm ứng dụng phục vụ trực tiếp nhu cầu công việc, học tập hoặc giải trí của người dùng.' },
-          { q: 'Ứng dụng nổi bật của Tin học trong y tế là gì?', opts: ['Quản lí hồ sơ bệnh án điện tử, chẩn đoán hình ảnh', 'Trồng lúa nước', 'Khai thác mỏ than', 'Dệt vải thủ công'], ans: 0, ex: 'Tin học hỗ trợ lưu trữ bệnh án, đặt lịch khám, phân tích ảnh X-quang, MRI và quản lí thuốc.' },
-          { q: 'Trong giáo dục, Tin học hỗ trợ hiệu quả nhất ở hoạt động nào?', opts: ['Học trực tuyến, mô phỏng thí nghiệm, tra cứu học liệu số', 'Thay thế hoàn toàn tư duy sáng tạo của học sinh', 'Làm hỏng thiết bị học tập', 'Giảm khả năng đọc hiểu'], ans: 0, ex: 'CNTT mở rộng kho học liệu, hỗ trợ học từ xa và trực quan hóa kiến thức.' },
-          { q: 'Hành vi nào thể hiện văn hóa và tuân thủ pháp luật trên không gian mạng?', opts: ['Tôn trọng bản quyền khi dùng tài liệu', 'Tung tin giả gây hoang mang', 'Xâm nhập trái phép tài khoản người khác', 'Bắt nạt trực tuyến bạn học'], ans: 0, ex: 'Cần tôn trọng quyền tác giả, quyền riêng tư và ứng xử có trách nhiệm khi tham gia mạng.' },
-          { q: 'Rủi ro phổ biến khi bấm vào đường link lạ gửi qua tin nhắn là gì?', opts: ['Bị đánh cắp tài khoản hoặc cài mã độc', 'Máy tính tự động nâng cấp RAM miễn phí', 'Tăng dung lượng pin gấp đôi', 'Tự động làm xong bài tập'], ans: 0, ex: 'Liên kết giả mạo (phishing) thường dẫn tới trang đánh cắp mật khẩu hoặc phát tán mã độc.' },
-          { q: 'Cách đặt mật khẩu tài khoản an toàn nhất là gì?', opts: ['Dùng 123456 cho dễ nhớ', 'Kết hợp chữ hoa, chữ thường, số và kí tự đặc biệt; không dùng chung một mật khẩu cho mọi nơi', 'Dùng ngày sinh của bản thân', 'Chia sẻ mật khẩu cho nhiều người'], ans: 1, ex: 'Mật khẩu mạnh, đủ dài và khác nhau giữa các dịch vụ giúp giảm nguy cơ bị dò hoặc lộ lọt.' },
-          { q: 'Dấu hiệu nào cho thấy một thông tin trên mạng cần được kiểm chứng kỹ?', opts: ['Giật tít cực đoan, không rõ tác giả hoặc nguồn chính thống', 'Có dẫn nguồn rõ ràng và nhiều cơ quan uy tín xác nhận', 'Phù hợp với kiến thức khoa học đã kiểm chứng', 'Có ngày đăng và tác giả minh bạch'], ans: 0, ex: 'Tin đồn, tin giả thường dùng tiêu đề gây sốc, thiếu nguồn kiểm chứng đáng tin cậy.' },
-          { q: 'Khi đăng ảnh bạn bè lên mạng xã hội, điều nên làm trước tiên là gì?', opts: ['Hỏi ý kiến và được sự đồng ý của bạn đó', 'Đăng ngay kèm bình luận trêu chọc', 'Chỉnh sửa ảnh gây hiểu lầm', 'Gắn thẻ bừa bãi'], ans: 0, ex: 'Tôn trọng quyền riêng tư và hình ảnh cá nhân của người khác là nguyên tắc ứng xử văn minh.' },
-          { q: 'Tác hại của việc sử dụng thiết bị số quá nhiều vào ban đêm là gì?', opts: ['Giảm chất lượng giấc ngủ, mỏi mắt và giảm tập trung hôm sau', 'Tăng cường thị lực', 'Giúp ngủ sâu hơn ngay lập tức', 'Không ảnh hưởng gì tới sức khỏe'], ans: 0, ex: 'Ánh sáng xanh và thói quen dùng thiết bị khuya dễ làm rối loạn giấc ngủ và mệt mỏi.' },
-          { q: 'Dữ liệu số có ưu điểm gì nổi bật so với lưu trữ giấy truyền thống?', opts: ['Dễ tìm kiếm, sao lưu và chia sẻ nhanh chóng', 'Không bao giờ cần sao lưu dự phòng', 'Không thể bị chỉnh sửa hay xóa nhầm', 'Không cần thiết bị điện tử'], ans: 0, ex: 'Dữ liệu số dễ tổ chức, tìm kiếm và truyền tải, nhưng vẫn cần sao lưu và bảo mật cẩn thận.' },
-          { q: 'Nghề nghiệp nào gắn trực tiếp với lĩnh vực Công nghệ thông tin?', opts: ['Kĩ sư phần mềm, chuyên viên an ninh mạng', 'Giáo viên Thể dục', 'Đầu bếp', 'Kiến trúc sư cảnh quan'], ans: 0, ex: 'Phát triển phần mềm, quản trị hệ thống, khoa học dữ liệu và an ninh mạng là các nhóm nghề trọng tâm của CNTT.' }
-        ]
-      },
-      {
-        id: 'exam_toan_10',
-        subject: 'Toán học',
-        title: 'Ôn kiểm tra Toán 10 - Mệnh đề, Tập hợp & BPT',
-        durationMinutes: 35,
-        curriculum: 'SGK Kết nối tri thức 10',
-        attemptRule: 'Không giới hạn lượt ôn',
-        questions: [
-          { q: 'Phát biểu nào sau đây là một mệnh đề?', opts: ['Hôm nay trời đẹp quá!', '3 + 5 = 8.', 'x là số chẵn phải không?', 'Hãy mở sách trang 10!'], ans: 1, ex: '"3 + 5 = 8" là câu khẳng định có tính đúng xác định nên là mệnh đề.' },
-          { q: 'Mệnh đề nào sau đây là mệnh đề sai?', opts: ['π là một số vô tỉ.', 'Tổng hai số lẻ là một số chẵn.', '2 là số nguyên tố.', '5 là số chẵn.'], ans: 3, ex: '5 chia cho 2 dư 1 nên 5 là số lẻ, do đó khẳng định "5 là số chẵn" là mệnh đề sai.' },
-          { q: 'Mệnh đề phủ định của mệnh đề P: "∀x ∈ ℝ, x² + 1 > 0" là gì?', opts: ['∃x ∈ ℝ, x² + 1 ≤ 0', '∀x ∈ ℝ, x² + 1 ≤ 0', '∃x ∈ ℝ, x² + 1 < 0', '∀x ∈ ℝ, x² + 1 = 0'], ans: 0, ex: 'Phủ định của "∀" là "∃" và phủ định của ">" là "≤".' },
-          { q: 'Cho mệnh đề kéo theo P ⇒ Q: "Nếu tam giác ABC đều thì tam giác ABC cân". Mệnh đề này đúng hay sai?', opts: ['Đúng', 'Sai', 'Vừa đúng vừa sai', 'Không xác định'], ans: 0, ex: 'Mọi tam giác đều đều có ba cạnh bằng nhau nên chắc chắn là tam giác cân.' },
-          { q: 'Kí hiệu nào biểu diễn "x thuộc tập hợp A"?', opts: ['x ∉ A', 'x ∈ A', 'A ⊂ x', 'x ⊂ A'], ans: 1, ex: 'Kí hiệu "∈" đọc là "thuộc", "∉" đọc là "không thuộc".' },
-          { q: 'Cho A = {1; 2; 3} và B = {2; 3; 4}. Tập hợp A ∩ B là tập hợp nào?', opts: ['{1; 4}', '{2; 3}', '{1; 2; 3; 4}', '∅'], ans: 1, ex: 'Giao của hai tập hợp A ∩ B gồm các phần tử thuộc cả A và B, đó là 2 và 3.' },
-          { q: 'Cho A = {1; 2} và B = {2; 3}. Tập hợp A ∪ B là tập hợp nào?', opts: ['{2}', '{1; 3}', '{1; 2; 3}', '{1; 2}'], ans: 2, ex: 'Hợp của hai tập hợp A ∪ B gồm tất cả phần tử thuộc A hoặc thuộc B.' },
-          { q: 'Cho A = {1; 2; 3; 4} và B = {3; 4; 5}. Tập hợp A \\ B là tập hợp nào?', opts: ['{1; 2}', '{5}', '{3; 4}', '{1; 2; 5}'], ans: 0, ex: 'A \\ B gồm các phần tử thuộc A nhưng không thuộc B, tức là 1 và 2.' },
-          { q: 'Nửa khoảng [-2; 5) gồm các số thực x thỏa mãn điều kiện nào?', opts: ['-2 < x < 5', '-2 ≤ x < 5', '-2 ≤ x ≤ 5', '-2 < x ≤ 5'], ans: 1, ex: 'Móc vuông "[" tính đầu mút (-2 ≤ x), ngoặc tròn ")" không tính đầu mút (x < 5).' },
-          { q: 'Khoảng (1; 4) chứa bao nhiêu số nguyên?', opts: ['1', '2', '3', '4'], ans: 1, ex: 'Các số nguyên nằm giữa 1 và 4 là 2 và 3 (có 2 số nguyên).' },
-          { q: 'Bất phương trình nào sau đây là bất phương trình bậc nhất hai ẩn?', opts: ['2x - 3y ≤ 6', 'x² + y ≤ 1', 'xy > 4', '2x - 3y + z ≥ 0'], ans: 0, ex: 'Bất phương trình bậc nhất hai ẩn x, y có dạng ax + by ≤ c (hoặc <, >, ≥) với a, b không đồng thời bằng 0.' },
-          { q: 'Cặp số (x; y) = (1; 2) là nghiệm của bất phương trình nào dưới đây?', opts: ['3x - y > 5', '2x + y - 4 ≤ 0', 'x + y < 2', '5x - 2y > 10'], ans: 1, ex: 'Thay x = 1, y = 2 vào 2x + y - 4 ta được 2(1) + 2 - 4 = 0 ≤ 0 (thỏa mãn).' },
-          { q: 'Miền nghiệm của bất phương trình ax + by < c trên mặt phẳng tọa độ là gì?', opts: ['Một đường thẳng', 'Một nửa mặt phẳng (không kể bờ)', 'Một parabol', 'Một điểm duy nhất'], ans: 1, ex: 'Bất phương trình bậc nhất hai ẩn có miền nghiệm là một nửa mặt phẳng.' },
-          { q: 'Đường thẳng d: x + y = 3 chia mặt phẳng tọa độ thành mấy phần (không kể d)?', opts: ['1 phần', '2 phần', '3 phần', '4 phần'], ans: 1, ex: 'Một đường thẳng chia mặt phẳng thành hai nửa mặt phẳng đối nhau.' },
-          { q: 'Điểm O(0; 0) có thuộc miền nghiệm của bất phương trình x + 2y > 1 không?', opts: ['Có', 'Không', 'Chỉ khi y = 1', 'Chỉ khi x = 1'], ans: 1, ex: 'Thay (0; 0) ta được 0 + 0 = 0 > 1 (sai), nên O không thuộc miền nghiệm.' },
-          { q: 'Hệ bất phương trình bậc nhất hai ẩn gồm bao nhiêu bất phương trình bậc nhất hai ẩn?', opts: ['Chỉ 1 bất phương trình', 'Từ hai bất phương trình trở lên', 'Luôn đúng 2 bất phương trình', 'Không có bất phương trình nào'], ans: 1, ex: 'Hệ bất phương trình bậc nhất hai ẩn gồm hai hay nhiều bất phương trình bậc nhất hai ẩn.' },
-          { q: 'Nghiệm chung của tất cả các bất phương trình trong hệ gọi là gì?', opts: ['Hệ số của hệ', 'Nghiệm của hệ bất phương trình', 'Bờ miền nghiệm', 'Tập xác định'], ans: 1, ex: 'Mỗi cặp (x; y) thỏa mãn đồng thời mọi bất phương trình trong hệ là một nghiệm của hệ.' },
-          { q: 'Biểu diễn miền nghiệm của hệ bất phương trình trên mặt phẳng tọa độ là gì?', opts: ['Phần giao của các miền nghiệm từng bất phương trình', 'Phần hợp của các miền nghiệm', 'Đường thẳng chia đôi mặt phẳng', 'Tập rỗng với mọi hệ'], ans: 0, ex: 'Miền nghiệm của hệ là giao của các miền nghiệm tương ứng với từng bất phương trình.' },
-          { q: 'Cho tập hợp A = {x ∈ ℝ | -1 ≤ x ≤ 3}. Cách viết nào tương đương?', opts: ['A = (-1; 3)', 'A = [-1; 3]', 'A = [-1; 3)', 'A = (-1; 3]'], ans: 1, ex: 'Cả hai đầu mút -1 và 3 đều có dấu "≤" nên dùng ngoặc vuông [-1; 3].' },
-          { q: 'Phát biểu "Tồn tại số thực x sao cho x + 1 = 0" viết bằng kí hiệu là gì?', opts: ['∀x ∈ ℝ, x + 1 = 0', '∃x ∈ ℝ, x + 1 = 0', '∃x ∈ ℝ, x + 1 ≠ 0', '∀x ∈ ℝ, x + 1 > 0'], ans: 1, ex: '"Tồn tại số thực x" kí hiệu là ∃x ∈ ℝ.' },
-          { q: 'Nếu A ⊂ B và B ⊂ C thì kết luận nào sau đây luôn đúng?', opts: ['A ⊂ C', 'C ⊂ A', 'A = C', 'A ∩ C = ∅'], ans: 0, ex: 'Quan hệ bao hàm có tính bắc cầu: nếu A là tập con của B và B là tập con của C thì A là tập con của C.' },
-          { q: 'Trong bài toán tối ưu sản xuất trên K12/Toán 10, giá trị lớn nhất hoặc nhỏ nhất của biểu thức F(x; y) thường đạt được ở đâu?', opts: ['Tại các đỉnh của miền đa giác nghiệm', 'Chỉ ở ngoài miền nghiệm', 'Trên trục tung bất kì', 'Không bao giờ xác định được'], ans: 0, ex: 'Với miền nghiệm là đa giác lồi, giá trị lớn nhất/nhỏ nhất của biểu thức bậc nhất thường đạt tại các đỉnh của đa giác.' }
-        ]
-      },
-      {
-        id: 'exam_van_10',
-        subject: 'Ngữ Văn',
-        title: 'Ôn kiểm tra Ngữ văn 10 - Thần thoại, Sử thi & Nghị luận',
-        durationMinutes: 30,
-        curriculum: 'SGK Kết nối tri thức 10',
-        attemptRule: 'Không giới hạn lượt ôn',
-        questions: [
-          { q: 'Đặc trưng nổi bật của nhân vật trong truyện thần thoại là gì?', opts: ['Thường là các vị thần hoặc nhân vật có sức mạnh siêu nhiên, kì ảo', 'Luôn là người nông dân bình thường không phép thuật', 'Chỉ nói về đời sống cung đình phong kiến', 'Nhân vật luôn có tâm lí giằng xé nội tâm hiện đại'], ans: 0, ex: 'Thần thoại giải thích nguồn gốc tự nhiên và đời sống thông qua các vị thần và kì tích siêu nhiên.' },
-          { q: 'Không gian trong truyện thần thoại thường có đặc điểm gì?', opts: ['Không gian vũ trụ rộng lớn, mang tính tạo lập thế giới', 'Chỉ gói gọn trong một căn phòng', 'Không gian đô thị hiện đại', 'Không gian phòng thí nghiệm'], ans: 0, ex: 'Thần thoại thường mở ra không gian vũ trụ bao la với trời, đất, biển, núi sông...' },
-          { q: 'Thời gian trong truyện thần thoại thường là loại thời gian nào?', opts: ['Thời gian phiếm chỉ, xa xưa ("ngày xửa ngày xưa", "thuở ấy")', 'Thời gian tính bằng giây, phút chính xác', 'Thời gian tương lai khoa học viễn tưởng', 'Thời gian lịch sử ghi năm cụ thể'], ans: 0, ex: 'Thời gian thần thoại là thời gian cổ sơ, phiếm chỉ, chưa gắn với lịch sử thành văn.' },
-          { q: 'Trong sử thi, nhân vật anh hùng thường đại diện cho điều gì?', opts: ['Lí tưởng, sức mạnh và danh dự của cả cộng đồng', 'Lợi ích cá nhân vụ lợi', 'Sự buông xuôi, yếu đuối', 'Sự châm biếm đời thường'], ans: 0, ex: 'Người anh hùng sử thi mang tầm vóc lớn lao, gắn bó chặt chẽ với cộng đồng, bộ tộc.' },
-          { q: 'Ngôn ngữ trong sử thi thường mang sắc thái nào?', opts: ['Trang trọng, hào hùng, giàu nhịp điệu và hình ảnh phóng đại', 'Nói lắp, khẩu ngữ suồng sã', 'Khô khan như văn bản hành chính', 'Mật mã kĩ thuật'], ans: 0, ex: 'Lời kể sử thi trang trọng, giàu tính nhạc và thường sử dụng lối so sánh, phóng đại.' },
-          { q: 'Văn bản nghị luận có mục đích chính là gì?', opts: ['Trình bày ý kiến, lí lẽ và bằng chứng để thuyết phục người đọc', 'Kể chuyện cổ tích giải trí', 'Mô tả chi tiết một món ăn', 'Lập bảng thống kê số liệu thuần túy'], ans: 0, ex: 'Văn bản nghị luận tập trung làm sáng tỏ một luận điểm bằng hệ thống lí lẽ và bằng chứng thuyết phục.' },
-          { q: 'Luận điểm trong văn bản nghị luận là gì?', opts: ['Ý kiến thể hiện tư tưởng, quan điểm của người viết về vấn đề nghị luận', 'Một câu cảm thán bất kì', 'Tên tác giả ở cuối bài', 'Số trang của cuốn sách'], ans: 0, ex: 'Luận điểm là tư tưởng, quan điểm chính mà người viết muốn khẳng định và bảo vệ.' },
-          { q: 'Bằng chứng trong văn bản nghị luận dùng để làm gì?', opts: ['Làm sáng tỏ, củng cố độ tin cậy cho lí lẽ và luận điểm', 'Trang trí cho bài viết dài thêm', 'Thay thế hoàn toàn luận điểm', 'Gây khó hiểu cho người đọc'], ans: 0, ex: 'Bằng chứng (sự kiện, số liệu, dẫn chứng thực tế) giúp lí lẽ có sức thuyết phục cao hơn.' },
-          { q: 'Lỗi dùng từ không đúng nghĩa thường xảy ra khi nào?', opts: ['Nhầm lẫn giữa các từ gần âm hoặc gần nghĩa mà không chú ý ngữ cảnh', 'Dùng từ chuẩn xác theo từ điển', 'Viết hoa đầu câu', 'Dùng dấu chấm hết câu'], ans: 0, ex: 'Chọn từ sai sắc thái hoặc không hợp kết hợp ngữ cảnh sẽ làm câu văn tối nghĩa, sai ý.' },
-          { q: 'Lỗi câu mơ hồ (đa nghĩa ngoài ý muốn) thường do nguyên nhân nào?', opts: ['Cấu tạo ngữ pháp hoặc cách sắp xếp từ ngữ khiến câu hiểu theo nhiều nghĩa', 'Câu văn quá ngắn gọn', 'Dùng dấu phẩy đúng chỗ', 'Có chủ ngữ rõ ràng'], ans: 0, ex: 'Khi sắp xếp từ thiếu mạch lạc hoặc thiếu dấu câu, câu có thể gây hiểu nhầm nhiều cách.' },
-          { q: 'Khi sửa lỗi câu sai ngữ pháp, việc đầu tiên cần làm là gì?', opts: ['Xác định đúng thành phần câu và chỗ sai (thiếu chủ ngữ, vị ngữ, sai quan hệ từ...)', 'Xóa toàn bộ đoạn văn', 'Đổi sang viết chữ in hoa hết', 'Bỏ qua không cần sửa'], ans: 0, ex: 'Phải chẩn đoán đúng "bệnh" của câu thì mới sửa trúng và giữ được ý cần diễn đạt.' },
-          { q: 'Thơ trữ tình chú trọng thể hiện điều gì hơn cả?', opts: ['Tâm trạng, cảm xúc, rung động nội tâm của chủ thể trữ tình', 'Diễn biến vụ án trinh thám', 'Hướng dẫn sử dụng thiết bị', 'Thống kê dân số'], ans: 0, ex: 'Thơ trữ tình bộc lộ thế giới nội tâm, cảm xúc và thái độ của nhân vật trữ tình trước cuộc đời.' },
-          { q: 'Hình ảnh thơ có đặc điểm gì nổi bật?', opts: ['Gợi cảm, giàu sức liên tưởng, biểu đạt chiều sâu cảm xúc', 'Chỉ sao chép nguyên si hình ảnh chụp thực tế', 'Khó hiểu một cách cố ý', 'Không liên quan đến chủ đề'], ans: 0, ex: 'Hình ảnh trong thơ vừa cụ thể vừa giàu ý nghĩa biểu tượng, gợi nhiều liên tưởng.' },
-          { q: 'Khi đọc hiểu một văn bản thông tin, ta cần chú ý yếu tố nào?', opts: ['Thông tin chính, cách triển khai ý, nhan đề, sơ đồ/bảng biểu kèm theo', 'Chỉ đếm số lượng dấu câu', 'Chỉ xem màu chữ', 'Bỏ qua phần chú thích'], ans: 0, ex: 'Văn bản thông tin cung cấp tri thức khách quan nên cần nắm thông tin cốt lõi và cách tổ chức thông tin.' },
-          { q: 'Thái độ tôn trọng sự khác biệt trong thảo luận nhóm thể hiện ở đâu?', opts: ['Lắng nghe ý kiến người khác, phản biện lịch sự dựa trên lí lẽ', 'Ngắt lời và công kích cá nhân', 'Gạt bỏ mọi ý kiến trái chiều', 'Im lặng không đóng góp gì'], ans: 0, ex: 'Thảo luận văn minh cần lắng nghe, tôn trọng người đối thoại và trao đổi mang tính xây dựng.' },
-          { q: 'Trong bài văn nghị luận xã hội, phần mở bài cần làm gì?', opts: ['Giới thiệu vấn đề nghị luận và định hướng quan điểm của người viết', 'Trình bày toàn bộ kết luận cuối bài', 'Kể một câu chuyện không liên quan', 'Liệt kê mục lục'], ans: 0, ex: 'Mở bài nêu vấn đề và khơi gợi hứng thú, mở đường cho phần triển khai lí lẽ – bằng chứng.' },
-          { q: 'Phần kết bài của văn bản nghị luận có vai trò gì?', opts: ['Khẳng định lại vấn đề, rút ra bài học nhận thức và hành động', 'Đặt thêm câu hỏi mới chưa giải quyết', 'Lặp lại nguyên văn toàn bộ thân bài', 'Kết thúc đột ngột không ý nghĩa'], ans: 0, ex: 'Kết bài khép lại vấn đề một cách gọn ghẽ, đọng lại thông điệp hoặc lời nhắn nhủ.' },
-          { q: 'Biện pháp tu từ liệt kê giúp ích gì cho diễn đạt?', opts: ['Làm rõ hơn, đầy đủ và nhấn mạnh nhiều khía cạnh của sự vật, hiện tượng', 'Làm câu văn cụt ngủn', 'Làm mất trọng tâm ý chính', 'Thay thế dấu chấm than'], ans: 0, ex: 'Liệt kê giúp tăng tính cụ thể, sinh động và nhấn mạnh sắc thái biểu cảm.' },
-          { q: 'Khi trích dẫn lời nói hoặc ý kiến của người khác, cần chú ý điều gì?', opts: ['Trích dẫn trung thực, ghi rõ nguồn hoặc đặt trong ngoặc kép phù hợp', 'Tự sửa đổi nội dung rồi gán cho người khác', 'Sao chép nguyên bài mà không ghi nguồn', 'Bóp méo ý gốc'], ans: 0, ex: 'Tính trung thực học thuật đòi hỏi trích dẫn đúng và tôn trọng nguồn gốc tư liệu.' },
-          { q: 'Mục đích của việc rèn luyện kĩ năng viết bài nghị luận ở lớp 10 là gì?', opts: ['Biết suy nghĩ độc lập, lập luận chặt chẽ và bày tỏ chính kiến thuyết phục', 'Học thuộc lòng một bài văn mẫu duy nhất', 'Viết thật dài cho đủ trang', 'Tránh nêu quan điểm cá nhân'], ans: 0, ex: 'Nghị luận rèn tư duy phản biện, lập luận logic và khả năng diễn đạt rõ ràng trong học tập, cuộc sống.' }
-        ]
-      },
-      {
-        id: 'exam_su_10',
-        subject: 'Lịch sử',
-        title: 'Ôn kiểm tra Lịch sử 10 - Sử học & Văn minh cổ đại',
-        durationMinutes: 25,
-        curriculum: 'SGK Kết nối tri thức 10',
-        attemptRule: 'Không giới hạn lượt ôn',
-        questions: [
-          { q: 'Khái niệm "Lịch sử" thường được hiểu theo những nghĩa cơ bản nào?', opts: ['Những gì đã diễn ra trong quá khứ và khoa học tìm hiểu quá khứ loài người', 'Chỉ là những câu chuyện tưởng tượng', 'Chỉ là các con số thống kê hiện tại', 'Chỉ là dự đoán tương lai'], ans: 0, ex: 'Lịch sử vừa là hiện thực khách quan đã diễn ra trong quá khứ, vừa là môn khoa học nghiên cứu quá khứ.' },
-          { q: 'Sử học có vai trò quan trọng nào đối với đời sống hiện tại?', opts: ['Giúp hiểu cội nguồn, rút bài học kinh nghiệm và định hướng tương lai', 'Chỉ phục vụ cho việc thi cử thuần túy', 'Thay thế mọi môn khoa học khác', 'Không liên quan tới văn hóa'], ans: 0, ex: 'Nhìn lại quá khứ giúp con người trân trọng di sản, tránh lặp lại sai lầm và hành động khôn ngoan hơn.' },
-          { q: 'Sử liệu là gì trong nghiên cứu lịch sử?', opts: ['Những tư liệu còn lưu lại giúp con người nhận thức và phục dựng quá khứ', 'Chỉ là các bức ảnh chụp ngày hôm nay', 'Chỉ là truyện cười dân gian', 'Là suy đoán cá nhân không căn cứ'], ans: 0, ex: 'Sử liệu (hiện vật, chữ viết, truyền khẩu...) là nguồn tư liệu để tìm hiểu lịch sử.' },
-          { q: 'Nhóm sử liệu nào gồm di tích khảo cổ, công cụ lao động, đồ gốm, tiền cổ?', opts: ['Sử liệu hiện vật', 'Sử liệu truyền khẩu', 'Sử liệu thành văn', 'Sử liệu điện tử'], ans: 0, ex: 'Sử liệu hiện vật là các di vật, di tích vật chất còn giữ lại từ quá khứ.' },
-          { q: 'Một trong những thành tựu tiêu biểu của văn minh Ai Cập cổ đại là gì?', opts: ['Chữ tượng hình, kim tự tháp, kiến thức hình học và thiên văn', 'La bàn và thuốc súng', 'Chữ cái Latinh hiện đại', 'Động cơ hơi nước'], ans: 0, ex: 'Ai Cập cổ đại nổi tiếng với chữ tượng hình, kim tự tháp và kĩ thuật ướp xác, đo đạc ruộng đất.' },
-          { q: 'Văn minh Lưỡng Hà cổ đại hình thành bên lưu vực hai con sông nào?', opts: ['Sông Ti-grơ và sông Ơ-phrat', 'Sông Nin và sông Hằng', 'Sông Hoàng Hà và sông Trường Giang', 'Sông Mê Kông và sông Hồng'], ans: 0, ex: 'Lưỡng Hà nằm giữa hai con sông Ti-grơ và Ơ-phrat, nổi tiếng với bộ luật Ham-mu-ra-bi.' },
-          { q: 'Văn minh Ấn Độ cổ đại gắn liền với các tôn giáo lớn nào?', opts: ['Hin-đu giáo (Ấn Độ giáo) và Phật giáo', 'Thiên Chúa giáo và Hồi giáo', 'Đạo Tin Lành', 'Do Thái giáo'], ans: 0, ex: 'Ấn Độ là cái nôi của Hin-đu giáo và Phật giáo, có nhiều công trình kiến trúc và chữ viết cổ.' },
-          { q: 'Văn minh Trung Hoa cổ đại có các phát minh nào nổi bật?', opts: ['Giấy viết, kĩ thuật in, la bàn, thuốc súng', 'Máy bay và điện thoại', 'Kính hiển vi điện tử', 'Tàu ngầm hạt nhân'], ans: 0, ex: 'Tứ đại phát minh của Trung Hoa cổ đại gồm làm giấy, in ấn, la bàn và thuốc súng.' },
-          { q: 'Bảo tồn di sản văn hóa có ý nghĩa gì đối với cộng đồng?', opts: ['Gìn giữ bản sắc, bồi đắp lòng tự hào và phát triển du lịch bền vững', 'Làm cản trở giao lưu quốc tế', 'Chỉ tốn kém không mang lại giá trị', 'Xóa bỏ nét riêng của địa phương'], ans: 0, ex: 'Di sản văn hóa là tài sản vô giá gắn kết cộng đồng và tạo nguồn lực văn hóa - kinh tế.' },
-          { q: 'Sử liệu thành văn là loại tư liệu nào?', opts: ['Các ghi chép bằng chữ viết trên giấy, bia đá, mộc bản, văn khắc...', 'Những câu chuyện kể truyền miệng qua các thế hệ', 'Dấu vết khảo cổ dưới lòng đất', 'Hình ảnh mô phỏng 3D hiện đại'], ans: 0, ex: 'Sử liệu thành văn là tư liệu được ghi chép thành văn bản qua các thời kì.' },
-          { q: 'Vì sao các nền văn minh phương Đông cổ đại thường ra đời bên lưu vực các dòng sông lớn?', opts: ['Đất phù sa màu mỡ, nguồn nước thuận lợi cho nông nghiệp trồng trọt', 'Vì không có núi rừng', 'Vì nằm ở vùng cực lạnh giá', 'Vì chỉ phát triển đánh bắt cá voi'], ans: 0, ex: 'Các lưu vực sông lớn tạo điều kiện tưới tiêu và bồi đắp phù sa thuận lợi cho kinh tế nông nghiệp sớm phát triển.' },
-          { q: 'Bộ luật Ham-mu-ra-bi gắn liền với nền văn minh cổ đại nào?', opts: ['Văn minh Lưỡng Hà', 'Văn minh Ai Cập', 'Văn minh Hy Lạp', 'Văn minh La Mã'], ans: 0, ex: 'Bộ luật Ham-mu-ra-bi là một trong những bộ luật thành văn cổ nổi tiếng nhất của Lưỡng Hà.' },
-          { q: 'Nền văn minh Hi Lạp và La Mã cổ đại phát triển mạnh ở khu vực nào?', opts: ['Vùng Địa Trung Hải', 'Lưu vực sông Hoàng Hà', 'Thảo nguyên Trung Á', 'Quần đảo Nhật Bản'], ans: 0, ex: 'Văn minh cổ đại Hi Lạp - La Mã hình thành và phát triển rực rỡ ở khu vực Địa Trung Hải.' },
-          { q: 'Thành tựu nào sau đây là đóng góp tiêu biểu của văn minh Hi Lạp cổ đại?', opts: ['Hệ thống chữ cái, triết học, sử học, khoa học tự nhiên và Thế vận hội Ô-lim-píc', 'Kim tự tháp lớn nhất thế giới', 'Giấy viết và kĩ thuật in chữ rời', 'Chữ tượng hình trên đá'], ans: 0, ex: 'Hi Lạp cổ đại để lại nhiều di sản về dân chủ, triết học, khoa học, văn học và nghệ thuật.' },
-          { q: 'Nguyên tắc quan trọng khi đối chiếu các nguồn sử liệu là gì?', opts: ['Kiểm chứng nguồn gốc, thời điểm ra đời và so sánh nhiều nguồn để đảm bảo khách quan', 'Chỉ tin vào một nguồn duy nhất không kiểm tra', 'Chọn nguồn phù hợp sở thích cá nhân rồi bỏ qua phần còn lại', 'Tự bịa thêm chi tiết cho hấp dẫn'], ans: 0, ex: 'Đối chiếu và đánh giá độ tin cậy của sử liệu giúp nhận thức lịch sử chính xác và khách quan hơn.' },
-          { q: 'Di sản thiên nhiên thế giới có đặc điểm gì?', opts: ['Có giá trị nổi bật toàn cầu về cảnh quan, địa chất, đa dạng sinh học', 'Chỉ do con người xây dựng hoàn toàn', 'Không cần được bảo vệ', 'Chỉ tồn tại trong vài tháng'], ans: 0, ex: 'Di sản thiên nhiên mang giá trị nổi bật toàn cầu về thẩm mĩ, địa chất hoặc hệ sinh thái.' },
-          { q: 'Gắn kết học tập Lịch sử với di tích và bảo tàng địa phương mang lại lợi ích gì?', opts: ['Giúp kiến thức trực quan, sinh động và bồi dưỡng tình yêu quê hương', 'Làm mất thời gian không có tác dụng', 'Chỉ phù hợp cho chuyên gia khảo cổ', 'Thay thế hoàn toàn sách giáo khoa'], ans: 0, ex: 'Trải nghiệm thực tế tại di tích, bảo tàng giúp học sinh hiểu sâu sắc hơn về quá khứ tại chính địa phương mình.' },
-          { q: 'Khái niệm "văn minh" khác gì với "văn hóa" trong cách tiếp cận phổ biến?', opts: ['Văn minh nhấn mạnh trình độ phát triển vật chất, tinh thần và tổ chức xã hội ở một giai đoạn nhất định, gắn với đô thị/chữ viết/nhà nước', 'Văn minh hoàn toàn đối lập và phủ nhận văn hóa', 'Hai khái niệm giống hệt nhau mọi lúc', 'Văn minh chỉ nói về máy móc'], ans: 0, ex: 'Văn hóa rộng và mang tính bền vững, bản sắc; văn minh thường chỉ trình độ phát triển đạt tới của xã hội loài người ở những giai đoạn/không gian nhất định.' },
-          { q: 'Người học lịch sử cần rèn luyện phẩm chất và năng lực nào?', opts: ['Tư duy phản biện, tôn trọng sự thật lịch sử và trách nhiệm công dân', 'Học vẹt ngày tháng rời rạc', 'Phán xét cảm tính không có căn cứ', 'Thờ ơ với lịch sử dân tộc và nhân loại'], ans: 0, ex: 'Học lịch sử giúp hình thành tư duy phân tích, thái độ khách quan và ý thức trân trọng giá trị lịch sử.' },
-          { q: 'Hoạt động nào góp phần quảng bá di sản lịch sử - văn hóa địa phương trong thời đại số?', opts: ['Xây dựng bài giới thiệu, video ngắn, bản đồ số hoặc triển lãm trực tuyến có nguồn tư liệu chính xác', 'Đăng thông tin sai lệch để câu tương tác', 'Xóa bỏ tư liệu địa phương', 'Sao chép không ghi nguồn'], ans: 0, ex: 'Ứng dụng công nghệ số đúng cách giúp lan tỏa giá trị di sản tới đông đảo bạn trẻ và cộng đồng.' }
-        ]
-      },
-      {
-        id: 'exam_dia_10',
-        subject: 'Địa lý',
-        title: 'Ôn kiểm tra Địa lý 10 - Bản đồ, Trái Đất & Lớp vỏ địa lí',
-        durationMinutes: 25,
-        curriculum: 'SGK Kết nối tri thức 10',
-        attemptRule: 'Không giới hạn lượt ôn',
-        questions: [
-          { q: 'Trên bản đồ, "tỉ lệ bản đồ" cho biết điều gì?', opts: ['Mức độ thu nhỏ của khoảng cách trên bản đồ so với thực địa', 'Độ cao tuyệt đối của đỉnh núi', 'Hướng gió thổi trong năm', 'Nhiệt độ trung bình tháng'], ans: 0, ex: 'Tỉ lệ bản đồ cho biết 1 đơn vị đo trên bản đồ ứng với bao nhiêu đơn vị đo ngoài thực tế.' },
-          { q: 'Tỉ lệ bản đồ 1 : 100.000 có nghĩa là gì?', opts: ['1 cm trên bản đồ ứng với 100.000 cm (1 km) trên thực địa', '1 cm trên bản đồ ứng với 100 m trên thực địa', '1 cm trên bản đồ ứng với 10 km trên thực địa', '1 m trên bản đồ ứng với 100 km trên thực địa'], ans: 0, ex: '100.000 cm = 1.000 m = 1 km, nên 1 cm trên bản đồ tương ứng 1 km ngoài thực tế.' },
-          { q: 'Phương pháp kí hiệu trên bản đồ thường dùng để biểu hiện đối tượng nào?', opts: ['Các đối tượng phân bố theo điểm cụ thể như mỏ khoáng sản, cảng biển, nhà máy', 'Sự dịch chuyển dòng người di cư', 'Sự thay đổi màu sắc ngẫu nhiên', 'Tốc độ quay của Trái Đất'], ans: 0, ex: 'Phương pháp kí hiệu thể hiện chính xác vị trí và đặc điểm của các đối tượng phân bố theo điểm.' },
-          { q: 'Đường đồng mức trên bản đồ địa hình nối các điểm có đặc điểm gì?', opts: ['Có cùng độ cao', 'Có cùng lượng mưa năm', 'Có cùng dân số', 'Có cùng múi giờ'], ans: 0, ex: 'Đường bình độ (đồng mức) là đường nối các điểm có cùng độ cao so với mực nước biển.' },
-          { q: 'Khi các đường đồng mức càng xích lại gần nhau, địa hình có đặc điểm gì?', opts: ['Độ dốc càng lớn', 'Địa hình hoàn toàn bằng phẳng', 'Là mặt hồ tĩnh lặng', 'Không có độ cao'], ans: 0, ex: 'Đường đồng mức càng dày/gần nhau thì độ chênh cao trên một khoảng ngắn càng lớn, nghĩa là sườn càng dốc.' },
-          { q: 'Hệ thống lưới kinh, vĩ tuyến trên bản đồ giúp xác định yếu tố nào?', opts: ['Tọa độ địa lí và phương hướng trên bản đồ', 'Màu sắc của bầu trời', 'Giá cả hàng hóa', 'Tên các tác phẩm văn học'], ans: 0, ex: 'Kinh tuyến chỉ hướng Bắc - Nam, vĩ tuyến chỉ hướng Đông - Tây và giúp xác định tọa độ địa lí.' },
-          { q: 'Trái Đất tự quay quanh trục theo hướng nào?', opts: ['Từ Tây sang Đông', 'Từ Đông sang Tây', 'Từ Bắc xuống Nam', 'Từ Nam lên Bắc'], ans: 0, ex: 'Trái Đất tự quay quanh trục từ Tây sang Đông, tạo nên hiện tượng ngày và đêm luân phiên.' },
-          { q: 'Hệ quả trực tiếp của chuyển động tự quay quanh trục của Trái Đất là gì?', opts: ['Sự luân phiên ngày đêm, giờ trên Trái Đất và lệch hướng chuyển động (Cô-ri-ô-lít)', 'Sự thay đổi các mùa trong năm', 'Sự thay đổi độ dài ngày đêm theo mùa', 'Hiện tượng nhật thực toàn phần'], ans: 0, ex: 'Tự quay quanh trục sinh ra ngày đêm, giờ địa phương - giờ múi và lực Cô-ri-ô-lít.' },
-          { q: 'Nguyên nhân chính sinh ra các mùa Xuân, Hạ, Thu, Đông trên Trái Đất là gì?', opts: ['Trục Trái Đất nghiêng 23°27\' và không đổi hướng khi chuyển động quanh Mặt Trời', 'Mặt Trời ngừng chiếu sáng vào mùa đông', 'Khoảng cách Trái Đất - Mặt Trời thay đổi đột ngột mỗi tuần', 'Trái Đất ngừng tự quay'], ans: 0, ex: 'Trục nghiêng kết hợp với chuyển động tịnh tiến quanh Mặt Trời làm góc nhập xạ và thời gian chiếu sáng thay đổi theo mùa.' },
-          { q: 'Khu vực Xích đạo có đặc điểm gì về độ dài ngày và đêm quanh năm?', opts: ['Ngày và đêm luôn dài bằng nhau (khoảng 12 giờ)', 'Ngày dài suốt 24 giờ quanh năm', 'Đêm dài suốt 24 giờ quanh năm', 'Không có ban ngày'], ans: 0, ex: 'Đường Xích đạo luôn được phân chia thành hai phần bằng nhau bởi đường sáng tối nên ngày đêm dài bằng nhau.' },
-          { q: 'Lớp vỏ địa lí là nơi diễn ra hoạt động của đối tượng nào?', opts: ['Nơi các quyển (khí quyển, thạch quyển, thủy quyển, sinh quyển, thổ nhưỡng quyển) xâm nhập và tác động lẫn nhau', 'Chỉ có lớp đá nóng chảy sâu dưới tâm Trái Đất', 'Chỉ có tầng bình lưu', 'Không có sự sống'], ans: 0, ex: 'Lớp vỏ địa lí là lớp vỏ tự nhiên ở bề mặt Trái Đất, nơi các quyển tương tác mật thiết và có sự sống.' },
-          { q: 'Kĩ năng đọc lược đồ/bản đồ giúp ích gì trong học tập và đời sống?', opts: ['Định hướng không gian, nhận diện phân bố đối tượng và đọc hiểu thông tin trực quan', 'Thay thế việc ghi chép bài học', 'Làm bản đồ mất tính chính xác', 'Chỉ dùng khi đi du lịch nước ngoài'], ans: 0, ex: 'Đọc bản đồ là kĩ năng cốt lõi giúp nắm bắt nhanh không gian, vị trí và mối liên hệ địa lí.' },
-          { q: 'Vĩ độ địa lí của một điểm được tính từ đường nào?', opts: ['Từ đường Xích đạo (0°) về phía Bắc hoặc phía Nam đến 90°', 'Từ kinh tuyến gốc 0° về phía Đông hoặc Tây', 'Từ cực Bắc xuống đáy đại dương', 'Từ mực nước biển lên đỉnh núi'], ans: 0, ex: 'Vĩ độ tính từ Xích đạo (0°) đến hai cực (90°B hoặc 90°N).' },
-          { q: 'Kinh tuyến gốc (0°) đi qua đài thiên văn nào?', opts: ['Đài thiên văn Grin-uých (Greenwich)', 'Đỉnh Ê-vơ-rét', 'Đảo Ha-oai', 'Thành phố Ô-xlô'], ans: 0, ex: 'Kinh tuyến 0° quy ước đi qua đài thiên văn Greenwich (Anh).' },
-          { q: 'Nếu ở múi giờ số 7 là 12 giờ trưa thì ở múi giờ số 8 cùng ngày là mấy giờ?', opts: ['13 giờ', '11 giờ', '12 giờ', '10 giờ'], ans: 0, ex: 'Đi về phía Đông (từ múi 7 sang múi 8) giờ tăng thêm 1 giờ, nên là 13 giờ.' },
-          { q: 'Lực Cô-ri-ô-lít làm vật chuyển động ở bán cầu Bắc lệch theo hướng nào (nhìn theo hướng chuyển động)?', opts: ['Lệch về bên phải', 'Lệch về bên trái', 'Thẳng đứng lên trời', 'Không bị lệch'], ans: 0, ex: 'Ở bán cầu Bắc, lực Cô-ri-ô-lít làm vật chuyển động lệch về bên phải so với hướng chuyển động.' },
-          { q: 'Vào ngày hạ chí ở bán cầu Bắc (khoảng 22/6), khu vực này có đặc điểm gì?', opts: ['Ngày dài hơn đêm, góc nhập xạ lớn', 'Đêm dài suốt 24 giờ', 'Ngày ngắn nhất trong năm', 'Không nhận được ánh sáng Mặt Trời'], ans: 0, ex: 'Ngày 22/6 bán cầu Bắc ngả về phía Mặt Trời nên ngày dài hơn đêm và nhận nhiều nhiệt hơn.' },
-          { q: 'Thạch quyển gồm những thành phần nào?', opts: ['Vỏ Trái Đất và phần trên của lớp Manti', 'Toàn bộ đại dương và sông hồ', 'Tầng ô-zôn và tầng điện li', 'Chỉ gồm lớp đất mặt'], ans: 0, ex: 'Thạch quyển bao gồm vỏ Trái Đất và phần trên cứng chắc của lớp Manti.' },
-          { q: 'Khí quyển có vai trò gì quan trọng đối với sự sống trên Trái Đất?', opts: ['Cung cấp không khí cho sinh vật hô hấp, điều hòa nhiệt độ và che chắn bức xạ có hại', 'Tạo ra thủy triều đại dương', 'Hình thành các mảng kiến tạo lục địa', 'Làm ngừng chuyển động tự quay'], ans: 0, ex: 'Khí quyển duy trì sự sống, thời tiết, khí hậu và bảo vệ bề mặt Trái Đất.' },
-          { q: 'Quy luật thống nhất và hoàn chỉnh của lớp vỏ địa lí thể hiện ở điều gì?', opts: ['Mọi thành phần trong lớp vỏ địa lí đều có mối quan hệ phụ thuộc, tác động lẫn nhau; khi một thành phần biến đổi sẽ kéo theo các thành phần khác', 'Các quyển tồn tại tách rời hoàn toàn', 'Thay đổi khí hậu không ảnh hưởng gì tới sinh vật và đất', 'Chỉ có địa hình thay đổi'], ans: 0, ex: 'Lớp vỏ địa lí là một thể thống nhất hoàn chỉnh nên biến đổi ở một bộ phận sẽ tác động dây chuyền.' }
-        ]
-      },
-      {
-        id: 'exam_anh_10',
-        subject: 'Tiếng Anh',
-        title: 'Ôn kiểm tra Tiếng Anh 10 - Family Life & Environment',
-        durationMinutes: 25,
-        curriculum: 'Chương trình Tiếng Anh 10',
-        attemptRule: 'Không giới hạn lượt ôn',
-        questions: [
-          { q: 'Choose the best answer: My dad usually ______ the heavy lifting in our family.', opts: ['do', 'does', 'is doing', 'did'], ans: 1, ex: '"My dad" là ngôi thứ 3 số ít và có trạng từ tần suất "usually" -> dùng thì hiện tại đơn: does.' },
-          { q: 'Choose the best answer: Listen! Someone ______ the piano in the next room.', opts: ['plays', 'is playing', 'played', 'play'], ans: 1, ex: 'Dấu hiệu "Listen!" diễn tả hành động đang xảy ra ngay lúc nói -> hiện tại tiếp diễn: is playing.' },
-          { q: 'Choose the best answer: Doing housework helps children develop ______ skills.', opts: ['life', 'live', 'alive', 'lively'], ans: 0, ex: '"Life skills" là cụm từ cố định nghĩa là "kĩ năng sống".' },
-          { q: 'Choose the best answer: We should ______ plastic waste to protect the environment.', opts: ['increase', 'reduce', 'waste', 'destroy'], ans: 1, ex: '"Reduce plastic waste" nghĩa là giảm thiểu rác thải nhựa.' },
-          { q: 'Choose the best answer: A lot of trees ______ in our schoolyard every spring.', opts: ['plant', 'are planted', 'planted', 'is planting'], ans: 1, ex: 'Chủ ngữ "A lot of trees" chịu tác động của hành động trồng và có "every spring" -> bị động hiện tại đơn: are planted.' },
-          { q: 'Choose the best answer: She is capable ______ finishing the project on time.', opts: ['of', 'in', 'at', 'for'], ans: 0, ex: 'Cấu trúc "be capable of + V-ing" nghĩa là có khả năng làm gì.' },
-          { q: 'Choose the best answer: They ______ a volunteer campaign at the moment.', opts: ['run', 'are running', 'runs', 'ran'], ans: 1, ex: '"At the moment" là dấu hiệu của thì hiện tại tiếp diễn: are running.' },
-          { q: 'Choose the best answer: Air pollution is a serious ______ in big cities.', opts: ['issue', 'solution', 'benefit', 'habit'], ans: 0, ex: '"A serious issue" nghĩa là một vấn đề nghiêm trọng.' },
-          { q: 'Choose the best answer: Turn ______ the lights when you leave the room to save electricity.', opts: ['off', 'on', 'up', 'into'], ans: 0, ex: '"Turn off" nghĩa là tắt (đèn, thiết bị điện).' },
-          { q: 'Choose the best answer: My brother is interested ______ playing guitar in his free time.', opts: ['in', 'on', 'to', 'with'], ans: 0, ex: 'Cấu trúc "be interested in + V-ing" nghĩa là thích thú/quan tâm đến việc gì.' },
-          { q: 'Choose the best answer: Which word has the underlined part pronounced differently? (A: cat, B: map, C: name, D: hat)', opts: ['cat', 'map', 'name', 'hat'], ans: 2, ex: '"Name" có nguyên âm /eɪ/, trong khi cat, map, hat có âm /æ/.' },
-          { q: 'Choose the best answer: Which word has the underlined part pronounced differently? (A: clean, B: teach, C: bread, D: speak)', opts: ['clean', 'teach', 'bread', 'speak'], ans: 2, ex: '"Bread" phát âm là /e/, còn clean, teach, speak phát âm là /iː/.' },
-          { q: 'Choose the best answer: Sharing household chores makes family members feel ______.', opts: ['closer', 'farther', 'angrier', 'lonelier'], ans: 0, ex: 'Chia sẻ việc nhà giúp các thành viên gắn kết, gần gũi nhau hơn (closer).' },
-          { q: 'Choose the best answer: Solar energy and wind energy are ______ sources of energy.', opts: ['renewable', 'non-renewable', 'harmful', 'polluted'], ans: 0, ex: '"Renewable energy" là năng lượng tái tạo (mặt trời, gió...).' },
-          { q: 'Choose the best answer: I don\'t mind ______ you with your English homework.', opts: ['help', 'helping', 'to help', 'helped'], ans: 1, ex: 'Sau "don\'t mind" dùng danh động từ V-ing: helping.' },
-          { q: 'Choose the best answer: What time ______ the train leave tomorrow morning?', opts: ['do', 'does', 'is', 'has'], ans: 1, ex: 'Lịch trình tàu xe thường dùng thì hiện tại đơn; chủ ngữ "the train" số ít -> does.' },
-          { q: 'Choose the best answer: Recycling helps conserve natural ______.', opts: ['resources', 'problems', 'accidents', 'storms'], ans: 0, ex: '"Conserve natural resources" nghĩa là bảo tồn tài nguyên thiên nhiên.' },
-          { q: 'Choose the best answer: Lan is very ______; she always helps her classmates.', opts: ['helpful', 'selfish', 'lazy', 'careless'], ans: 0, ex: '"Helpful" nghĩa là hay giúp đỡ, có ích.' },
-          { q: 'Choose the best answer: We must ______ awareness of protecting endangered animals.', opts: ['raise', 'drop', 'hide', 'forget'], ans: 0, ex: '"Raise awareness" là cụm từ chuẩn nghĩa là nâng cao nhận thức.' },
-          { q: 'Choose the best answer: The students are preparing ______ the upcoming mid-term test.', opts: ['for', 'at', 'of', 'to'], ans: 0, ex: '"Prepare for something" nghĩa là chuẩn bị cho việc gì.' }
-        ]
-      }
+    const CLASS_10A4_GRADES = [
+      { stt: 1, name: 'Phạm Nguyễn Khánh An', nu: 'x', van: 6.7, toan: 7.7, anh: 10, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 7.0, dia: 5.0, gdktpl: 9.5, tin: 9.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 2, name: 'Cáp Ngọc Hồng Anh', nu: 'x', van: 7.0, toan: 6.3, anh: 8.7, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 7.8, dia: 8.3, gdktpl: 8.8, tin: 9.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 3, name: 'Đỗ Lê Xuân Anh', nu: '', van: 8.3, toan: 5.9, anh: 7.3, gdtc: 'Đ', qpan: 8.0, hdtn: 'Đ', gddp: 'Đ', su: 9.3, dia: 7.0, gdktpl: 8.5, tin: 9.3, mt: 'Đ', cp: '1', kp: '0' },
+      { stt: 4, name: 'Nguyễn Phương Anh', nu: 'x', van: 7.7, toan: 7.0, anh: 9.3, gdtc: 'Đ', qpan: 9.0, hdtn: 'Đ', gddp: 'Đ', su: 8.5, dia: 7.8, gdktpl: 9.3, tin: 9.0, mt: 'Đ', cp: '', kp: '' },
+      { stt: 5, name: 'Trà Trúc Anh', nu: 'x', van: 7.7, toan: 7.0, anh: 6.5, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 6.8, dia: 7.0, gdktpl: 7.8, tin: 7.0, mt: 'Đ', cp: '', kp: '' },
+      { stt: 6, name: 'Võ Chữ Minh Anh', nu: 'x', van: 6.3, toan: 6.2, anh: 9.3, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.0, dia: 7.3, gdktpl: 8.3, tin: 8.0, mt: 'Đ', cp: '', kp: '' },
+      { stt: 7, name: 'La Kim Ánh', nu: 'x', van: 6.9, toan: 5.7, anh: 9.0, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.5, dia: 8.0, gdktpl: 6.8, tin: 8.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 8, name: 'Văn Mỹ Bình', nu: 'x', van: 6.2, toan: 4.7, anh: 10, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.0, dia: 6.3, gdktpl: 8.3, tin: 8.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 9, name: 'Nguyễn Sơn Ca', nu: 'x', van: 7.8, toan: 7.0, anh: 9.7, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.0, dia: 8.0, gdktpl: 8.8, tin: 9.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 10, name: 'Bùi Lê Bảo Châu', nu: 'x', van: 7.5, toan: 7.7, anh: 8.7, gdtc: 'Đ', qpan: 9.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 7.8, gdktpl: 8.8, tin: 7.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 11, name: 'Châu Chí Cường', nu: '', van: 6.5, toan: 7.0, anh: 7.7, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 8.0, gdktpl: 9.0, tin: 9.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 12, name: 'Huỳnh Vương Hân Di', nu: 'x', van: 6.5, toan: 5.0, anh: 10, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 6.8, dia: 5.0, gdktpl: 8.0, tin: 8.0, mt: 'Đ', cp: '', kp: '' },
+      { stt: 13, name: 'Hồng Yến Doanh', nu: 'x', van: 8.5, toan: 6.3, anh: 8.7, gdtc: 'Đ', qpan: 8.0, hdtn: 'Đ', gddp: 'Đ', su: 7.0, dia: 6.5, gdktpl: 8.3, tin: 9.0, mt: 'Đ', cp: '', kp: '' },
+      { stt: 14, name: 'Đào Hương Giang', nu: 'x', van: 7.2, toan: 6.0, anh: 9.7, gdtc: 'Đ', qpan: 9.0, hdtn: 'Đ', gddp: 'Đ', su: 9.5, dia: 6.5, gdktpl: 8.5, tin: 8.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 15, name: 'Huỳnh Ngọc Vân Hà', nu: 'x', van: 7.7, toan: 7.7, anh: 9.2, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 7.8, dia: 7.3, gdktpl: 8.3, tin: 9.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 16, name: 'Nguyễn Ngọc Thanh Hà', nu: 'x', van: 7.2, toan: 5.9, anh: 9.2, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 7.5, dia: 6.0, gdktpl: 9.8, tin: 9.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 17, name: 'Từ Thúy Hà', nu: 'x', van: 7.7, toan: 9.0, anh: 10, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 8.3, gdktpl: 8.5, tin: 9.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 18, name: 'Huỳnh Vĩnh Hào', nu: '', van: 6.0, toan: 7.0, anh: 9.3, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 9.3, dia: 7.0, gdktpl: 8.5, tin: 9.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 19, name: 'Dương Gia Hân', nu: 'x', van: 8.3, toan: 5.9, anh: 8.5, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.5, dia: 8.3, gdktpl: 9.3, tin: 9.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 20, name: 'Nguyễn Anh Khôi', nu: '', van: 7.0, toan: 6.3, anh: 8.3, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.5, dia: 8.3, gdktpl: 8.0, tin: 8.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 21, name: 'Mai Trúc Linh', nu: 'x', van: 7.5, toan: 8.3, anh: 8.9, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 9.8, dia: 9.0, gdktpl: 10, tin: 9.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 22, name: 'Nguyễn Phương Linh', nu: 'x', van: 7.9, toan: 6.3, anh: 8.9, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.8, dia: 8.0, gdktpl: 8.3, tin: 8.0, mt: 'Đ', cp: '', kp: '' },
+      { stt: 23, name: 'Nguyễn Quang Minh', nu: '', van: 7.9, toan: 5.3, anh: 9.5, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 9.0, gdktpl: 7.5, tin: 9.0, mt: 'Đ', cp: '1', kp: '0' },
+      { stt: 24, name: 'Trần Tuệ Minh', nu: 'x', van: 8.0, toan: 6.7, anh: 10, gdtc: 'Đ', qpan: 8.0, hdtn: 'Đ', gddp: 'Đ', su: 9.0, dia: 8.8, gdktpl: 8.8, tin: 8.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 25, name: 'Huỳnh Lý Bảo Ngân', nu: 'x', van: 7.7, toan: 9.0, anh: 9.7, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.8, dia: 7.5, gdktpl: 8.5, tin: 8.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 26, name: 'Trương Thị Kim Ngân', nu: 'x', van: 7.5, toan: 7.0, anh: 9.0, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 8.5, gdktpl: 9.0, tin: 7.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 27, name: 'Lưu Khánh Nghi', nu: 'x', van: 6.7, toan: 6.7, anh: 9.3, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 9.3, dia: 6.3, gdktpl: 7.0, tin: 7.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 28, name: 'Nguyễn Lê Thành Nhân', nu: '', van: 5.7, toan: 9.0, anh: 9.0, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 7.3, gdktpl: 9.5, tin: 9.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 29, name: 'Nguyễn Trần Hạnh Nhi', nu: 'x', van: 9.2, toan: 7.3, anh: 8.7, gdtc: 'Đ', qpan: 9.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 8.3, gdktpl: 8.3, tin: 10, mt: 'Đ', cp: '', kp: '' },
+      { stt: 30, name: 'Trần Ái Như', nu: 'x', van: 8.9, toan: 7.7, anh: 9.5, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.5, dia: 8.0, gdktpl: 9.0, tin: 9.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 31, name: 'Trần Tố Như', nu: 'x', van: 6.2, toan: 6.7, anh: 7.3, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 6.5, dia: 6.0, gdktpl: 7.8, tin: 7.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 32, name: 'Vũ Tâm Như', nu: 'x', van: 8.7, toan: 7.0, anh: 9.9, gdtc: 'Đ', qpan: 9.0, hdtn: 'Đ', gddp: 'Đ', su: 8.8, dia: 9.0, gdktpl: 8.5, tin: 9.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 33, name: 'Nguyễn Đỗ Thái Ny', nu: 'x', van: 7.0, toan: 8.0, anh: 10, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.0, dia: 7.0, gdktpl: 9.5, tin: 9.8, mt: 'Đ', cp: '1', kp: '0' },
+      { stt: 34, name: 'Nguyễn Hoàng Phú', nu: '', van: 6.7, toan: 6.0, anh: 8.5, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 6.5, gdktpl: 7.5, tin: 9.0, mt: 'Đ', cp: '', kp: '' },
+      { stt: 35, name: 'Thái Lộc Phúc', nu: '', van: 6.7, toan: 4.7, anh: 9.7, gdtc: 'Đ', qpan: 8.0, hdtn: 'Đ', gddp: 'Đ', su: 7.0, dia: 7.3, gdktpl: 5.8, tin: 7.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 36, name: 'Huỳnh Đình Quý', nu: '', van: 5.2, toan: 4.9, anh: 7.7, gdtc: 'Đ', qpan: 8.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 7.8, gdktpl: 6.8, tin: 7.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 37, name: 'Lưu Nguyễn Minh Tâm', nu: '', van: 8.2, toan: 7.7, anh: 10, gdtc: 'Đ', qpan: 8.0, hdtn: 'Đ', gddp: 'Đ', su: 9.0, dia: 9.5, gdktpl: 9.5, tin: 9.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 38, name: 'Huỳnh Chí Thành', nu: '', van: 7.9, toan: 5.7, anh: 9.0, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 7.5, dia: 7.0, gdktpl: 9.0, tin: 8.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 39, name: 'Lê Ngọc Phương Thảo', nu: 'x', van: 8.3, toan: 7.7, anh: 9.2, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.0, dia: 8.3, gdktpl: 8.8, tin: 9.0, mt: 'Đ', cp: '', kp: '' },
+      { stt: 40, name: 'Nguyễn Thanh Thảo', nu: 'x', van: 6.7, toan: 6.3, anh: 8.7, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 7.3, dia: 8.8, gdktpl: 8.8, tin: 9.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 41, name: 'Bùi Phạm Song Thư', nu: 'x', van: 7.0, toan: 5.2, anh: 8.2, gdtc: 'Đ', qpan: 9.0, hdtn: 'Đ', gddp: 'Đ', su: 8.5, dia: 6.0, gdktpl: 9.0, tin: 9.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 42, name: 'Trần Phúc Tuệ Thư', nu: 'x', van: 7.5, toan: 9.3, anh: 8.9, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 9.0, dia: 8.8, gdktpl: 8.5, tin: 9.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 43, name: 'Sử Minh Thy', nu: 'x', van: 5.8, toan: 4.7, anh: 9.5, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.0, dia: 5.0, gdktpl: 8.3, tin: 9.0, mt: 'Đ', cp: '', kp: '' },
+      { stt: 44, name: 'Nguyễn Phú Trọng', nu: '', van: 7.0, toan: 7.2, anh: 9.5, gdtc: 'Đ', qpan: 8.0, hdtn: 'Đ', gddp: 'Đ', su: 8.5, dia: 8.8, gdktpl: 9.0, tin: 9.8, mt: 'Đ', cp: '', kp: '' },
+      { stt: 45, name: 'NGUYỄN LÊ UYÊN TÚ', nu: 'x', van: 7.5, toan: 7.0, anh: 9.2, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 9.0, gdktpl: 9.8, tin: 9.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 46, name: 'Trịnh Hoàng Khánh Uyên', nu: 'x', van: 6.9, toan: 6.3, anh: 6.0, gdtc: 'Đ', qpan: 9.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 7.5, gdktpl: 8.5, tin: 9.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 47, name: 'Nguyễn Kiều Vy', nu: 'x', van: 8.0, toan: 5.3, anh: 9.0, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 7.0, dia: 6.5, gdktpl: 8.8, tin: 7.5, mt: 'Đ', cp: '', kp: '' },
+      { stt: 48, name: 'Nguyễn Trần Khánh Vy', nu: 'x', van: 7.5, toan: 6.7, anh: 9.0, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.8, dia: 6.8, gdktpl: 9.5, tin: 9.3, mt: 'Đ', cp: '1', kp: '0' },
+      { stt: 49, name: 'Trần Tăng Tâm Ý', nu: 'x', van: 7.2, toan: 5.5, anh: 9.9, gdtc: 'Đ', qpan: 7.0, hdtn: 'Đ', gddp: 'Đ', su: 8.3, dia: 8.0, gdktpl: 9.0, tin: 9.3, mt: 'Đ', cp: '', kp: '' },
+      { stt: 50, name: 'Ngô Thanh Yến', nu: 'x', van: 7.9, toan: 6.5, anh: 8.5, gdtc: 'Đ', qpan: 9.0, hdtn: 'Đ', gddp: 'Đ', su: 8.5, dia: 8.0, gdktpl: 8.3, tin: 9.3, mt: 'Đ', cp: '', kp: '' }
     ];
-
-    let currentUser = null;
+let currentUser = null;
     let allPosts = [];
     let allComments = [];
     let allDeadlines = [];
@@ -893,6 +942,62 @@
 
     function normalizeEmail(email) {
       return (email || '').trim().toLowerCase();
+    }
+
+    function openClassGradesModal() {
+      document.getElementById('class-grades-modal').classList.remove('hidden');
+      renderClassGradesTable();
+    }
+
+    function closeClassGradesModal() {
+      document.getElementById('class-grades-modal').classList.add('hidden');
+    }
+
+    function renderClassGradesTable() {
+      const tbody = document.getElementById('class-grades-tbody');
+      const countInfo = document.getElementById('grade-count-info');
+      if (!tbody) return;
+
+      const q = (document.getElementById('grade-search-input')?.value || '').trim().toLowerCase();
+      const highlightSubj = document.getElementById('grade-highlight-subject')?.value || 'all';
+
+      const rows = CLASS_10A4_GRADES.filter(item => {
+        if (!q) return true;
+        return String(item.stt).includes(q) || item.name.toLowerCase().includes(q);
+      });
+
+      if (countInfo) {
+        countInfo.innerText = `Đang hiển thị ${rows.length} / ${CLASS_10A4_GRADES.length} học sinh lớp 10A4.`;
+      }
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="17" style="padding: 20px; color: var(--text-muted);">Không tìm thấy học sinh phù hợp.</td></tr>`;
+        return;
+      }
+
+      const hl = (key) => (highlightSubj === key ? ' class="score-highlight"' : '');
+
+      tbody.innerHTML = rows.map(r => `
+        <tr>
+          <td>${r.stt}</td>
+          <td class="name-col">${escapeHTML(r.name)}</td>
+          <td>${escapeHTML(r.nu)}</td>
+          <td${hl('van')}>${r.van}</td>
+          <td${hl('toan')}>${r.toan}</td>
+          <td${hl('anh')}>${r.anh}</td>
+          <td>${r.gdtc}</td>
+          <td${hl('qpan')}>${r.qpan}</td>
+          <td>${r.hdtn}</td>
+          <td>${r.gddp}</td>
+          <td${hl('su')}>${r.su}</td>
+          <td${hl('dia')}>${r.dia}</td>
+          <td${hl('gdktpl')}>${r.gdktpl}</td>
+          <td${hl('tin')}>${r.tin}</td>
+          <td>${r.mt}</td>
+          <td>${escapeHTML(r.cp)}</td>
+          <td>${escapeHTML(r.kp)}</td>
+        </tr>
+      `).join('');
     }
 
     function openUserProfileModal(email) {
@@ -924,7 +1029,7 @@
         recentPostsEl.innerHTML = `<div style="font-size: 12.5px; color: var(--text-muted); text-align: center; padding: 12px;">Chưa có bài đăng nào.</div>`;
       } else {
         recentPostsEl.innerHTML = userPosts.slice(0, 5).map(p => `
-          <div class="profile-recent-post" onclick="jumpToPostFromProfile('${escapeHTML(p.title || '').replace(/'/g, "\\'")}')">
+          <div class="profile-recent-post" onclick="jumpToPostFromProfile(decodeURIComponent('${encodeURIComponent(p.title || 'Thảo luận chung')}'))">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
               <strong style="font-size: 13px; color: var(--text-main);">${escapeHTML(p.title || 'Thảo luận chung')}</strong>
               <span class="badge">${escapeHTML(p.category || 'Thảo luận')}</span>
@@ -1232,7 +1337,7 @@
               <span class="subject-chip">${escapeHTML(subj)}</span>
               <span>${escapeHTML(contentText)}</span>
             </div>
-            <button onclick="event.stopPropagation(); deleteDeadline(${item.id})" style="background:none; border:none; color: var(--text-muted); font-size: 13px; padding: 2px 6px;" title="Xóa">✕</button>
+            <button type="button" onclick="event.stopPropagation(); deleteDeadline(${item.id})" style="background:none; border:none; color: var(--text-muted); font-size: 13px; padding: 2px 6px;" title="Xóa">✕</button>
           </div>
         `;
       }).join('');
@@ -1271,7 +1376,194 @@
         localStorage.setItem('class_deadline_subjects', JSON.stringify(deadlineSubjects));
       }
 
-      textInput.value = '';
+    const EXAM_MODULES = [
+      {
+        id: 'exam_tin_10',
+        subject: 'Tin học',
+        title: 'Ôn kiểm tra Tin học 10 - Chủ đề 1 & An toàn số',
+        durationMinutes: 25,
+        curriculum: 'SGK Kết nối tri thức 10',
+        attemptRule: 'Không giới hạn lượt ôn',
+        questions: [
+          { q: 'Đặc điểm nổi bật nhất của xã hội tri thức so với xã hội công nghiệp là gì?', opts: ['Tri thức là lực lượng sản xuất chủ yếu, CNTT gắn liền với mọi hoạt động', 'Chỉ dựa vào khai thác tài nguyên thô', 'Không còn sử dụng máy tính', 'Chỉ áp dụng cho ngành xuất bản giấy'], ans: 0, ex: 'Xã hội tri thức lấy tri thức và công nghệ thông tin - truyền thông làm động lực phát triển cốt lõi.' },
+          { q: 'Khái niệm nào sau đây phản ánh đúng nhất "dữ liệu"?', opts: ['Ý nghĩa con người rút ra để ra quyết định', 'Thông tin thô, số liệu, kí hiệu, hình ảnh chưa được xử lí', 'Kinh nghiệm sống lâu năm', 'Phần mềm ứng dụng trên điện thoại'], ans: 1, ex: 'Dữ liệu là sự thể hiện thông tin dưới dạng số, chữ, kí hiệu, âm thanh, hình ảnh... để máy tính tiếp nhận và xử lí.' },
+          { q: 'Khi tiếp nhận và xử lí dữ liệu, con người thu được điều gì?', opts: ['Thông tin có ý nghĩa', 'Tăng dung lượng ổ cứng', 'Thay đổi cấu trúc phần cứng', 'Xóa toàn bộ dữ liệu gốc'], ans: 0, ex: 'Xử lí dữ liệu giúp biến dữ liệu thô thành thông tin mang lại hiểu biết và ý nghĩa cho con người.' },
+          { q: 'Tri thức hình thành như thế nào từ thông tin?', opts: ['Khi thông tin được con người hiểu, tích hợp và vận dụng vào thực tiễn', 'Khi sao chép file sang USB khác', 'Khi tắt nguồn máy tính', 'Khi tăng độ sáng màn hình'], ans: 0, ex: 'Tri thức là những hiểu biết của con người về một lĩnh vực hoặc vấn đề cụ thể, rút ra từ thông tin và kinh nghiệm.' },
+          { q: 'Đơn vị đo lượng thông tin cơ bản nhỏ nhất trong tin học là gì?', opts: ['Byte', 'Bit', 'Kilobyte', 'Megabyte'], ans: 1, ex: 'Bit (viết tắt của binary digit) là đơn vị nhỏ nhất của thông tin, nhận giá trị 0 hoặc 1.' },
+          { q: '1 Byte thông thường gồm bao nhiêu bit?', opts: ['4 bit', '8 bit', '16 bit', '32 bit'], ans: 1, ex: 'Theo chuẩn phổ biến trong tin học, 1 Byte = 8 bit.' },
+          { q: 'Thiết bị nào sau đây là thiết bị vào (nhập dữ liệu)?', opts: ['Màn hình', 'Máy in', 'Bàn phím', 'Loa ngoài'], ans: 2, ex: 'Bàn phím dùng để nhập kí tự, lệnh vào máy tính; màn hình, máy in, loa là thiết bị ra.' },
+          { q: 'Thiết bị nào sau đây là thiết bị ra (xuất thông tin)?', opts: ['Chuột máy tính', 'Máy quét (Scanner)', 'Màn hình', 'Microphone'], ans: 2, ex: 'Màn hình hiển thị kết quả xử lí và giao diện làm việc cho người dùng.' },
+          { q: 'Thành phần nào được ví như "bộ não" xử lí tính toán và điều khiển của máy tính?', opts: ['RAM', 'CPU', 'Ổ cứng SSD', 'Card mạng'], ans: 1, ex: 'CPU (Central Processing Unit) thực hiện các phép tính và điều khiển hoạt động của hệ thống.' },
+          { q: 'Bộ nhớ nào sau đây có tốc độ truy xuất nhanh nhưng dữ liệu thường mất khi tắt điện?', opts: ['RAM', 'HDD', 'SSD', 'Thẻ nhớ SD'], ans: 0, ex: 'RAM là bộ nhớ truy cập ngẫu nhiên, lưu dữ liệu tạm thời khi máy đang hoạt động.' },
+          { q: 'Phần mềm nào thuộc nhóm phần mềm hệ thống?', opts: ['Microsoft Word', 'Windows 11', 'CapCut', 'Trình duyệt Chrome'], ans: 1, ex: 'Hệ điều hành (như Windows, Linux, Android) là phần mềm hệ thống quản lí phần cứng và phần mềm khác.' },
+          { q: 'Phần mềm nào sau đây là phần mềm ứng dụng?', opts: ['BIOS', 'Hệ điều hành macOS', 'Trình soạn thảo văn bản', 'Trình điều khiển card đồ họa'], ans: 2, ex: 'Phần mềm ứng dụng phục vụ trực tiếp nhu cầu công việc, học tập hoặc giải trí của người dùng.' },
+          { q: 'Ứng dụng nổi bật của Tin học trong y tế là gì?', opts: ['Quản lí hồ sơ bệnh án điện tử, chẩn đoán hình ảnh', 'Trồng lúa nước', 'Khai thác mỏ than', 'Dệt vải thủ công'], ans: 0, ex: 'Tin học hỗ trợ lưu trữ bệnh án, đặt lịch khám, phân tích ảnh X-quang, MRI và quản lí thuốc.' },
+          { q: 'Trong giáo dục, Tin học hỗ trợ hiệu quả nhất ở hoạt động nào?', opts: ['Học trực tuyến, mô phỏng thí nghiệm, tra cứu học liệu số', 'Thay thế hoàn toàn tư duy sáng tạo của học sinh', 'Làm hỏng thiết bị học tập', 'Giảm khả năng đọc hiểu'], ans: 0, ex: 'CNTT mở rộng kho học liệu, hỗ trợ học từ xa và trực quan hóa kiến thức.' },
+          { q: 'Hành vi nào thể hiện văn hóa và tuân thủ pháp luật trên không gian mạng?', opts: ['Tôn trọng bản quyền khi dùng tài liệu', 'Tung tin giả gây hoang mang', 'Xâm nhập trái phép tài khoản người khác', 'Bắt nạt trực tuyến bạn học'], ans: 0, ex: 'Cần tôn trọng quyền tác giả, quyền riêng tư và ứng xử có trách nhiệm khi tham gia mạng.' },
+          { q: 'Rủi ro phổ biến khi bấm vào đường link lạ gửi qua tin nhắn là gì?', opts: ['Bị đánh cắp tài khoản hoặc cài mã độc', 'Máy tính tự động nâng cấp RAM miễn phí', 'Tăng dung lượng pin gấp đôi', 'Tự động làm xong bài tập'], ans: 0, ex: 'Liên kết giả mạo (phishing) thường dẫn tới trang đánh cắp mật khẩu hoặc phát tán mã độc.' },
+          { q: 'Cách đặt mật khẩu tài khoản an toàn nhất là gì?', opts: ['Dùng 123456 cho dễ nhớ', 'Kết hợp chữ hoa, chữ thường, số và kí tự đặc biệt; không dùng chung một mật khẩu cho mọi nơi', 'Dùng ngày sinh của bản thân', 'Chia sẻ mật khẩu cho nhiều người'], ans: 1, ex: 'Mật khẩu mạnh, đủ dài và khác nhau giữa các dịch vụ giúp giảm nguy cơ bị dò hoặc lộ lọt.' },
+          { q: 'Dấu hiệu nào cho thấy một thông tin trên mạng cần được kiểm chứng kỹ?', opts: ['Giật tít cực đoan, không rõ tác giả hoặc nguồn chính thống', 'Có dẫn nguồn rõ ràng và nhiều cơ quan uy tín xác nhận', 'Phù hợp với kiến thức khoa học đã kiểm chứng', 'Có ngày đăng và tác giả minh bạch'], ans: 0, ex: 'Tin đồn, tin giả thường dùng tiêu đề gây sốc, thiếu nguồn kiểm chứng đáng tin cậy.' },
+          { q: 'Khi đăng ảnh bạn bè lên mạng xã hội, điều nên làm trước tiên là gì?', opts: ['Hỏi ý kiến và được sự đồng ý của bạn đó', 'Đăng ngay kèm bình luận trêu chọc', 'Chỉnh sửa ảnh gây hiểu lầm', 'Gắn thẻ bừa bãi'], ans: 0, ex: 'Tôn trọng quyền riêng tư và hình ảnh cá nhân của người khác là nguyên tắc ứng xử văn minh.' },
+          { q: 'Tác hại của việc sử dụng thiết bị số quá nhiều vào ban đêm là gì?', opts: ['Giảm chất lượng giấc ngủ, mỏi mắt và giảm tập trung hôm sau', 'Tăng cường thị lực', 'Giúp ngủ sâu hơn ngay lập tức', 'Không ảnh hưởng gì tới sức khỏe'], ans: 0, ex: 'Ánh sáng xanh và thói quen dùng thiết bị khuya dễ làm rối loạn giấc ngủ và mệt mỏi.' },
+          { q: 'Dữ liệu số có ưu điểm gì nổi bật so với lưu trữ giấy truyền thống?', opts: ['Dễ tìm kiếm, sao lưu và chia sẻ nhanh chóng', 'Không bao giờ cần sao lưu dự phòng', 'Không thể bị chỉnh sửa hay xóa nhầm', 'Không cần thiết bị điện tử'], ans: 0, ex: 'Dữ liệu số dễ tổ chức, tìm kiếm và truyền tải, nhưng vẫn cần sao lưu và bảo mật cẩn thận.' },
+          { q: 'Nghề nghiệp nào gắn trực tiếp với lĩnh vực Công nghệ thông tin?', opts: ['Kĩ sư phần mềm, chuyên viên an ninh mạng', 'Giáo viên Thể dục', 'Đầu bếp', 'Kiến trúc sư cảnh quan'], ans: 0, ex: 'Phát triển phần mềm, quản trị hệ thống, khoa học dữ liệu và an ninh mạng là các nhóm nghề trọng tâm của CNTT.' }
+        ]
+      },
+      {
+        id: 'exam_toan_10',
+        subject: 'Toán học',
+        title: 'Ôn kiểm tra Toán 10 - Mệnh đề, Tập hợp & BPT',
+        durationMinutes: 35,
+        curriculum: 'SGK Kết nối tri thức 10',
+        attemptRule: 'Không giới hạn lượt ôn',
+        questions: [
+          { q: 'Phát biểu nào sau đây là một mệnh đề?', opts: ['Hôm nay trời đẹp quá!', '3 + 5 = 8.', 'x là số chẵn phải không?', 'Hãy mở sách trang 10!'], ans: 1, ex: '"3 + 5 = 8" là câu khẳng định có tính đúng xác định nên là mệnh đề.' },
+          { q: 'Mệnh đề nào sau đây là mệnh đề sai?', opts: ['π là một số vô tỉ.', 'Tổng hai số lẻ là một số chẵn.', '2 là số nguyên tố.', '5 là số chẵn.'], ans: 3, ex: '5 chia cho 2 dư 1 nên 5 là số lẻ, do đó khẳng định "5 là số chẵn" là mệnh đề sai.' },
+          { q: 'Mệnh đề phủ định của mệnh đề P: "∀x ∈ ℝ, x² + 1 > 0" là gì?', opts: ['∃x ∈ ℝ, x² + 1 ≤ 0', '∀x ∈ ℝ, x² + 1 ≤ 0', '∃x ∈ ℝ, x² + 1 < 0', '∀x ∈ ℝ, x² + 1 = 0'], ans: 0, ex: 'Phủ định của "∀" là "∃" và phủ định của ">" là "≤".' },
+          { q: 'Cho mệnh đề kéo theo P ⇒ Q: "Nếu tam giác ABC đều thì tam giác ABC cân". Mệnh đề này đúng hay sai?', opts: ['Đúng', 'Sai', 'Vừa đúng vừa sai', 'Không xác định'], ans: 0, ex: 'Mọi tam giác đều đều có ba cạnh bằng nhau nên chắc chắn là tam giác cân.' },
+          { q: 'Kí hiệu nào biểu diễn "x thuộc tập hợp A"?', opts: ['x ∉ A', 'x ∈ A', 'A ⊂ x', 'x ⊂ A'], ans: 1, ex: 'Kí hiệu "∈" đọc là "thuộc", "∉" đọc là "không thuộc".' },
+          { q: 'Cho A = {1; 2; 3} và B = {2; 3; 4}. Tập hợp A ∩ B là tập hợp nào?', opts: ['{1; 4}', '{2; 3}', '{1; 2; 3; 4}', '∅'], ans: 1, ex: 'Giao của hai tập hợp A ∩ B gồm các phần tử thuộc cả A và B, đó là 2 và 3.' },
+          { q: 'Cho A = {1; 2} và B = {2; 3}. Tập hợp A ∪ B là tập hợp nào?', opts: ['{2}', '{1; 3}', '{1; 2; 3}', '{1; 2}'], ans: 2, ex: 'Hợp của hai tập hợp A ∪ B gồm tất cả phần tử thuộc A hoặc thuộc B.' },
+          { q: 'Cho A = {1; 2; 3; 4} và B = {3; 4; 5}. Tập hợp A \ B là tập hợp nào?', opts: ['{1; 2}', '{5}', '{3; 4}', '{1; 2; 5}'], ans: 0, ex: 'A \ B gồm các phần tử thuộc A nhưng không thuộc B, tức là 1 và 2.' },
+          { q: 'Nửa khoảng [-2; 5) gồm các số thực x thỏa mãn điều kiện nào?', opts: ['-2 < x < 5', '-2 ≤ x < 5', '-2 ≤ x ≤ 5', '-2 < x ≤ 5'], ans: 1, ex: 'Móc vuông "[" tính đầu mút (-2 ≤ x), ngoặc tròn ")" không tính đầu mút (x < 5).' },
+          { q: 'Khoảng (1; 4) chứa bao nhiêu số nguyên?', opts: ['1', '2', '3', '4'], ans: 1, ex: 'Các số nguyên nằm giữa 1 và 4 là 2 và 3 (có 2 số nguyên).' },
+          { q: 'Bất phương trình nào sau đây là bất phương trình bậc nhất hai ẩn?', opts: ['2x - 3y ≤ 6', 'x² + y ≤ 1', 'xy > 4', '2x - 3y + z ≥ 0'], ans: 0, ex: 'Bất phương trình bậc nhất hai ẩn x, y có dạng ax + by ≤ c (hoặc <, >, ≥) với a, b không đồng thời bằng 0.' },
+          { q: 'Cặp số (x; y) = (1; 2) là nghiệm của bất phương trình nào dưới đây?', opts: ['3x - y > 5', '2x + y - 4 ≤ 0', 'x + y < 2', '5x - 2y > 10'], ans: 1, ex: 'Thay x = 1, y = 2 vào 2x + y - 4 ta được 2(1) + 2 - 4 = 0 ≤ 0 (thỏa mãn).' },
+          { q: 'Miền nghiệm của bất phương trình ax + by < c trên mặt phẳng tọa độ là gì?', opts: ['Một đường thẳng', 'Một nửa mặt phẳng (không kể bờ)', 'Một parabol', 'Một điểm duy nhất'], ans: 1, ex: 'Bất phương trình bậc nhất hai ẩn có miền nghiệm là một nửa mặt phẳng.' },
+          { q: 'Đường thẳng d: x + y = 3 chia mặt phẳng tọa độ thành mấy phần (không kể d)?', opts: ['1 phần', '2 phần', '3 phần', '4 phần'], ans: 1, ex: 'Một đường thẳng chia mặt phẳng thành hai nửa mặt phẳng đối nhau.' },
+          { q: 'Điểm O(0; 0) có thuộc miền nghiệm của bất phương trình x + 2y > 1 không?', opts: ['Có', 'Không', 'Chỉ khi y = 1', 'Chỉ khi x = 1'], ans: 1, ex: 'Thay (0; 0) ta được 0 + 0 = 0 > 1 (sai), nên O không thuộc miền nghiệm.' },
+          { q: 'Hệ bất phương trình bậc nhất hai ẩn gồm bao nhiêu bất phương trình bậc nhất hai ẩn?', opts: ['Chỉ 1 bất phương trình', 'Từ hai bất phương trình trở lên', 'Luôn đúng 2 bất phương trình', 'Không có bất phương trình nào'], ans: 1, ex: 'Hệ bất phương trình bậc nhất hai ẩn gồm hai hay nhiều bất phương trình bậc nhất hai ẩn.' },
+          { q: 'Nghiệm chung của tất cả các bất phương trình trong hệ gọi là gì?', opts: ['Hệ số của hệ', 'Nghiệm của hệ bất phương trình', 'Bờ miền nghiệm', 'Tập xác định'], ans: 1, ex: 'Mỗi cặp (x; y) thỏa mãn đồng thời mọi bất phương trình trong hệ là một nghiệm của hệ.' },
+          { q: 'Biểu diễn miền nghiệm của hệ bất phương trình trên mặt phẳng tọa độ là gì?', opts: ['Phần giao của các miền nghiệm từng bất phương trình', 'Phần hợp của các miền nghiệm', 'Đường thẳng chia đôi mặt phẳng', 'Tập rỗng với mọi hệ'], ans: 0, ex: 'Miền nghiệm của hệ là giao của các miền nghiệm tương ứng với từng bất phương trình.' },
+          { q: 'Cho tập hợp A = {x ∈ ℝ | -1 ≤ x ≤ 3}. Cách viết nào tương đương?', opts: ['A = (-1; 3)', 'A = [-1; 3]', 'A = [-1; 3)', 'A = (-1; 3]'], ans: 1, ex: 'Cả hai đầu mút -1 và 3 đều có dấu "≤" nên dùng ngoặc vuông [-1; 3].' },
+          { q: 'Phát biểu "Tồn tại số thực x sao cho x + 1 = 0" viết bằng kí hiệu là gì?', opts: ['∀x ∈ ℝ, x + 1 = 0', '∃x ∈ ℝ, x + 1 = 0', '∃x ∈ ℝ, x + 1 ≠ 0', '∀x ∈ ℝ, x + 1 > 0'], ans: 1, ex: '"Tồn tại số thực x" kí hiệu là ∃x ∈ ℝ.' },
+          { q: 'Nếu A ⊂ B và B ⊂ C thì kết luận nào sau đây luôn đúng?', opts: ['A ⊂ C', 'C ⊂ A', 'A = C', 'A ∩ C = ∅'], ans: 0, ex: 'Quan hệ bao hàm có tính bắc cầu: nếu A là tập con của B và B là tập con của C thì A là tập con của C.' },
+          { q: 'Trong bài toán tối ưu sản xuất trên K12/Toán 10, giá trị lớn nhất hoặc nhỏ nhất của biểu thức F(x; y) thường đạt được ở đâu?', opts: ['Tại các đỉnh của miền đa giác nghiệm', 'Chỉ ở ngoài miền nghiệm', 'Trên trục tung bất kì', 'Không bao giờ xác định được'], ans: 0, ex: 'Với miền nghiệm là đa giác lồi, giá trị lớn nhất/nhỏ nhất của biểu thức bậc nhất thường đạt tại các đỉnh của đa giác.' }
+        ]
+      },
+      {
+        id: 'exam_van_10',
+        subject: 'Ngữ Văn',
+        title: 'Ôn kiểm tra Ngữ văn 10 - Thần thoại, Sử thi & Nghị luận',
+        durationMinutes: 30,
+        curriculum: 'SGK Kết nối tri thức 10',
+        attemptRule: 'Không giới hạn lượt ôn',
+        questions: [
+          { q: 'Đặc trưng nổi bật của nhân vật trong truyện thần thoại là gì?', opts: ['Thường là các vị thần hoặc nhân vật có sức mạnh siêu nhiên, kì ảo', 'Luôn là người nông dân bình thường không phép thuật', 'Chỉ nói về đời sống cung đình phong kiến', 'Nhân vật luôn có tâm lí giằng xé nội tâm hiện đại'], ans: 0, ex: 'Thần thoại giải thích nguồn gốc tự nhiên và đời sống thông qua các vị thần và kì tích siêu nhiên.' },
+          { q: 'Không gian trong truyện thần thoại thường có đặc điểm gì?', opts: ['Không gian vũ trụ rộng lớn, mang tính tạo lập thế giới', 'Chỉ gói gọn trong một căn phòng', 'Không gian đô thị hiện đại', 'Không gian phòng thí nghiệm'], ans: 0, ex: 'Thần thoại thường mở ra không gian vũ trụ bao la với trời, đất, biển, núi sông...' },
+          { q: 'Thời gian trong truyện thần thoại thường là loại thời gian nào?', opts: ['Thời gian phiếm chỉ, xa xưa ("ngày xửa ngày xưa", "thuở ấy")', 'Thời gian tính bằng giây, phút chính xác', 'Thời gian tương lai khoa học viễn tưởng', 'Thời gian lịch sử ghi năm cụ thể'], ans: 0, ex: 'Thời gian thần thoại là thời gian cổ sơ, phiếm chỉ, chưa gắn với lịch sử thành văn.' },
+          { q: 'Trong sử thi, nhân vật anh hùng thường đại diện cho điều gì?', opts: ['Lí tưởng, sức mạnh và danh dự của cả cộng đồng', 'Lợi ích cá nhân vụ lợi', 'Sự buông xuôi, yếu đuối', 'Sự châm biếm đời thường'], ans: 0, ex: 'Người anh hùng sử thi mang tầm vóc lớn lao, gắn bó chặt chẽ với cộng đồng, bộ tộc.' },
+          { q: 'Ngôn ngữ trong sử thi thường mang sắc thái nào?', opts: ['Trang trọng, hào hùng, giàu nhịp điệu và hình ảnh phóng đại', 'Nói lắp, khẩu ngữ suồng sã', 'Khô khan như văn bản hành chính', 'Mật mã kĩ thuật'], ans: 0, ex: 'Lời kể sử thi trang trọng, giàu tính nhạc và thường sử dụng lối so sánh, phóng đại.' },
+          { q: 'Văn bản nghị luận có mục đích chính là gì?', opts: ['Trình bày ý kiến, lí lẽ và bằng chứng để thuyết phục người đọc', 'Kể chuyện cổ tích giải trí', 'Mô tả chi tiết một món ăn', 'Lập bảng thống kê số liệu thuần túy'], ans: 0, ex: 'Văn bản nghị luận tập trung làm sáng tỏ một luận điểm bằng hệ thống lí lẽ và bằng chứng thuyết phục.' },
+          { q: 'Luận điểm trong văn bản nghị luận là gì?', opts: ['Ý kiến thể hiện tư tưởng, quan điểm của người viết về vấn đề nghị luận', 'Một câu cảm thán bất kì', 'Tên tác giả ở cuối bài', 'Số trang của cuốn sách'], ans: 0, ex: 'Luận điểm là tư tưởng, quan điểm chính mà người viết muốn khẳng định và bảo vệ.' },
+          { q: 'Bằng chứng trong văn bản nghị luận dùng để làm gì?', opts: ['Làm sáng tỏ, củng cố độ tin cậy cho lí lẽ và luận điểm', 'Trang trí cho bài viết dài thêm', 'Thay thế hoàn toàn luận điểm', 'Gây khó hiểu cho người đọc'], ans: 0, ex: 'Bằng chứng (sự kiện, số liệu, dẫn chứng thực tế) giúp lí lẽ có sức thuyết phục cao hơn.' },
+          { q: 'Lỗi dùng từ không đúng nghĩa thường xảy ra khi nào?', opts: ['Nhầm lẫn giữa các từ gần âm hoặc gần nghĩa mà không chú ý ngữ cảnh', 'Dùng từ chuẩn xác theo từ điển', 'Viết hoa đầu câu', 'Dùng dấu chấm hết câu'], ans: 0, ex: 'Chọn từ sai sắc thái hoặc không hợp kết hợp ngữ cảnh sẽ làm câu văn tối nghĩa, sai ý.' },
+          { q: 'Lỗi câu mơ hồ (đa nghĩa ngoài ý muốn) thường do nguyên nhân nào?', opts: ['Cấu tạo ngữ pháp hoặc cách sắp xếp từ ngữ khiến câu hiểu theo nhiều nghĩa', 'Câu văn quá ngắn gọn', 'Dùng dấu phẩy đúng chỗ', 'Có chủ ngữ rõ ràng'], ans: 0, ex: 'Khi sắp xếp từ thiếu mạch lạc hoặc thiếu dấu câu, câu có thể gây hiểu nhầm nhiều cách.' },
+          { q: 'Khi sửa lỗi câu sai ngữ pháp, việc đầu tiên cần làm là gì?', opts: ['Xác định đúng thành phần câu và chỗ sai (thiếu chủ ngữ, vị ngữ, sai quan hệ từ...)', 'Xóa toàn bộ đoạn văn', 'Đổi sang viết chữ in hoa hết', 'Bỏ qua không cần sửa'], ans: 0, ex: 'Phải chẩn đoán đúng "bệnh" của câu thì mới sửa trúng và giữ được ý cần diễn đạt.' },
+          { q: 'Thơ trữ tình chú trọng thể hiện điều gì hơn cả?', opts: ['Tâm trạng, cảm xúc, rung động nội tâm của chủ thể trữ tình', 'Diễn biến vụ án trinh thám', 'Hướng dẫn sử dụng thiết bị', 'Thống kê dân số'], ans: 0, ex: 'Thơ trữ tình bộc lộ thế giới nội tâm, cảm xúc và thái độ của nhân vật trữ tình trước cuộc đời.' },
+          { q: 'Hình ảnh thơ có đặc điểm gì nổi bật?', opts: ['Gợi cảm, giàu sức liên tưởng, biểu đạt chiều sâu cảm xúc', 'Chỉ sao chép nguyên si hình ảnh chụp thực tế', 'Khó hiểu một cách cố ý', 'Không liên quan đến chủ đề'], ans: 0, ex: 'Hình ảnh trong thơ vừa cụ thể vừa giàu ý nghĩa biểu tượng, gợi nhiều liên tưởng.' },
+          { q: 'Khi đọc hiểu một văn bản thông tin, ta cần chú ý yếu tố nào?', opts: ['Thông tin chính, cách triển khai ý, nhan đề, sơ đồ/bảng biểu kèm theo', 'Chỉ đếm số lượng dấu câu', 'Chỉ xem màu chữ', 'Bỏ qua phần chú thích'], ans: 0, ex: 'Văn bản thông tin cung cấp tri thức khách quan nên cần nắm thông tin cốt lõi và cách tổ chức thông tin.' },
+          { q: 'Thái độ tôn trọng sự khác biệt trong thảo luận nhóm thể hiện ở đâu?', opts: ['Lắng nghe ý kiến người khác, phản biện lịch sự dựa trên lí lẽ', 'Ngắt lời và công kích cá nhân', 'Gạt bỏ mọi ý kiến trái chiều', 'Im lặng không đóng góp gì'], ans: 0, ex: 'Thảo luận văn minh cần lắng nghe, tôn trọng người đối thoại và trao đổi mang tính xây dựng.' },
+          { q: 'Trong bài văn nghị luận xã hội, phần mở bài cần làm gì?', opts: ['Giới thiệu vấn đề nghị luận và định hướng quan điểm của người viết', 'Trình bày toàn bộ kết luận cuối bài', 'Kể một câu chuyện không liên quan', 'Liệt kê mục lục'], ans: 0, ex: 'Mở bài nêu vấn đề và khơi gợi hứng thú, mở đường cho phần triển khai lí lẽ – bằng chứng.' },
+          { q: 'Phần kết bài của văn bản nghị luận có vai trò gì?', opts: ['Khẳng định lại vấn đề, rút ra bài học nhận thức và hành động', 'Đặt thêm câu hỏi mới chưa giải quyết', 'Lặp lại nguyên văn toàn bộ thân bài', 'Kết thúc đột ngột không ý nghĩa'], ans: 0, ex: 'Kết bài khép lại vấn đề một cách gọn ghẽ, đọng lại thông điệp hoặc lời nhắn nhủ.' },
+          { q: 'Biện pháp tu từ liệt kê giúp ích gì cho diễn đạt?', opts: ['Làm rõ hơn, đầy đủ và nhấn mạnh nhiều khía cạnh của sự vật, hiện tượng', 'Làm câu văn cụt ngủn', 'Làm mất trọng tâm ý chính', 'Thay thế dấu chấm than'], ans: 0, ex: 'Liệt kê giúp tăng tính cụ thể, sinh động và nhấn mạnh sắc thái biểu cảm.' },
+          { q: 'Khi trích dẫn lời nói hoặc ý kiến của người khác, cần chú ý điều gì?', opts: ['Trích dẫn trung thực, ghi rõ nguồn hoặc đặt trong ngoặc kép phù hợp', 'Tự sửa đổi nội dung rồi gán cho người khác', 'Sao chép nguyên bài mà không ghi nguồn', 'Bóp méo ý gốc'], ans: 0, ex: 'Tính trung thực học thuật đòi hỏi trích dẫn đúng và tôn trọng nguồn gốc tư liệu.' },
+          { q: 'Mục đích của việc rèn luyện kĩ năng viết bài nghị luận ở lớp 10 là gì?', opts: ['Biết suy nghĩ độc lập, lập luận chặt chẽ và bày tỏ chính kiến thuyết phục', 'Học thuộc lòng một bài văn mẫu duy nhất', 'Viết thật dài cho đủ trang', 'Tránh nêu quan điểm cá nhân'], ans: 0, ex: 'Nghị luận rèn tư duy phản biện, lập luận logic và khả năng diễn đạt rõ ràng trong học tập, cuộc sống.' }
+        ]
+      },
+      {
+        id: 'exam_su_10',
+        subject: 'Lịch sử',
+        title: 'Ôn kiểm tra Lịch sử 10 - Sử học & Văn minh cổ đại',
+        durationMinutes: 25,
+        curriculum: 'SGK Kết nối tri thức 10',
+        attemptRule: 'Không giới hạn lượt ôn',
+        questions: [
+          { q: 'Khái niệm "Lịch sử" thường được hiểu theo những nghĩa cơ bản nào?', opts: ['Những gì đã diễn ra trong quá khứ và khoa học tìm hiểu quá khứ loài người', 'Chỉ là những câu chuyện tưởng tượng', 'Chỉ là các con số thống kê hiện tại', 'Chỉ là dự đoán tương lai'], ans: 0, ex: 'Lịch sử vừa là hiện thực khách quan đã diễn ra trong quá khứ, vừa là môn khoa học nghiên cứu quá khứ.' },
+          { q: 'Sử học có vai trò quan trọng nào đối với đời sống hiện tại?', opts: ['Giúp hiểu cội nguồn, rút bài học kinh nghiệm và định hướng tương lai', 'Chỉ phục vụ cho việc thi cử thuần túy', 'Thay thế mọi môn khoa học khác', 'Không liên quan tới văn hóa'], ans: 0, ex: 'Nhìn lại quá khứ giúp con người trân trọng di sản, tránh lặp lại sai lầm và hành động khôn ngoan hơn.' },
+          { q: 'Sử liệu là gì trong nghiên cứu lịch sử?', opts: ['Những tư liệu còn lưu lại giúp con người nhận thức và phục dựng quá khứ', 'Chỉ là các bức ảnh chụp ngày hôm nay', 'Chỉ là truyện cười dân gian', 'Là suy đoán cá nhân không căn cứ'], ans: 0, ex: 'Sử liệu (hiện vật, chữ viết, truyền khẩu...) là nguồn tư liệu để tìm hiểu lịch sử.' },
+          { q: 'Nhóm sử liệu nào gồm di tích khảo cổ, công cụ lao động, đồ gốm, tiền cổ?', opts: ['Sử liệu hiện vật', 'Sử liệu truyền khẩu', 'Sử liệu thành văn', 'Sử liệu điện tử'], ans: 0, ex: 'Sử liệu hiện vật là các di vật, di tích vật chất còn giữ lại từ quá khứ.' },
+          { q: 'Một trong những thành tựu tiêu biểu của văn minh Ai Cập cổ đại là gì?', opts: ['Chữ tượng hình, kim tự tháp, kiến thức hình học và thiên văn', 'La bàn và thuốc súng', 'Chữ cái Latinh hiện đại', 'Động cơ hơi nước'], ans: 0, ex: 'Ai Cập cổ đại nổi tiếng với chữ tượng hình, kim tự tháp và kĩ thuật ướp xác, đo đạc ruộng đất.' },
+          { q: 'Văn minh Lưỡng Hà cổ đại hình thành bên lưu vực hai con sông nào?', opts: ['Sông Ti-grơ và sông Ơ-phrat', 'Sông Nin và sông Hằng', 'Sông Hoàng Hà và sông Trường Giang', 'Sông Mê Kông và sông Hồng'], ans: 0, ex: 'Lưỡng Hà nằm giữa hai con sông Ti-grơ và Ơ-phrat, nổi tiếng với bộ luật Ham-mu-ra-bi.' },
+          { q: 'Văn minh Ấn Độ cổ đại gắn liền với các tôn giáo lớn nào?', opts: ['Hin-đu giáo (Ấn Độ giáo) và Phật giáo', 'Thiên Chúa giáo và Hồi giáo', 'Đạo Tin Lành', 'Do Thái giáo'], ans: 0, ex: 'Ấn Độ là cái nôi của Hin-đu giáo và Phật giáo, có nhiều công trình kiến trúc và chữ viết cổ.' },
+          { q: 'Văn minh Trung Hoa cổ đại có các phát minh nào nổi bật?', opts: ['Giấy viết, kĩ thuật in, la bàn, thuốc súng', 'Máy bay và điện thoại', 'Kính hiển vi điện tử', 'Tàu ngầm hạt nhân'], ans: 0, ex: 'Tứ đại phát minh của Trung Hoa cổ đại gồm làm giấy, in ấn, la bàn và thuốc súng.' },
+          { q: 'Bảo tồn di sản văn hóa có ý nghĩa gì đối với cộng đồng?', opts: ['Gìn giữ bản sắc, bồi đắp lòng tự hào và phát triển du lịch bền vững', 'Làm cản trở giao lưu quốc tế', 'Chỉ tốn kém không mang lại giá trị', 'Xóa bỏ nét riêng của địa phương'], ans: 0, ex: 'Di sản văn hóa là tài sản vô giá gắn kết cộng đồng và tạo nguồn lực văn hóa - kinh tế.' },
+          { q: 'Sử liệu thành văn là loại tư liệu nào?', opts: ['Các ghi chép bằng chữ viết trên giấy, bia đá, mộc bản, văn khắc...', 'Những câu chuyện kể truyền miệng qua các thế hệ', 'Dấu vết khảo cổ dưới lòng đất', 'Hình ảnh mô phỏng 3D hiện đại'], ans: 0, ex: 'Sử liệu thành văn là tư liệu được ghi chép thành văn bản qua các thời kì.' },
+          { q: 'Vì sao các nền văn minh phương Đông cổ đại thường ra đời bên lưu vực các dòng sông lớn?', opts: ['Đất phù sa màu mỡ, nguồn nước thuận lợi cho nông nghiệp trồng trọt', 'Vì không có núi rừng', 'Vì nằm ở vùng cực lạnh giá', 'Vì chỉ phát triển đánh bắt cá voi'], ans: 0, ex: 'Các lưu vực sông lớn tạo điều kiện tưới tiêu và bồi đắp phù sa thuận lợi cho kinh tế nông nghiệp sớm phát triển.' },
+          { q: 'Bộ luật Ham-mu-ra-bi gắn liền với nền văn minh cổ đại nào?', opts: ['Văn minh Lưỡng Hà', 'Văn minh Ai Cập', 'Văn minh Hy Lạp', 'Văn minh La Mã'], ans: 0, ex: 'Bộ luật Ham-mu-ra-bi là một trong những bộ luật thành văn cổ nổi tiếng nhất của Lưỡng Hà.' },
+          { q: 'Nền văn minh Hi Lạp và La Mã cổ đại phát triển mạnh ở khu vực nào?', opts: ['Vùng Địa Trung Hải', 'Lưu vực sông Hoàng Hà', 'Thảo nguyên Trung Á', 'Quần đảo Nhật Bản'], ans: 0, ex: 'Văn minh cổ đại Hi Lạp - La Mã hình thành và phát triển rực rỡ ở khu vực Địa Trung Hải.' },
+          { q: 'Thành tựu nào sau đây là đóng góp tiêu biểu của văn minh Hi Lạp cổ đại?', opts: ['Hệ thống chữ cái, triết học, sử học, khoa học tự nhiên và Thế vận hội Ô-lim-píc', 'Kim tự tháp lớn nhất thế giới', 'Giấy viết và kĩ thuật in chữ rời', 'Chữ tượng hình trên đá'], ans: 0, ex: 'Hi Lạp cổ đại để lại nhiều di sản về dân chủ, triết học, khoa học, văn học và nghệ thuật.' },
+          { q: 'Nguyên tắc quan trọng khi đối chiếu các nguồn sử liệu là gì?', opts: ['Kiểm chứng nguồn gốc, thời điểm ra đời và so sánh nhiều nguồn để đảm bảo khách quan', 'Chỉ tin vào một nguồn duy nhất không kiểm tra', 'Chọn nguồn phù hợp sở thích cá nhân rồi bỏ qua phần còn lại', 'Tự bịa thêm chi tiết cho hấp dẫn'], ans: 0, ex: 'Đối chiếu và đánh giá độ tin cậy của sử liệu giúp nhận thức lịch sử chính xác và khách quan hơn.' },
+          { q: 'Di sản thiên nhiên thế giới có đặc điểm gì?', opts: ['Có giá trị nổi bật toàn cầu về cảnh quan, địa chất, đa dạng sinh học', 'Chỉ do con người xây dựng hoàn toàn', 'Không cần được bảo vệ', 'Chỉ tồn tại trong vài tháng'], ans: 0, ex: 'Di sản thiên nhiên mang giá trị nổi bật toàn cầu về thẩm mĩ, địa chất hoặc hệ sinh thái.' },
+          { q: 'Gắn kết học tập Lịch sử với di tích và bảo tàng địa phương mang lại lợi ích gì?', opts: ['Giúp kiến thức trực quan, sinh động và bồi dưỡng tình yêu quê hương', 'Làm mất thời gian không có tác dụng', 'Chỉ phù hợp cho chuyên gia khảo cổ', 'Thay thế hoàn toàn sách giáo khoa'], ans: 0, ex: 'Trải nghiệm thực tế tại di tích, bảo tàng giúp học sinh hiểu sâu sắc hơn về quá khứ tại chính địa phương mình.' },
+          { q: 'Khái niệm "văn minh" khác gì với "văn hóa" trong cách tiếp cận phổ biến?', opts: ['Văn minh nhấn mạnh trình độ phát triển vật chất, tinh thần và tổ chức xã hội ở một giai đoạn nhất định, gắn với đô thị/chữ viết/nhà nước', 'Văn minh hoàn toàn đối lập và phủ nhận văn hóa', 'Hai khái niệm giống hệt nhau mọi lúc', 'Văn minh chỉ nói về máy móc'], ans: 0, ex: 'Văn hóa rộng và mang tính bền vững, bản sắc; văn minh thường chỉ trình độ phát triển đạt tới của xã hội loài người ở những giai đoạn/không gian nhất định.' },
+          { q: 'Người học lịch sử cần rèn luyện phẩm chất và năng lực nào?', opts: ['Tư duy phản biện, tôn trọng sự thật lịch sử và trách nhiệm công dân', 'Học vẹt ngày tháng rời rạc', 'Phán xét cảm tính không có căn cứ', 'Thờ ơ với lịch sử dân tộc và nhân loại'], ans: 0, ex: 'Học lịch sử giúp hình thành tư duy phân tích, thái độ khách quan và ý thức trân trọng giá trị lịch sử.' },
+          { q: 'Hoạt động nào góp phần quảng bá di sản lịch sử - văn hóa địa phương trong thời đại số?', opts: ['Xây dựng bài giới thiệu, video ngắn, bản đồ số hoặc triển lãm trực tuyến có nguồn tư liệu chính xác', 'Đăng thông tin sai lệch để câu tương tác', 'Xóa bỏ tư liệu địa phương', 'Sao chép không ghi nguồn'], ans: 0, ex: 'Ứng dụng công nghệ số đúng cách giúp lan tỏa giá trị di sản tới đông đảo bạn trẻ và cộng đồng.' }
+        ]
+      },
+      {
+        id: 'exam_dia_10',
+        subject: 'Địa lý',
+        title: 'Ôn kiểm tra Địa lý 10 - Bản đồ, Trái Đất & Lớp vỏ địa lí',
+        durationMinutes: 25,
+        curriculum: 'SGK Kết nối tri thức 10',
+        attemptRule: 'Không giới hạn lượt ôn',
+        questions: [
+          { q: 'Trên bản đồ, "tỉ lệ bản đồ" cho biết điều gì?', opts: ['Mức độ thu nhỏ của khoảng cách trên bản đồ so với thực địa', 'Độ cao tuyệt đối của đỉnh núi', 'Hướng gió thổi trong năm', 'Nhiệt độ trung bình tháng'], ans: 0, ex: 'Tỉ lệ bản đồ cho biết 1 đơn vị đo trên bản đồ ứng với bao nhiêu đơn vị đo ngoài thực tế.' },
+          { q: 'Tỉ lệ bản đồ 1 : 100.000 có nghĩa là gì?', opts: ['1 cm trên bản đồ ứng với 100.000 cm (1 km) trên thực địa', '1 cm trên bản đồ ứng với 100 m trên thực địa', '1 cm trên bản đồ ứng với 10 km trên thực địa', '1 m trên bản đồ ứng với 100 km trên thực địa'], ans: 0, ex: '100.000 cm = 1.000 m = 1 km, nên 1 cm trên bản đồ tương ứng 1 km ngoài thực tế.' },
+          { q: 'Phương pháp kí hiệu trên bản đồ thường dùng để biểu hiện đối tượng nào?', opts: ['Các đối tượng phân bố theo điểm cụ thể như mỏ khoáng sản, cảng biển, nhà máy', 'Sự dịch chuyển dòng người di cư', 'Sự thay đổi màu sắc ngẫu nhiên', 'Tốc độ quay của Trái Đất'], ans: 0, ex: 'Phương pháp kí hiệu thể hiện chính xác vị trí và đặc điểm của các đối tượng phân bố theo điểm.' },
+          { q: 'Đường đồng mức trên bản đồ địa hình nối các điểm có đặc điểm gì?', opts: ['Có cùng độ cao', 'Có cùng lượng mưa năm', 'Có cùng dân số', 'Có cùng múi giờ'], ans: 0, ex: 'Đường bình độ (đồng mức) là đường nối các điểm có cùng độ cao so với mực nước biển.' },
+          { q: 'Khi các đường đồng mức càng xích lại gần nhau, địa hình có đặc điểm gì?', opts: ['Độ dốc càng lớn', 'Địa hình hoàn toàn bằng phẳng', 'Là mặt hồ tĩnh lặng', 'Không có độ cao'], ans: 0, ex: 'Đường đồng mức càng dày/gần nhau thì độ chênh cao trên một khoảng ngắn càng lớn, nghĩa là sườn càng dốc.' },
+          { q: 'Hệ thống lưới kinh, vĩ tuyến trên bản đồ giúp xác định yếu tố nào?', opts: ['Tọa độ địa lí và phương hướng trên bản đồ', 'Màu sắc của bầu trời', 'Giá cả hàng hóa', 'Tên các tác phẩm văn học'], ans: 0, ex: 'Kinh tuyến chỉ hướng Bắc - Nam, vĩ tuyến chỉ hướng Đông - Tây và giúp xác định tọa độ địa lí.' },
+          { q: 'Trái Đất tự quay quanh trục theo hướng nào?', opts: ['Từ Tây sang Đông', 'Từ Đông sang Tây', 'Từ Bắc xuống Nam', 'Từ Nam lên Bắc'], ans: 0, ex: 'Trái Đất tự quay quanh trục từ Tây sang Đông, tạo nên hiện tượng ngày và đêm luân phiên.' },
+          { q: 'Hệ quả trực tiếp của chuyển động tự quay quanh trục của Trái Đất là gì?', opts: ['Sự luân phiên ngày đêm, giờ trên Trái Đất và lệch hướng chuyển động (Cô-ri-ô-lít)', 'Sự thay đổi các mùa trong năm', 'Sự thay đổi độ dài ngày đêm theo mùa', 'Hiện tượng nhật thực toàn phần'], ans: 0, ex: 'Tự quay quanh trục sinh ra ngày đêm, giờ địa phương - giờ múi và lực Cô-ri-ô-lít.' },
+          { q: 'Nguyên nhân chính sinh ra các mùa Xuân, Hạ, Thu, Đông trên Trái Đất là gì?', opts: ['Trục Trái Đất nghiêng 23°27\' và không đổi hướng khi chuyển động quanh Mặt Trời', 'Mặt Trời ngừng chiếu sáng vào mùa đông', 'Khoảng cách Trái Đất - Mặt Trời thay đổi đột ngột mỗi tuần', 'Trái Đất ngừng tự quay'], ans: 0, ex: 'Trục nghiêng kết hợp với chuyển động tịnh tiến quanh Mặt Trời làm góc nhập xạ và thời gian chiếu sáng thay đổi theo mùa.' },
+          { q: 'Khu vực Xích đạo có đặc điểm gì về độ dài ngày và đêm quanh năm?', opts: ['Ngày và đêm luôn dài bằng nhau (khoảng 12 giờ)', 'Ngày dài suốt 24 giờ quanh năm', 'Đêm dài suốt 24 giờ quanh năm', 'Không có ban ngày'], ans: 0, ex: 'Đường Xích đạo luôn được phân chia thành hai phần bằng nhau bởi đường sáng tối nên ngày đêm dài bằng nhau.' },
+          { q: 'Lớp vỏ địa lí là nơi diễn ra hoạt động của đối tượng nào?', opts: ['Nơi các quyển (khí quyển, thạch quyển, thủy quyển, sinh quyển, thổ nhưỡng quyển) xâm nhập và tác động lẫn nhau', 'Chỉ có lớp đá nóng chảy sâu dưới tâm Trái Đất', 'Chỉ có tầng bình lưu', 'Không có sự sống'], ans: 0, ex: 'Lớp vỏ địa lí là lớp vỏ tự nhiên ở bề mặt Trái Đất, nơi các quyển tương tác mật thiết và có sự sống.' },
+          { q: 'Kĩ năng đọc lược đồ/bản đồ giúp ích gì trong học tập và đời sống?', opts: ['Định hướng không gian, nhận diện phân bố đối tượng và đọc hiểu thông tin trực quan', 'Thay thế việc ghi chép bài học', 'Làm bản đồ mất tính chính xác', 'Chỉ dùng khi đi du lịch nước ngoài'], ans: 0, ex: 'Đọc bản đồ là kĩ năng cốt lõi giúp nắm bắt nhanh không gian, vị trí và mối liên hệ địa lí.' },
+          { q: 'Vĩ độ địa lí của một điểm được tính từ đường nào?', opts: ['Từ đường Xích đạo (0°) về phía Bắc hoặc phía Nam đến 90°', 'Từ kinh tuyến gốc 0° về phía Đông hoặc Tây', 'Từ cực Bắc xuống đáy đại dương', 'Từ mực nước biển lên đỉnh núi'], ans: 0, ex: 'Vĩ độ tính từ Xích đạo (0°) đến hai cực (90°B hoặc 90°N).' },
+          { q: 'Kinh tuyến gốc (0°) đi qua đài thiên văn nào?', opts: ['Đài thiên văn Grin-uých (Greenwich)', 'Đỉnh Ê-vơ-rét', 'Đảo Ha-oai', 'Thành phố Ô-xlô'], ans: 0, ex: 'Kinh tuyến 0° quy ước đi qua đài thiên văn Greenwich (Anh).' },
+          { q: 'Nếu ở múi giờ số 7 là 12 giờ trưa thì ở múi giờ số 8 cùng ngày là mấy giờ?', opts: ['13 giờ', '11 giờ', '12 giờ', '10 giờ'], ans: 0, ex: 'Đi về phía Đông (từ múi 7 sang múi 8) giờ tăng thêm 1 giờ, nên là 13 giờ.' },
+          { q: 'Lực Cô-ri-ô-lít làm vật chuyển động ở bán cầu Bắc lệch theo hướng nào (nhìn theo hướng chuyển động)?', opts: ['Lệch về bên phải', 'Lệch về bên trái', 'Thẳng đứng lên trời', 'Không bị lệch'], ans: 0, ex: 'Ở bán cầu Bắc, lực Cô-ri-ô-lít làm vật chuyển động lệch về bên phải so với hướng chuyển động.' },
+          { q: 'Vào ngày hạ chí ở bán cầu Bắc (khoảng 22/6), khu vực này có đặc điểm gì?', opts: ['Ngày dài hơn đêm, góc nhập xạ lớn', 'Đêm dài suốt 24 giờ', 'Ngày ngắn nhất trong năm', 'Không nhận được ánh sáng Mặt Trời'], ans: 0, ex: 'Ngày 22/6 bán cầu Bắc ngả về phía Mặt Trời nên ngày dài hơn đêm và nhận nhiều nhiệt hơn.' },
+          { q: 'Thạch quyển gồm những thành phần nào?', opts: ['Vỏ Trái Đất và phần trên của lớp Manti', 'Toàn bộ đại dương và sông hồ', 'Tầng ô-zôn và tầng điện li', 'Chỉ gồm lớp đất mặt'], ans: 0, ex: 'Thạch quyển bao gồm vỏ Trái Đất và phần trên cứng chắc của lớp Manti.' },
+          { q: 'Khí quyển có vai trò gì quan trọng đối với sự sống trên Trái Đất?', opts: ['Cung cấp không khí cho sinh vật hô hấp, điều hòa nhiệt độ và che chắn bức xạ có hại', 'Tạo ra thủy triều đại dương', 'Hình thành các mảng kiến tạo lục địa', 'Làm ngừng chuyển động tự quay'], ans: 0, ex: 'Khí quyển duy trì sự sống, thời tiết, khí hậu và bảo vệ bề mặt Trái Đất.' },
+          { q: 'Quy luật thống nhất và hoàn chỉnh của lớp vỏ địa lí thể hiện ở điều gì?', opts: ['Mọi thành phần trong lớp vỏ địa lí đều có mối quan hệ phụ thuộc, tác động lẫn nhau; khi một thành phần biến đổi sẽ kéo theo các thành phần khác', 'Các quyển tồn tại tách rời hoàn toàn', 'Thay đổi khí hậu không ảnh hưởng gì tới sinh vật và đất', 'Chỉ có địa hình thay đổi'], ans: 0, ex: 'Lớp vỏ địa lí là một thể thống nhất hoàn chỉnh nên biến đổi ở một bộ phận sẽ tác động dây chuyền.' }
+        ]
+      },
+      {
+        id: 'exam_anh_10',
+        subject: 'Tiếng Anh',
+        title: 'Ôn kiểm tra Tiếng Anh 10 - Family Life & Environment',
+        durationMinutes: 25,
+        curriculum: 'Chương trình Tiếng Anh 10',
+        attemptRule: 'Không giới hạn lượt ôn',
+        questions: [
+          { q: 'Choose the best answer: My dad usually ______ the heavy lifting in our family.', opts: ['do', 'does', 'is doing', 'did'], ans: 1, ex: '"My dad" là ngôi thứ 3 số ít và có trạng từ tần suất "usually" -> dùng thì hiện tại đơn: does.' },
+          { q: 'Choose the best answer: Listen! Someone ______ the piano in the next room.', opts: ['plays', 'is playing', 'played', 'play'], ans: 1, ex: 'Dấu hiệu "Listen!" diễn tả hành động đang xảy ra ngay lúc nói -> hiện tại tiếp diễn: is playing.' },
+          { q: 'Choose the best answer: Doing housework helps children develop ______ skills.', opts: ['life', 'live', 'alive', 'lively'], ans: 0, ex: '"Life skills" là cụm từ cố định nghĩa là "kĩ năng sống".' },
+          { q: 'Choose the best answer: We should ______ plastic waste to protect the environment.', opts: ['increase', 'reduce', 'waste', 'destroy'], ans: 1, ex: '"Reduce plastic waste" nghĩa là giảm thiểu rác thải nhựa.' },
+          { q: 'Choose the best answer: A lot of trees ______ in our schoolyard every spring.', opts: ['plant', 'are planted', 'planted', 'is planting'], ans: 1, ex: 'Chủ ngữ "A lot of trees" chịu tác động của hành động trồng và có "every spring" -> bị động hiện tại đơn: are planted.' },
+          { q: 'Choose the best answer: She is capable ______ finishing the project on time.', opts: ['of', 'in', 'at', 'for'], ans: 0, ex: 'Cấu trúc "be capable of + V-ing" nghĩa là có khả năng làm gì.' },
+          { q: 'Choose the best answer: They ______ a volunteer campaign at the moment.', opts: ['run', 'are running', 'runs', 'ran'], ans: 1, ex: '"At the moment" là dấu hiệu của thì hiện tại tiếp diễn: are running.' },
+          { q: 'Choose the best answer: Air pollution is a serious ______ in big cities.', opts: ['issue', 'solution', 'benefit', 'habit'], ans: 0, ex: '"A serious issue" nghĩa là một vấn đề nghiêm trọng.' },
+          { q: 'Choose the best answer: Turn ______ the lights when you leave the room to save electricity.', opts: ['off', 'on', 'up', 'into'], ans: 0, ex: '"Turn off" nghĩa là tắt (đèn, thiết bị điện).' },
+          { q: 'Choose the best answer: My brother is interested ______ playing guitar in his free time.', opts: ['in', 'on', 'to', 'with'], ans: 0, ex: 'Cấu trúc "be interested in + V-ing" nghĩa là thích thú/quan tâm đến việc gì.' },
+          { q: 'Choose the best answer: Which word has the underlined part pronounced differently? (A: cat, B: map, C: name, D: hat)', opts: ['cat', 'map', 'name', 'hat'], ans: 2, ex: '"Name" có nguyên âm /eɪ/, trong khi cat, map, hat có âm /æ/.' },
+          { q: 'Choose the best answer: Which word has the underlined part pronounced differently? (A: clean, B: teach, C: bread, D: speak)', opts: ['clean', 'teach', 'bread', 'speak'], ans: 2, ex: '"Bread" phát âm là /e/, còn clean, teach, speak phát âm là /iː/.' },
+          { q: 'Choose the best answer: Sharing household chores makes family members feel ______.', opts: ['closer', 'farther', 'angrier', 'lonelier'], ans: 0, ex: 'Chia sẻ việc nhà giúp các thành viên gắn kết, gần gũi nhau hơn (closer).' },
+          { q: 'Choose the best answer: Solar energy and wind energy are ______ sources of energy.', opts: ['renewable', 'non-renewable', 'harmful', 'polluted'], ans: 0, ex: '"Renewable energy" là năng lượng tái tạo (mặt trời, gió...).' },
+          { q: 'Choose the best answer: I don\'t mind ______ you with your English homework.', opts: ['help', 'helping', 'to help', 'helped'], ans: 1, ex: 'Sau "don\'t mind" dùng danh động từ V-ing: helping.' },
+          { q: 'Choose the best answer: What time ______ the train leave tomorrow morning?', opts: ['do', 'does', 'is', 'has'], ans: 1, ex: 'Lịch trình tàu xe thường dùng thì hiện tại đơn; chủ ngữ "the train" số ít -> does.' },
+          { q: 'Choose the best answer: Recycling helps conserve natural ______.', opts: ['resources', 'problems', 'accidents', 'storms'], ans: 0, ex: '"Conserve natural resources" nghĩa là bảo tồn tài nguyên thiên nhiên.' },
+          { q: 'Choose the best answer: Lan is very ______; she always helps her classmates.', opts: ['helpful', 'selfish', 'lazy', 'careless'], ans: 0, ex: '"Helpful" nghĩa là hay giúp đỡ, có ích.' },
+          { q: 'Choose the best answer: We must ______ awareness of protecting endangered animals.', opts: ['raise', 'drop', 'hide', 'forget'], ans: 0, ex: '"Raise awareness" là cụm từ chuẩn nghĩa là nâng cao nhận thức.' },
+          { q: 'Choose the best answer: The students are preparing ______ the upcoming mid-term test.', opts: ['for', 'at', 'of', 'to'], ans: 0, ex: '"Prepare for something" nghĩa là chuẩn bị cho việc gì.' }
+        ]
+      }
+    ];
+
+    textInput.value = '';
       await fetchDeadlines();
     }
 
@@ -1407,6 +1699,7 @@
 
       updateProfileUI();
       renderExamCatalog();
+      renderClassGradesTable();
       fetchData();
       fetchDeadlines();
     }
@@ -1418,7 +1711,7 @@
       document.getElementById('profile-display-name').innerText = profile.name;
       document.getElementById('profile-email-txt').innerText = emailKey;
       document.getElementById('profile-avatar-preview').src = profile.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${profile.name}`;
-      
+
       const bioEl = document.getElementById('profile-bio-txt');
       bioEl.innerText = profile.bio ? `"${profile.bio}"` : 'Chưa có tiểu sử. Hãy cập nhật giới thiệu bản thân bên dưới!';
 
@@ -1556,9 +1849,9 @@
       const newContent = prompt("Sửa nội dung bài viết:", post.content || '');
       if (newContent === null) return;
 
-      const { error } = await sb.from('posts').update({ 
-        title: newTitle.trim() || 'Thảo luận chung', 
-        content: newContent.trim() 
+      const { error } = await sb.from('posts').update({
+        title: newTitle.trim() || 'Thảo luận chung',
+        content: newContent.trim()
       }).eq('id', postId);
 
       if (error) {
@@ -1594,7 +1887,7 @@
       const inputEl = document.getElementById(`comment-input-${postId}`);
       const fileInputEl = document.getElementById(`comment-file-${postId}`);
       let text = inputEl.value.trim();
-      
+
       if (!text && (!fileInputEl || fileInputEl.files.length === 0)) {
         alert("Vui lòng nhập nội dung bình luận hoặc chọn ảnh!");
         return;
@@ -1612,9 +1905,9 @@
           fileUrl = uploaded.url;
         }
 
-        const { error } = await sb.from('comments').insert([{ 
-          post_id: postId, 
-          user_email: normalizeEmail(currentUser.email), 
+        const { error } = await sb.from('comments').insert([{
+          post_id: postId,
+          user_email: normalizeEmail(currentUser.email),
           content: text,
           file_url: fileUrl,
           likes: []
@@ -1661,8 +1954,8 @@
       const newContent = prompt("Sửa nội dung bình luận:", comment.content || '');
       if (newContent === null || !newContent.trim()) return;
 
-      const { error } = await sb.from('comments').update({ 
-        content: newContent.trim() 
+      const { error } = await sb.from('comments').update({
+        content: newContent.trim()
       }).eq('id', commentId);
 
       if (error) {
@@ -1725,7 +2018,7 @@
 
       let filtered = allPosts.filter(post => {
         const matchCat = (catFilter === 'all') || (post.category === catFilter);
-        const matchKey = !keyword || 
+        const matchKey = !keyword ||
           (post.title && post.title.toLowerCase().includes(keyword)) ||
           (post.content && post.content.toLowerCase().includes(keyword)) ||
           (post.user_email && post.user_email.toLowerCase().includes(keyword));
@@ -1760,10 +2053,10 @@
         const postEmail = normalizeEmail(post.user_email);
         const author = getAuthorInfo(postEmail);
         const timeStr = new Date(post.created_at).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
-        
+
         const isPostEdited = editedItems[`post_${post.id}`];
         const editedPostHTML = isPostEdited ? `<span class="edited-tag">(đã chỉnh sửa)</span>` : '';
-        
+
         const likesList = Array.isArray(post.likes) ? post.likes.map(normalizeEmail) : [];
         const isLiked = likesList.includes(currentEmail);
         const isOwner = postEmail === currentEmail;
@@ -1805,13 +2098,13 @@
                 ${commentFileHTML}
               </div>
               <div class="comment-actions">
-                <button class="comment-btn ${isCLiked ? 'liked' : ''}" onclick="toggleCommentLike(${c.id})">
+                <button type="button" class="comment-btn ${isCLiked ? 'liked' : ''}" onclick="toggleCommentLike(${c.id})">
                   ${isCLiked ? '❤️' : '🤍'} ${cLikesList.length}
                 </button>
-                <button class="comment-btn" onclick="setReplyTo(${post.id}, '${escapeHTML(cAuthor.name).replace(/'/g, "\\'")}')">💬 Trả lời</button>
+                <button type="button" class="comment-btn" onclick="setReplyTo(${post.id}, '${escapeHTML(cAuthor.name).replace(/'/g, "\'")}')">💬 Trả lời</button>
                 ${isCommentOwner ? `
-                  <button class="comment-btn" onclick="editComment(${c.id})">✏️ Sửa</button>
-                  <button class="comment-btn" style="color: var(--danger);" onclick="deleteComment(${c.id})">🗑️ Xóa</button>
+                  <button type="button" class="comment-btn" onclick="editComment(${c.id})">✏️ Sửa</button>
+                  <button type="button" class="comment-btn" style="color: var(--danger);" onclick="deleteComment(${c.id})">🗑️ Xóa</button>
                 ` : ''}
               </div>
             </div>
@@ -1840,11 +2133,11 @@
               </div>
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 ${(isCurrentUserAdmin || isOwner) ? `
-                  <button class="btn-pin ${pinned ? 'active' : ''}" onclick="togglePinPost(${post.id}, ${pinned})">📌 ${pinned ? 'Bỏ ghim' : 'Ghim'}</button>
+                  <button type="button" class="btn-pin ${pinned ? 'active' : ''}" onclick="togglePinPost(${post.id}, ${pinned})">📌 ${pinned ? 'Bỏ ghim' : 'Ghim'}</button>
                 ` : ''}
                 ${isOwner ? `
-                  <button class="btn-warning" onclick="editPost(${post.id})">✏️ Sửa</button>
-                  <button class="btn-danger" onclick="deletePost(${post.id})">🗑️ Xóa</button>
+                  <button type="button" class="btn-warning" onclick="editPost(${post.id})">✏️ Sửa</button>
+                  <button type="button" class="btn-danger" onclick="deletePost(${post.id})">🗑️ Xóa</button>
                 ` : ''}
               </div>
             </div>
@@ -1854,10 +2147,10 @@
             ${attachmentHTML}
 
             <div class="post-actions">
-              <button class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+              <button type="button" class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
                 ${isLiked ? '❤️' : '🤍'} Thích (${likesList.length})
               </button>
-              <button class="action-btn" onclick="document.getElementById('comment-input-${post.id}').focus()">
+              <button type="button" class="action-btn" onclick="document.getElementById('comment-input-${post.id}').focus()">
                 💬 Bình luận (${postComments.length})
               </button>
             </div>
@@ -1868,7 +2161,7 @@
                 <input type="text" id="comment-input-${post.id}" placeholder="Viết bình luận..." onkeypress="if(event.key==='Enter') addComment(${post.id})" />
                 <label for="comment-file-${post.id}" style="font-size: 13px; cursor: pointer; color: var(--text-muted);" title="Đính kèm ảnh">📷 <span id="comment-file-name-${post.id}"></span></label>
                 <input type="file" id="comment-file-${post.id}" accept="image/*" style="display:none;" onchange="document.getElementById('comment-file-name-${post.id}').innerText = this.files[0] ? '1 ảnh' : ''" />
-                <button class="btn-ghost" onclick="addComment(${post.id})">Gửi</button>
+                <button type="button" class="btn-ghost" onclick="addComment(${post.id})">Gửi</button>
               </div>
             </div>
           </div>
