@@ -1792,9 +1792,14 @@
 
 .navbar,
 .k12-tabs-bar,
-.container,
-.profile-modal-backdrop {
+.container {
   position: relative;
+}
+
+.profile-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
 }
 
 .navbar {
@@ -1860,6 +1865,13 @@
         <button type="button" class="palette-swatch" data-swatch="emerald" onclick="setPalette('emerald')" aria-label="Màu Xanh Ngọc"></button>
         <button type="button" class="palette-swatch" data-swatch="rose" onclick="setPalette('rose')" aria-label="Màu Đỏ Hồng"></button>
         <button type="button" class="palette-swatch" data-swatch="amber" onclick="setPalette('amber')" aria-label="Màu Vàng Cam"></button>
+      </div>
+      <div class="bg-effect-switcher" title="Chọn hiệu ứng nền động">
+        <select id="bg-effect-select" onchange="setBgEffect(this.value)" aria-label="Hiệu ứng nền">
+          <option value="meteor">☄️ Sao băng</option>
+          <option value="rain">🌧️ Mưa rơi</option>
+          <option value="off">⏸️ Tắt nền</option>
+        </select>
       </div>
 
       <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 10px;">
@@ -2549,11 +2561,13 @@
 
     function openClassGradesModal() {
       document.getElementById('class-grades-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
       renderClassGradesTable();
     }
 
     function closeClassGradesModal() {
       document.getElementById('class-grades-modal').classList.add('hidden');
+      document.body.style.overflow = '';
     }
 
     function renderClassGradesTable() {
@@ -3995,6 +4009,7 @@
         if (currentMode === 'off') return;
         resizeCanvas();
         initParticlesForMode(currentMode);
+        ripples = [];
       });
 
       const savedBg = localStorage.getItem(BG_STORAGE_KEY) || 'meteor';
