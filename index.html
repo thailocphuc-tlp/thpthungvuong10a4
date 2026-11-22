@@ -46,6 +46,101 @@
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
+
+    :root[data-palette="ocean"] {
+      --primary: #0284c7;
+      --primary-light: rgba(2, 132, 199, 0.14);
+      --accent: #0ea5e9;
+      --accent-gradient: linear-gradient(135deg, #0056b3 0%, #0284c7 100%);
+      --border-glow: rgba(2, 132, 199, 0.28);
+    }
+
+    :root[data-palette="emerald"] {
+      --primary: #059669;
+      --primary-light: rgba(5, 150, 105, 0.14);
+      --accent: #10b981;
+      --accent-gradient: linear-gradient(135deg, #047857 0%, #10b981 100%);
+      --border-glow: rgba(16, 185, 129, 0.28);
+    }
+
+    :root[data-palette="rose"] {
+      --primary: #e11d48;
+      --primary-light: rgba(225, 29, 72, 0.14);
+      --accent: #f43f5e;
+      --accent-gradient: linear-gradient(135deg, #be123c 0%, #f43f5e 100%);
+      --border-glow: rgba(244, 63, 94, 0.28);
+    }
+
+    :root[data-palette="amber"] {
+      --primary: #d97706;
+      --primary-light: rgba(217, 119, 6, 0.14);
+      --accent: #f59e0b;
+      --accent-gradient: linear-gradient(135deg, #b45309 0%, #f59e0b 100%);
+      --border-glow: rgba(245, 158, 11, 0.28);
+    }
+
+    :root[data-theme="dark"][data-palette="ocean"] {
+      --primary: #38bdf8;
+      --primary-light: rgba(56, 189, 248, 0.15);
+      --accent: #38bdf8;
+      --accent-gradient: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
+      --border-glow: rgba(56, 189, 248, 0.3);
+    }
+
+    :root[data-theme="dark"][data-palette="emerald"] {
+      --primary: #34d399;
+      --primary-light: rgba(52, 211, 153, 0.15);
+      --accent: #10b981;
+      --accent-gradient: linear-gradient(135deg, #059669 0%, #14b8a6 100%);
+      --border-glow: rgba(52, 211, 153, 0.3);
+    }
+
+    :root[data-theme="dark"][data-palette="rose"] {
+      --primary: #fb7185;
+      --primary-light: rgba(251, 113, 133, 0.16);
+      --accent: #f43f5e;
+      --accent-gradient: linear-gradient(135deg, #e11d48 0%, #c026d3 100%);
+      --border-glow: rgba(251, 113, 133, 0.3);
+    }
+
+    :root[data-theme="dark"][data-palette="amber"] {
+      --primary: #fbbf24;
+      --primary-light: rgba(251, 191, 36, 0.16);
+      --accent: #f59e0b;
+      --accent-gradient: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+      --border-glow: rgba(251, 191, 36, 0.3);
+    }
+
+    .palette-switcher {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+    }
+
+    .palette-swatch {
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+    }
+
+    .palette-swatch[data-swatch="ocean"] { background: #0284c7; }
+    .palette-swatch[data-swatch="emerald"] { background: #10b981; }
+    .palette-swatch[data-swatch="rose"] { background: #f43f5e; }
+    .palette-swatch[data-swatch="amber"] { background: #f59e0b; }
+
+    .palette-swatch.active {
+      transform: scale(1.22);
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; transition: background-color 0.25s, color 0.25s, border-color 0.25s; }
     body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; padding-bottom: 70px; }
 
@@ -783,6 +878,13 @@
     <div class="nav-right">
       <a href="https://k12online.vn" target="_blank" rel="noopener noreferrer" class="btn-ghost">🔗 Mở K12 Online</a>
       <button class="btn-ghost" onclick="toggleTheme()" id="theme-btn">🌓 Giao diện</button>
+      <div class="palette-switcher" title="Chọn bảng màu giao diện">
+        <button type="button" class="palette-swatch active" data-swatch="ocean" onclick="setPalette('ocean')" aria-label="Màu Xanh Biển"></button>
+        <button type="button" class="palette-swatch" data-swatch="emerald" onclick="setPalette('emerald')" aria-label="Màu Xanh Ngọc"></button>
+        <button type="button" class="palette-swatch" data-swatch="rose" onclick="setPalette('rose')" aria-label="Màu Đỏ Hồng"></button>
+        <button type="button" class="palette-swatch" data-swatch="amber" onclick="setPalette('amber')" aria-label="Màu Vàng Cam"></button>
+      </div>
+
       <div id="nav-user-info" class="hidden" style="display: flex; align-items: center; gap: 10px;">
         <span id="display-username" onclick="openUserProfileModal(currentUser?.email)" style="font-size: 13px; color: var(--text-main); font-weight: 700; cursor: pointer;" title="Xem hồ sơ cá nhân của bạn"></span>
         <button class="btn-danger" onclick="handleLogout()">Đăng xuất</button>
@@ -2602,6 +2704,42 @@
 
       document.addEventListener('pointermove', updateLight, { passive: true });
     })();
+
+    const THEME_STORAGE_KEY = 'portal_10a4_theme';
+    const PALETTE_STORAGE_KEY = 'portal_10a4_palette';
+    const VALID_PALETTES = ['ocean', 'emerald', 'rose', 'amber'];
+
+    function applyTheme(theme) {
+      const nextTheme = theme === 'dark' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', nextTheme);
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      const btn = document.getElementById('theme-btn');
+      if (btn) {
+        btn.innerText = nextTheme === 'dark' ? '☀️ Sáng' : '🌙 Tối';
+      }
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    function setPalette(palette) {
+      const nextPalette = VALID_PALETTES.includes(palette) ? palette : 'ocean';
+      document.documentElement.setAttribute('data-palette', nextPalette);
+      localStorage.setItem(PALETTE_STORAGE_KEY, nextPalette);
+      document.querySelectorAll('.palette-swatch').forEach(el => {
+        el.classList.toggle('active', el.getAttribute('data-swatch') === nextPalette);
+      });
+    }
+
+    (function initAppearanceSettings() {
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || document.documentElement.getAttribute('data-theme') || 'light';
+      const savedPalette = localStorage.getItem(PALETTE_STORAGE_KEY) || 'ocean';
+      applyTheme(savedTheme);
+      setPalette(savedPalette);
+    })();
+
 </script>
 </body>
 </html>
