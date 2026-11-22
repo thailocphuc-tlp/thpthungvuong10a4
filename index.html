@@ -265,33 +265,39 @@
       box-shadow: 0 0 0 2px var(--primary);
     }
 
-    /* Segmented Tab Bar — Thanh tab hộp bo góc sắc cạnh kiểu dock */
+    /* Pill Tab Bar — Thanh tab bo tròn mềm mại */
     .k12-tabs-bar {
       background: var(--bg-card);
       border: 1.5px solid var(--border-strong);
-      border-radius: 14px;
+      border-radius: 9999px;
       max-width: 1040px;
       margin: 14px auto 0;
-      padding: 5px;
+      padding: 6px;
       position: sticky;
       top: 72px;
       z-index: 100;
       display: flex;
       justify-content: space-between;
-      gap: 5px;
+      align-items: center;
+      gap: 6px;
       overflow-x: auto;
+      scrollbar-width: none;
       box-shadow: var(--shadow);
+    }
+
+    .k12-tabs-bar::-webkit-scrollbar {
+      display: none;
     }
 
     .k12-tab {
       flex: 1;
-      padding: 10px 14px;
+      padding: 10px 18px;
       font-size: 13px;
       font-weight: 700;
       color: var(--text-muted);
       background: transparent;
       border: 1px solid transparent;
-      border-radius: 10px;
+      border-radius: 9999px;
       cursor: pointer;
       white-space: nowrap;
       display: inline-flex;
